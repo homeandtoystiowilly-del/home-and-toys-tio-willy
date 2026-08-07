@@ -122,6 +122,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
   const handleLogout = async () => {
     try {
       await logoutAction();
+      router.push('/');
       router.refresh();
     } catch (err) {
       console.error('Error al cerrar sesión', err);
