@@ -637,7 +637,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                   return (
                     <div 
                       key={prod._id}
-                      className="group flex flex-col sm:flex-row gap-4 items-center bg-[#0d0d0f] border border-zinc-900 rounded-2xl p-4 relative hover:border-zinc-800 transition-colors"
+                      className="group flex flex-col sm:flex-row gap-4 items-start sm:items-center bg-[#0d0d0f] border border-zinc-900 rounded-2xl p-4 relative hover:border-zinc-800 transition-colors"
                     >
                       {/* Miniatura de Imagen con Badge +N */}
                       <div className="relative w-16 h-16 rounded-xl bg-zinc-900 overflow-hidden flex-shrink-0 border border-zinc-800">
@@ -657,7 +657,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                       <div className="flex-1 w-full min-w-0">
                         <div className="flex justify-between items-start gap-4">
                           <div>
-                            <h3 className="font-bold text-white text-sm tracking-wide truncate pr-4 max-w-[240px]" title={prod.name}>
+                            <h3 className="font-bold text-white text-sm tracking-wide truncate pr-6" title={prod.name}>
                               {prod.name}
                             </h3>
                             <span className="text-[10px] uppercase tracking-wider text-red-500 font-bold mt-0.5 block">

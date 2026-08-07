@@ -232,6 +232,7 @@ export default function Catalog({
   const [selectedCategory, setSelectedCategory] = useState<string>('todos');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const ITEMS_PER_PAGE = 6;
 
   // Filtrar productos por Categoría y Búsqueda de Texto
@@ -267,7 +268,165 @@ export default function Catalog({
   }, [selectedCategory, searchQuery]);
 
   return (
-    <div className="min-h-screen bg-black text-white font-sans selection:bg-red-500 selection:text-white">
+    <div className="min-h-screen bg-black text-white font-sans selection:bg-red-500 selection:text-white relative">
+      {/* Sticky Top Navbar */}
+      <nav className="sticky top-0 z-30 w-full bg-black/85 border-b border-zinc-900/60 backdrop-blur-md py-4 transition-all">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+          {/* Logo compact */}
+          <a href="#" className="flex items-center gap-2.5 group">
+            <svg className="w-6.5 h-6.5 text-red-500 group-hover:scale-105 transition-transform" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M50 85C42 77 15 54 15 37C15 17 31 5 50 5C69 5 85 17 85 37C85 54 58 77 50 85Z" stroke="#FF2D2D" strokeWidth="8"/>
+              <path d="M38 48V62H62V48M32 48L50 32L68 48" stroke="#FF2D2D" strokeWidth="7"/>
+              <rect x="46" y="52" width="8" height="10" fill="#FF2D2D" />
+            </svg>
+            <span className="font-black tracking-widest text-xs uppercase leading-none block text-white font-sans">
+              HOME & TOYS <span className="text-red-500 font-bold block text-[8px] tracking-[0.2em] mt-0.5">Tío Willy</span>
+            </span>
+          </a>
+
+          {/* Desktop Navigation Links */}
+          <div className="hidden md:flex items-center gap-6">
+            <button 
+              onClick={() => { setSelectedCategory('todos'); document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' }); }} 
+              className={`text-xs font-bold uppercase tracking-widest transition-colors cursor-pointer ${selectedCategory === 'todos' ? 'text-red-500' : 'text-zinc-400 hover:text-white'}`}
+            >
+              Todos
+            </button>
+            {initialCategorias.map((cat) => (
+              <button
+                key={cat._id}
+                onClick={() => { setSelectedCategory(cat._id); document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' }); }}
+                className={`text-xs font-bold uppercase tracking-widest transition-colors cursor-pointer ${selectedCategory === cat._id ? 'text-red-500' : 'text-zinc-400 hover:text-white'}`}
+              >
+                {cat.name}
+              </button>
+            ))}
+          </div>
+
+          {/* Contact / Drawer Trigger */}
+          <div className="flex items-center gap-3">
+            <a 
+              href="https://wa.me/5491122334455"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-2 rounded-full bg-red-950/40 border border-red-500/30 hover:bg-red-650 hover:text-white text-red-500 text-xs font-bold transition-all uppercase tracking-wider"
+            >
+              WhatsApp
+            </a>
+
+            {/* Mobile Hamburger Button */}
+            <button
+              onClick={() => setIsDrawerOpen(true)}
+              className="md:hidden p-2 text-zinc-400 hover:text-white hover:bg-zinc-900 rounded-xl transition-colors focus:outline-none cursor-pointer"
+              aria-label="Abrir menú móvil"
+            >
+              <svg className="w-5.5 h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 6h16M4 12h16m-7 6h7" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      {/* Mobile Drawer (Menu Lateral) */}
+      <div className={`fixed inset-0 z-50 transition-all duration-300 ${isDrawerOpen ? 'visible' : 'invisible'}`}>
+        {/* Backdrop (fondo oscuro semitransparente) */}
+        <div 
+          onClick={() => setIsDrawerOpen(false)}
+          className={`absolute inset-0 bg-black/70 backdrop-blur-sm transition-opacity duration-300 ${isDrawerOpen ? 'opacity-100' : 'opacity-0'}`}
+        ></div>
+
+        {/* Panel lateral */}
+        <div className={`absolute inset-y-0 right-0 w-80 max-w-[85%] bg-zinc-950 border-l border-zinc-900 p-6 flex flex-col gap-6 shadow-2xl transition-transform duration-300 transform ${isDrawerOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+          {/* Cabecera del menú */}
+          <div className="flex items-center justify-between">
+            <span className="font-extrabold tracking-widest text-[10px] uppercase text-zinc-500">Navegación / Filtros</span>
+            <button
+              onClick={() => setIsDrawerOpen(false)}
+              className="p-2 text-zinc-500 hover:text-white hover:bg-zinc-900 rounded-xl transition-colors cursor-pointer"
+              aria-label="Cerrar menú móvil"
+            >
+              <svg className="w-5.5 h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Buscador dentro del menú móvil */}
+          <div className="flex flex-col gap-2">
+            <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Búsqueda rápida</h4>
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Buscar productos..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 bg-zinc-900 border border-zinc-800 rounded-xl focus:border-red-500/80 text-white placeholder-zinc-500 focus:outline-none transition-all text-xs"
+              />
+              <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+          </div>
+
+          {/* Categorías dentro del menú móvil */}
+          <div className="flex flex-col gap-2">
+            <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Categorías</h4>
+            <div className="flex flex-col gap-2 max-h-[360px] overflow-y-auto pr-1">
+              <button
+                onClick={() => { setSelectedCategory('todos'); setIsDrawerOpen(false); document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' }); }}
+                className={`w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold transition-all text-xs ${
+                  selectedCategory === 'todos'
+                    ? 'bg-red-650 text-white shadow-lg shadow-red-950/20'
+                    : 'bg-zinc-900 text-zinc-400 hover:text-white'
+                }`}
+              >
+                <span>Todos los productos</span>
+                <span className={`text-[10px] px-2 py-0.5 rounded-full ${selectedCategory === 'todos' ? 'bg-red-750 text-white' : 'bg-zinc-850 text-zinc-650 font-bold'}`}>
+                  {categoryCounts.todos}
+                </span>
+              </button>
+
+              {initialCategorias.map((cat: Category) => {
+                const isActive = selectedCategory === cat._id;
+                const count = categoryCounts[cat._id] || 0;
+                return (
+                  <button
+                    key={cat._id}
+                    onClick={() => { setSelectedCategory(cat._id); setIsDrawerOpen(false); document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' }); }}
+                    className={`w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold transition-all text-xs ${
+                      isActive
+                        ? 'bg-red-650 text-white shadow-lg shadow-red-950/20'
+                        : 'bg-zinc-900 text-zinc-400 hover:text-white'
+                    }`}
+                  >
+                    <span>{cat.name}</span>
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full ${isActive ? 'bg-red-750 text-white' : 'bg-zinc-850 text-zinc-650 font-bold'}`}>
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="h-[1px] bg-zinc-900"></div>
+
+          {/* Información de contacto */}
+          <div className="mt-auto flex flex-col gap-3">
+            <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest block text-center">Atención al Cliente</span>
+            <a
+              href="https://wa.me/5491122334455"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full py-3 bg-red-650 hover:bg-red-650 border border-red-550/20 text-white rounded-xl font-bold text-center text-xs transition-colors"
+            >
+              📞 +54 9 11 2233 4455
+            </a>
+          </div>
+        </div>
+      </div>
+
       {/* Header / Hero */}
       <header className="relative w-full py-16 md:py-24 overflow-hidden flex flex-col items-center justify-center border-b border-zinc-900 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-red-950/20 via-black to-black">
         {/* Luces de ambiente traseras */}
@@ -297,7 +456,7 @@ export default function Catalog({
         <div className="flex flex-col lg:flex-row gap-8 lg:items-start">
           
           {/* Columna Izquierda: Filtros de Categoría y Buscador */}
-          <aside className="w-full lg:w-80 flex flex-col gap-6 lg:sticky lg:top-8 z-20">
+          <aside className="w-full lg:w-80 flex flex-col gap-6 lg:sticky lg:top-8 z-20 hidden lg:flex">
             {/* Buscador */}
             <div className="p-6 rounded-3xl bg-zinc-950/90 border border-zinc-900 flex flex-col gap-3 shadow-xl shadow-black/50 backdrop-blur-md">
               <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Búsqueda</h4>
@@ -366,7 +525,23 @@ export default function Catalog({
           </aside>
 
           {/* Columna Derecha: Catálogo de Productos y Paginación */}
-          <div className="flex-1 flex flex-col gap-10">
+          <div className="flex-1 flex flex-col gap-8 lg:gap-10">
+            {/* Mobile Filter & Search Button Trigger */}
+            <div className="lg:hidden flex items-center justify-between bg-zinc-950 border border-zinc-900 rounded-3xl p-4 shadow-lg shadow-black/40">
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Catálogo</span>
+                <span className="text-xs font-black text-white">{filteredProducts.length} Productos</span>
+              </div>
+              <button
+                onClick={() => setIsDrawerOpen(true)}
+                className="flex items-center gap-2 px-4 py-2.5 bg-red-650 hover:bg-red-550 active:bg-red-750 text-white rounded-xl font-bold text-xs transition-colors cursor-pointer shadow-lg shadow-red-950/20"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                </svg>
+                Filtrar y Buscar
+              </button>
+            </div>
             {/* Grid de Productos */}
             {paginatedProducts.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
