@@ -113,7 +113,12 @@ export async function createProductAction(formData: FormData) {
           });
           uploadedUrls.push(result.secure_url);
         } else {
-          usingFallbackImages = true;
+          // Si no está Cloudinary, convertimos la imagen a Base64 para guardarla directamente en MongoDB
+          const arrayBuffer = await file.arrayBuffer();
+          const buffer = Buffer.from(arrayBuffer);
+          const base64 = buffer.toString('base64');
+          const dataUrl = `data:${file.type};base64,${base64}`;
+          uploadedUrls.push(dataUrl);
         }
       }
     }
