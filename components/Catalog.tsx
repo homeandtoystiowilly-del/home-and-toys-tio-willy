@@ -87,7 +87,7 @@ export function ProductCard({ product }: { product: Product }) {
   const currentVariety = product.varieties[activeIdx] || product.varieties[0];
 
   // Enlace de WhatsApp
-  const phone = '5491122334455'; // Reemplazar con el número del cliente
+  const phone = '584244576086'; // Número del cliente
   const textMessage = `Hola Tío Willy, me interesa consultar por el producto:\n\n*${product.name}*\n- *Variedad:* ${currentVariety}\n- *Precio Detal:* $${product.priceDetal.toFixed(2)}\n- *Precio Mayor:* $${product.priceMayor.toFixed(2)} (A partir de ${product.minMayor} unidades)\n\n¿Tienen stock disponible?`;
   const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(textMessage)}`;
 
@@ -306,7 +306,7 @@ export default function Catalog({
           {/* Contact / Drawer Trigger */}
           <div className="flex items-center gap-3">
             <a 
-              href="https://wa.me/5491122334455"
+              href="https://wa.me/584244576086"
               target="_blank"
               rel="noopener noreferrer"
               className="px-4 py-2 rounded-full bg-red-950/40 border border-red-500/30 hover:bg-red-650 hover:text-white text-red-500 text-xs font-bold transition-all uppercase tracking-wider"
@@ -416,12 +416,12 @@ export default function Catalog({
           <div className="mt-auto flex flex-col gap-3">
             <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest block text-center">Atención al Cliente</span>
             <a
-              href="https://wa.me/5491122334455"
+              href="https://wa.me/584244576086"
               target="_blank"
               rel="noopener noreferrer"
               className="w-full py-3 bg-red-650 hover:bg-red-650 border border-red-550/20 text-white rounded-xl font-bold text-center text-xs transition-colors"
             >
-              📞 +54 9 11 2233 4455
+              📞 +58 424 457 6086
             </a>
           </div>
         </div>
