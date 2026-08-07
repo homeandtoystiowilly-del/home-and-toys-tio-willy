@@ -14,8 +14,8 @@ export default async function AdminPage() {
   const session = cookieStore.get('admin_session')?.value;
   const isAuthorized = session === 'session_active';
 
-  // Obtener las categorías dinámicas (creadas en la base de datos o fallback)
-  const { categorias } = await seedDatabase();
+  // Obtener las categorías y productos dinámicos (creados en la base de datos o fallback)
+  const { categorias, productos } = await seedDatabase();
 
-  return <AdminClient isAuthorized={isAuthorized} categories={categorias} />;
+  return <AdminClient isAuthorized={isAuthorized} categories={categorias} initialProducts={productos} />;
 }

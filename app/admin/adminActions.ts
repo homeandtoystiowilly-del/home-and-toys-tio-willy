@@ -4,6 +4,7 @@ import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 import { v2 as cloudinary } from 'cloudinary';
 import clientPromise from '@/lib/stitch';
+import { ObjectId } from 'mongodb';
 
 // Configurar Cloudinary
 cloudinary.config({
@@ -171,5 +172,128 @@ export async function createProductAction(formData: FormData) {
   } catch (error: any) {
     console.error('Error al guardar el producto:', error);
     return { success: false, error: error.message || 'Error interno del servidor al crear el producto.' };
+  }
+}
+
+// Acción para crear una categoría manualmente
+export async function createCategoryAction(name: string) {
+  try {
+    const cookieStore = await cookies();
+    const session = cookieStore.get('admin_session')?.value;
+    if (session !== 'session_active') {
+      return { success: false, error: 'No autorizado.' };
+    }
+
+    if (!name || name.trim().length === 0) {
+      return { success: false, error: 'El nombre de la categoría no puede estar vacío.' };
+    }
+
+    const newCategoryId = name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '_');
+    
+    const client = await clientPromise;
+    const db = client.db('tio_willy_db');
+
+    const existingCategory = await (db.collection('categorias') as any).findOne({ _id: newCategoryId });
+    if (existingCategory) {
+      return { success: false, error: 'La categoría ya existe.' };
+    }
+
+    await (db.collection('categorias') as any).insertOne({
+      _id: newCategoryId,
+      name: name.trim()
+    });
+
+    revalidatePath('/');
+    revalidatePath('/admin');
+
+    return { success: true, categoryId: newCategoryId, message: 'Categoría agregada con éxito.' };
+  } catch (error: any) {
+    console.error('Error al crear categoría:', error);
+    return { success: false, error: error.message || 'Error al guardar la categoría.' };
+  }
+}
+
+// Acción para eliminar una categoría
+export async function deleteCategoryAction(id: string) {
+  try {
+    const cookieStore = await cookies();
+    const session = cookieStore.get('admin_session')?.value;
+    if (session !== 'session_active') {
+      return { success: false, error: 'No autorizado.' };
+    }
+
+    const client = await clientPromise;
+    const db = client.db('tio_willy_db');
+
+    // Eliminar la categoría
+    await (db.collection('categorias') as any).deleteOne({ _id: id });
+
+    revalidatePath('/');
+    revalidatePath('/admin');
+
+    return { success: true, message: 'Categoría eliminada con éxito.' };
+  } catch (error: any) {
+    console.error('Error al eliminar categoría:', error);
+    return { success: false, error: error.message || 'Error al eliminar la categoría.' };
+  }
+}
+
+// Acción para eliminar un producto
+export async function deleteProductAction(id: string) {
+  try {
+    const cookieStore = await cookies();
+    const session = cookieStore.get('admin_session')?.value;
+    if (session !== 'session_active') {
+      return { success: false, error: 'No autorizado.' };
+    }
+
+    const client = await clientPromise;
+    const db = client.db('tio_willy_db');
+
+    await db.collection('productos').deleteOne({ _id: new ObjectId(id) });
+
+    revalidatePath('/');
+    revalidatePath('/admin');
+
+    return { success: true, message: 'Producto eliminado con éxito.' };
+  } catch (error: any) {
+    console.error('Error al eliminar producto:', error);
+    return { success: false, error: error.message || 'Error al eliminar el producto.' };
+  }
+}
+
+// Acción para actualizar los precios de un producto de forma in-line
+export async function updateProductPricesAction(id: string, priceDetal: number, priceMayor: number) {
+  try {
+    const cookieStore = await cookies();
+    const session = cookieStore.get('admin_session')?.value;
+    if (session !== 'session_active') {
+      return { success: false, error: 'No autorizado.' };
+    }
+
+    if (isNaN(priceDetal) || isNaN(priceMayor)) {
+      return { success: false, error: 'Precios inválidos.' };
+    }
+
+    const client = await clientPromise;
+    const db = client.db('tio_willy_db');
+
+    await db.collection('productos').updateOne(
+      { _id: new ObjectId(id) },
+      { 
+        $set: { 
+          priceDetal: priceDetal, 
+          priceMayor: priceMayor 
+        } 
+      }
+    );
+
+    revalidatePath('/');
+    revalidatePath('/admin');
+
+    return { success: true, message: 'Precios actualizados con éxito.' };
+  } catch (error: any) {
+    console.error('Error al actualizar precios:', error);
+    return { success: false, error: error.message || 'Error al actualizar precios.' };
   }
 }
