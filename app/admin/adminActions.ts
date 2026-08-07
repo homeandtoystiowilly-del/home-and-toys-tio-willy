@@ -13,6 +13,16 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+const DB_ERROR_FRIENDLY = 'No se pudo conectar a la base de datos MongoDB. Asegúrate de configurar la variable de entorno STITCH_DB_URI en tu panel de control de Vercel con tu cadena de conexión real.';
+
+function getFriendlyError(error: any, defaultMsg: string) {
+  const errMsg = error?.message || '';
+  if (errMsg.includes('STITCH_DB_URI') || errMsg.includes('ConnectionString') || errMsg.includes('scheme') || errMsg.includes('MongoParseError') || errMsg.includes('connect')) {
+    return DB_ERROR_FRIENDLY;
+  }
+  return errMsg || defaultMsg;
+}
+
 // Acción para verificar la contraseña y crear la sesión del administrador
 export async function verifyPasswordAction(password: string) {
   const adminPassword = process.env.ADMIN_PASSWORD || 'adminwilly';
@@ -171,7 +181,7 @@ export async function createProductAction(formData: FormData) {
 
   } catch (error: any) {
     console.error('Error al guardar el producto:', error);
-    return { success: false, error: error.message || 'Error interno del servidor al crear el producto.' };
+    return { success: false, error: getFriendlyError(error, 'Error interno del servidor al crear el producto.') };
   }
 }
 
@@ -209,7 +219,7 @@ export async function createCategoryAction(name: string) {
     return { success: true, categoryId: newCategoryId, message: 'Categoría agregada con éxito.' };
   } catch (error: any) {
     console.error('Error al crear categoría:', error);
-    return { success: false, error: error.message || 'Error al guardar la categoría.' };
+    return { success: false, error: getFriendlyError(error, 'Error al guardar la categoría.') };
   }
 }
 
@@ -234,7 +244,7 @@ export async function deleteCategoryAction(id: string) {
     return { success: true, message: 'Categoría eliminada con éxito.' };
   } catch (error: any) {
     console.error('Error al eliminar categoría:', error);
-    return { success: false, error: error.message || 'Error al eliminar la categoría.' };
+    return { success: false, error: getFriendlyError(error, 'Error al eliminar la categoría.') };
   }
 }
 
@@ -258,7 +268,7 @@ export async function deleteProductAction(id: string) {
     return { success: true, message: 'Producto eliminado con éxito.' };
   } catch (error: any) {
     console.error('Error al eliminar producto:', error);
-    return { success: false, error: error.message || 'Error al eliminar el producto.' };
+    return { success: false, error: getFriendlyError(error, 'Error al eliminar el producto.') };
   }
 }
 
@@ -294,6 +304,6 @@ export async function updateProductPricesAction(id: string, priceDetal: number, 
     return { success: true, message: 'Precios actualizados con éxito.' };
   } catch (error: any) {
     console.error('Error al actualizar precios:', error);
-    return { success: false, error: error.message || 'Error al actualizar precios.' };
+    return { success: false, error: getFriendlyError(error, 'Error al actualizar precios.') };
   }
 }
