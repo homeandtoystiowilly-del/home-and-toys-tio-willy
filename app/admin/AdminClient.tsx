@@ -9,7 +9,8 @@ import {
   createCategoryAction,
   deleteCategoryAction,
   deleteProductAction,
-  updateProductPricesAction 
+  updateProductPricesAction,
+  updateProductAction 
 } from './adminActions';
 
 // Interfaces locales coincidentes con Catalog.tsx
@@ -133,6 +134,10 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
   // Estado para indicar si se está guardando algún cambio de precio en la lista
   const [priceSavingId, setPriceSavingId] = useState<string | null>(null);
 
+  // Estados de edición de productos
+  const [editingProductId, setEditingProductId] = useState<string | null>(null);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Auto-seleccionar primera categoría si cambia
@@ -210,7 +215,51 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
     setSelectedFiles((prev) => prev.filter((_, idx) => idx !== idxToRemove));
   };
 
-  // Agregar Producto
+  // Iniciar edición de un producto
+  const handleStartEdit = (product: Product) => {
+    setEditingProductId(product._id);
+    setName(product.name);
+    setDescription(product.description);
+    setCategory(product.category);
+    setPriceDetal(product.priceDetal.toString());
+    setPriceMayor(product.priceMayor.toString());
+    setMinMayor(product.minMayor.toString());
+    setVarieties(product.varieties.join(', '));
+    setExistingImages(product.images || []);
+    
+    // Limpiar archivos locales recién seleccionados para evitar mezclas involuntarias
+    setSelectedFiles([]);
+    setPreviewUrls([]);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+
+    // Hacer scroll suave hacia el formulario (izquierda) en móviles
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Cancelar la edición
+  const handleCancelEdit = () => {
+    setEditingProductId(null);
+    setName('');
+    setDescription('');
+    setCategory(categories[0]?._id || '');
+    setPriceDetal('');
+    setPriceMayor('');
+    setMinMayor('3');
+    setVarieties('Estándar');
+    setExistingImages([]);
+    setSelectedFiles([]);
+    setPreviewUrls([]);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+    setSuccessMsg('');
+    setErrorMsg('');
+  };
+
+  // Quitar una imagen activa de las ya subidas
+  const handleRemoveExistingImage = (idxToRemove: number) => {
+    setExistingImages((prev) => prev.filter((_, idx) => idx !== idxToRemove));
+  };
+
+  // Guardar (Agregar o Actualizar) Producto
   const handleAddProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitLoading(true);
@@ -232,15 +281,25 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
     formData.append('minMayor', minMayor);
     formData.append('varieties', varieties);
     
+    if (editingProductId) {
+      formData.append('existingImages', JSON.stringify(existingImages));
+    }
+
     selectedFiles.forEach((file) => {
       formData.append('images', file);
     });
 
     try {
-      const res = await createProductAction(formData);
+      let res;
+      if (editingProductId) {
+        res = await updateProductAction(editingProductId, formData);
+      } else {
+        res = await createProductAction(formData);
+      }
+
       if (res.success) {
         setSuccessMsg(res.message || 'Producto guardado con éxito.');
-        // Limpiar formulario
+        // Limpiar formulario / salir de edición
         setName('');
         setDescription('');
         setPriceDetal('');
@@ -249,6 +308,8 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
         setVarieties('Estándar');
         setSelectedFiles([]);
         setPreviewUrls([]);
+        setExistingImages([]);
+        setEditingProductId(null);
         if (fileInputRef.current) fileInputRef.current.value = '';
         router.refresh(); // Sincroniza con el servidor
       } else {
@@ -437,8 +498,14 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
             {/* 1. Nuevo Producto Form Card */}
             <div className="p-6 rounded-3xl bg-zinc-950 border border-zinc-900 shadow-xl shadow-black/60 flex flex-col gap-6">
               <div>
-                <h2 className="text-xl font-bold tracking-wide text-white">Nuevo producto</h2>
-                <p className="text-zinc-500 text-xs mt-1">Sube una o varias imágenes desde tu ordenador y completa los datos.</p>
+                <h2 className="text-xl font-bold tracking-wide text-white">
+                  {editingProductId ? 'Editar producto' : 'Nuevo producto'}
+                </h2>
+                <p className="text-zinc-500 text-xs mt-1">
+                  {editingProductId 
+                    ? 'Modifica los campos del producto y guarda los cambios.' 
+                    : 'Sube una o varias imágenes desde tu ordenador y completa los datos.'}
+                </p>
               </div>
 
               {successMsg && (
@@ -479,19 +546,41 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                     className="hidden"
                   />
 
-                  {/* Listado de miniaturas con botón eliminar individual */}
-                  {previewUrls.length > 0 && (
+                  {/* Listado de miniaturas (Existentes y Nuevas) */}
+                  {(existingImages.length > 0 || previewUrls.length > 0) && (
                     <div className="mt-2.5 flex flex-wrap gap-2.5">
+                      {/* Imágenes Activas Existentes */}
+                      {existingImages.map((url, idx) => (
+                        <div key={`existing-${idx}`} className="relative w-14 h-14 rounded-xl border border-zinc-900 bg-zinc-900 group/thumb">
+                          <img src={url} alt="existing" className="w-full h-full object-cover rounded-xl opacity-80" />
+                          <span className="absolute bottom-0 right-0 bg-red-950/90 text-red-500 font-mono font-bold text-[8px] px-1 rounded-tl-lg uppercase">
+                            Activa
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveExistingImage(idx)}
+                            className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-red-650 hover:bg-red-500 text-white flex items-center justify-center transition-all duration-200 cursor-pointer shadow-md focus:outline-none"
+                            title="Quitar imagen actual"
+                          >
+                            <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                      ))}
+
+                      {/* Imágenes Nuevas (Previsualización local) */}
                       {previewUrls.map((url, idx) => (
-                        <div key={idx} className="relative w-14 h-14 rounded-xl border border-zinc-900 bg-zinc-900 group/thumb">
+                        <div key={`new-${idx}`} className="relative w-14 h-14 rounded-xl border border-zinc-900 bg-zinc-900 group/thumb">
                           <img src={url} alt="mini" className="w-full h-full object-cover rounded-xl" />
-                          <span className="absolute bottom-0 right-0 bg-zinc-950/80 text-zinc-500 font-mono font-bold text-[8px] px-1 rounded-tl-lg">
-                            +{idx + 1}
+                          <span className="absolute bottom-0 right-0 bg-zinc-950/80 text-zinc-500 font-mono font-bold text-[8px] px-1 rounded-tl-lg uppercase">
+                            Nueva
                           </span>
                           <button
                             type="button"
                             onClick={() => handleRemoveFile(idx)}
                             className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-red-650 hover:bg-red-500 text-white flex items-center justify-center transition-all duration-200 cursor-pointer shadow-md focus:outline-none"
+                            title="Quitar imagen nueva"
                           >
                             <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M6 18L18 6M6 6l12 12" />
@@ -603,22 +692,46 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                   />
                 </div>
 
-                <button
-                  type="submit"
-                  disabled={submitLoading}
-                  className="mt-2 w-full py-3 px-4 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-                >
-                  {submitLoading ? (
-                    'Agregando...'
-                  ) : (
-                    <>
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 4v16m8-8H4" />
-                      </svg>
-                      Agregar producto
-                    </>
+                <div className="flex flex-col gap-2 mt-2">
+                  <button
+                    type="submit"
+                    disabled={submitLoading}
+                    className="w-full py-3 px-4 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                  >
+                    {submitLoading ? (
+                      editingProductId ? 'Actualizando...' : 'Agregando...'
+                    ) : (
+                      <>
+                        {editingProductId ? (
+                          <>
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+                            </svg>
+                            Actualizar producto
+                          </>
+                        ) : (
+                          <>
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 4v16m8-8H4" />
+                            </svg>
+                            Agregar producto
+                          </>
+                        )}
+                      </>
+                    )}
+                  </button>
+
+                  {editingProductId && (
+                    <button
+                      type="button"
+                      onClick={handleCancelEdit}
+                      disabled={submitLoading}
+                      className="w-full py-2.5 px-4 bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 text-zinc-400 hover:text-white rounded-xl font-bold transition-all cursor-pointer text-sm"
+                    >
+                      Cancelar edición
+                    </button>
                   )}
-                </button>
+                </div>
               </form>
             </div>
 
@@ -760,16 +873,30 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                         </div>
                       </div>
 
-                      {/* Botón para Eliminar Producto (Trash Can) */}
-                      <button
-                        onClick={() => handleDeleteProduct(prod._id)}
-                        className="absolute sm:relative top-4 right-4 sm:top-auto sm:right-auto w-8 h-8 rounded-full bg-zinc-900 hover:bg-red-950/60 text-zinc-650 hover:text-red-500 flex items-center justify-center transition-colors cursor-pointer focus:outline-none border border-zinc-850"
-                        title="Eliminar producto"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </button>
+                      {/* Botones de Acción */}
+                      <div className="absolute sm:relative top-4 right-4 sm:top-auto sm:right-auto flex sm:flex-row gap-2">
+                        {/* Botón para Editar Producto (Pencil) */}
+                        <button
+                          onClick={() => handleStartEdit(prod)}
+                          className="w-8 h-8 rounded-full bg-zinc-900 hover:bg-zinc-800 hover:text-red-400 text-zinc-500 flex items-center justify-center transition-colors cursor-pointer focus:outline-none border border-zinc-850"
+                          title="Editar producto"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                          </svg>
+                        </button>
+
+                        {/* Botón para Eliminar Producto (Trash Can) */}
+                        <button
+                          onClick={() => handleDeleteProduct(prod._id)}
+                          className="w-8 h-8 rounded-full bg-zinc-900 hover:bg-red-950/60 text-zinc-650 hover:text-red-500 flex items-center justify-center transition-colors cursor-pointer focus:outline-none border border-zinc-850"
+                          title="Eliminar producto"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      </div>
                     </div>
                   );
                 })}

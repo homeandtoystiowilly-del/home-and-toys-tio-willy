@@ -314,3 +314,114 @@ export async function updateProductPricesAction(id: string, priceDetal: number, 
     return { success: false, error: getFriendlyError(error, 'Error al actualizar precios.') };
   }
 }
+
+// Acción para actualizar un producto existente
+export async function updateProductAction(productId: string, formData: FormData) {
+  try {
+    const cookieStore = await cookies();
+    const session = cookieStore.get('admin_session')?.value;
+    if (session !== 'session_active') {
+      return { success: false, error: 'No autorizado.' };
+    }
+
+    const name = formData.get('name') as string;
+    const description = formData.get('description') as string;
+    const category = formData.get('category') as string;
+    const priceDetal = parseFloat(formData.get('priceDetal') as string);
+    const priceMayor = parseFloat(formData.get('priceMayor') as string);
+    const minMayor = parseInt(formData.get('minMayor') as string, 10);
+    
+    const varietiesRaw = formData.get('varieties') as string;
+    const varieties = varietiesRaw 
+      ? varietiesRaw.split(',').map((v) => v.trim()).filter((v) => v.length > 0)
+      : ['Estándar'];
+
+    const existingImagesRaw = formData.get('existingImages') as string;
+    const existingImages: string[] = existingImagesRaw ? JSON.parse(existingImagesRaw) : [];
+
+    const imageFiles = formData.getAll('images') as File[];
+
+    if (!productId) {
+      return { success: false, error: 'ID de producto no proporcionado.' };
+    }
+
+    if (!name || !description || !category || isNaN(priceDetal) || isNaN(priceMayor) || isNaN(minMayor)) {
+      return { success: false, error: 'Por favor rellene todos los campos obligatorios con valores válidos.' };
+    }
+
+    // Procesar las nuevas imágenes (Subida a Cloudinary o Fallback de desarrollo a Base64)
+    const uploadedUrls: string[] = [];
+    const isCloudinaryConfigured = 
+      process.env.CLOUDINARY_CLOUD_NAME && 
+      process.env.CLOUDINARY_CLOUD_NAME !== 'tu_cloud_name' &&
+      process.env.CLOUDINARY_API_KEY && 
+      process.env.CLOUDINARY_API_KEY !== 'tu_api_key';
+
+    for (let i = 0; i < imageFiles.length; i++) {
+      const file = imageFiles[i];
+      if (file && file.size > 0) {
+        if (isCloudinaryConfigured) {
+          const arrayBuffer = await file.arrayBuffer();
+          const buffer = Buffer.from(arrayBuffer);
+
+          const result = await new Promise<any>((resolve, reject) => {
+            cloudinary.uploader.upload_stream(
+              { folder: 'tio_willy_catalogo' },
+              (error, result) => {
+                if (error) reject(error);
+                else resolve(result);
+              }
+            ).end(buffer);
+          });
+          uploadedUrls.push(result.secure_url);
+        } else {
+          // Fallback a Base64
+          const arrayBuffer = await file.arrayBuffer();
+          const buffer = Buffer.from(arrayBuffer);
+          const base64 = buffer.toString('base64');
+          const dataUrl = `data:${file.type};base64,${base64}`;
+          uploadedUrls.push(dataUrl);
+        }
+      }
+    }
+
+    // Combinar imágenes conservadas del producto con las nuevas subidas
+    const mergedImages = [...existingImages, ...uploadedUrls];
+
+    // Asegurar que el número de imágenes coincida con el número de variedades
+    const finalImages: string[] = [];
+    for (let i = 0; i < varieties.length; i++) {
+      finalImages.push(mergedImages[i] || mergedImages[0] || '/images/chair_red.jpg');
+    }
+
+    const client = await clientPromise;
+    const db = client.db('tio_willy_db');
+
+    const queryId = ObjectId.isValid(productId) && productId.length === 24 ? new ObjectId(productId) : productId;
+
+    await db.collection('productos').updateOne(
+      { _id: queryId as any },
+      {
+        $set: {
+          name,
+          description,
+          category,
+          priceDetal,
+          priceMayor,
+          minMayor,
+          images: finalImages,
+          varieties,
+          updatedAt: new Date()
+        }
+      }
+    );
+
+    revalidatePath('/');
+    revalidatePath('/admin');
+
+    return { success: true, message: 'Producto actualizado con éxito.' };
+  } catch (error: any) {
+    console.error('Error al actualizar el producto:', error);
+    return { success: false, error: getFriendlyError(error, 'Error interno del servidor al actualizar el producto.') };
+  }
+}
