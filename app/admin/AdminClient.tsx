@@ -29,6 +29,59 @@ export interface Category {
   _id: string;
   name: string;
 }
+// Función de compresión de imágenes en el cliente usando Canvas
+const compressImage = (file: File): Promise<File> => {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target?.result as string;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 1000;
+        const MAX_HEIGHT = 1000;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              const compressedFile = new File([blob], file.name, {
+                type: 'image/jpeg',
+                lastModified: Date.now()
+              });
+              resolve(compressedFile);
+            } else {
+              resolve(file);
+            }
+          },
+          'image/jpeg',
+          0.7
+        );
+      };
+      img.onerror = () => resolve(file);
+    };
+    reader.onerror = () => resolve(file);
+  });
+};
 
 interface AdminClientProps {
   isAuthorized: boolean;
@@ -129,13 +182,24 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
     }
   };
 
-  // Manejar cambio de imágenes
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Manejar cambio de imágenes con compresión automática
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const files = Array.from(e.target.files);
-      const urls = files.map((file) => URL.createObjectURL(file));
+      
+      const compressedFiles = await Promise.all(
+        files.map((file) => {
+          // Solo comprimir si es una imagen y supera los 200KB
+          if (file.type.startsWith('image/') && file.size > 200 * 1024) {
+            return compressImage(file);
+          }
+          return Promise.resolve(file);
+        })
+      );
+
+      const urls = compressedFiles.map((file) => URL.createObjectURL(file));
       setPreviewUrls((prev) => [...prev, ...urls]);
-      setSelectedFiles((prev) => [...prev, ...files]);
+      setSelectedFiles((prev) => [...prev, ...compressedFiles]);
     }
   };
 
