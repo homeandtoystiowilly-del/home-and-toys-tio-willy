@@ -404,16 +404,16 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                     <span className="text-xs font-bold text-zinc-400 group-hover:text-white transition-colors">
                       Haz clic para seleccionar imágenes (puedes elegir varias)
                     </span>
-                    
-                    <input
-                      type="file"
-                      ref={fileInputRef}
-                      onChange={handleFileChange}
-                      accept="image/*"
-                      multiple
-                      className="hidden"
-                    />
                   </div>
+
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    accept="image/*"
+                    multiple
+                    className="hidden"
+                  />
 
                   {/* Listado de miniaturas con botón eliminar individual */}
                   {previewUrls.length > 0 && (
