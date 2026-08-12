@@ -73,6 +73,35 @@ function LogoTioWilly({ className = '' }: { className?: string }) {
 export function ProductCard({ product }: { product: Product }) {
   const [activeIdx, setActiveIdx] = useState(0);
 
+  // Soporte de gestos táctiles (swipe) para móviles
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe && product.images.length > 1) {
+      // Deslizar izquierda -> Siguiente imagen
+      setActiveIdx((prev) => (prev + 1) % product.images.length);
+    } else if (isRightSwipe && product.images.length > 1) {
+      // Deslizar derecha -> Imagen anterior
+      setActiveIdx((prev) => (prev - 1 + product.images.length) % product.images.length);
+    }
+  };
+
   const handlePrev = (e: React.MouseEvent) => {
     e.stopPropagation();
     setActiveIdx((prev) => (prev - 1 + product.images.length) % product.images.length);
@@ -93,8 +122,13 @@ export function ProductCard({ product }: { product: Product }) {
 
   return (
     <div className="group relative flex flex-col rounded-3xl bg-zinc-950/80 border border-zinc-800/80 hover:border-red-500/40 transition-all duration-500 overflow-hidden shadow-2xl hover:shadow-red-950/20 shadow-black/80">
-      {/* Carrusel de Imágenes */}
-      <div className="relative aspect-square w-full bg-zinc-900 overflow-hidden">
+      {/* Carrusel de Imágenes con soporte híbrido de gestos swipe */}
+      <div 
+        className="relative aspect-square w-full bg-zinc-900 overflow-hidden cursor-grab active:cursor-grabbing select-none"
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+      >
         <img 
           src={currentImage} 
           alt={`${product.name} - ${currentVariety}`}
