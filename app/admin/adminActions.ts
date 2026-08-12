@@ -265,7 +265,8 @@ export async function deleteProductAction(id: string) {
     const client = await clientPromise;
     const db = client.db('tio_willy_db');
 
-    await db.collection('productos').deleteOne({ _id: new ObjectId(id) });
+    const queryId = ObjectId.isValid(id) && id.length === 24 ? new ObjectId(id) : id;
+    await db.collection('productos').deleteOne({ _id: queryId as any });
 
     revalidatePath('/');
     revalidatePath('/admin');
@@ -293,8 +294,9 @@ export async function updateProductPricesAction(id: string, priceDetal: number, 
     const client = await clientPromise;
     const db = client.db('tio_willy_db');
 
+    const queryId = ObjectId.isValid(id) && id.length === 24 ? new ObjectId(id) : id;
     await db.collection('productos').updateOne(
-      { _id: new ObjectId(id) },
+      { _id: queryId as any },
       { 
         $set: { 
           priceDetal: priceDetal, 
