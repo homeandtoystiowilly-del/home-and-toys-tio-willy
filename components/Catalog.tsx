@@ -258,10 +258,12 @@ export function ProductCard({ product }: { product: Product }) {
 
 export default function Catalog({ 
   initialProductos, 
-  initialCategorias 
+  initialCategorias,
+  mapUrl
 }: { 
   initialProductos: Product[]; 
   initialCategorias: Category[]; 
+  mapUrl?: string;
 }) {
   const [selectedCategory, setSelectedCategory] = useState<string>('todos');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -639,6 +641,31 @@ export default function Catalog({
           </div>
         </div>
       </main>
+
+      {/* Sección de Ubicación (Google Maps) con diseño dark premium */}
+      <section id="ubicacion" className="w-full py-16 bg-zinc-950/20 border-t border-zinc-900 scroll-mt-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
+          <div className="text-center max-w-2xl mb-10">
+            <span className="text-[10px] text-red-500 font-bold uppercase tracking-[0.2em] block mb-2">Visita nuestra tienda</span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white mb-3">Nuestra Ubicación</h2>
+            <p className="text-zinc-400 text-xs sm:text-sm">
+              Estamos ubicados en Caracas. Ven y conoce nuestra gran variedad de productos para el hogar, juguetes y tecnología.
+            </p>
+          </div>
+
+          {/* Mapa Responsivo */}
+          <div className="w-full max-w-4xl aspect-[16/9] sm:aspect-[21/9] min-h-[320px] rounded-3xl overflow-hidden border border-zinc-800 shadow-2xl shadow-black/80">
+            <iframe
+              src={mapUrl || 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d125556.76465492415!2d-67.03061405000001!3d10.4683838!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8c2a58adcd824845%3A0xa1e2d787747e117f!2sCaracas%2C%20Distrito%20Capital!5e0!3m2!1ses-419!2sve!4v1710000000000!5m2!1ses-419!2sve'}
+              className="w-full h-full border-0 grayscale invert contrast-[1.2]"
+              allowFullScreen={false}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="Google Maps Ubicación Tío Willy"
+            ></iframe>
+          </div>
+        </div>
+      </section>
 
       {/* Footer */}
       <footer className="w-full py-12 border-t border-zinc-900 bg-zinc-950/40 text-center text-zinc-500 text-sm flex flex-col items-center gap-3">

@@ -424,3 +424,35 @@ export async function updateProductAction(productId: string, formData: FormData)
     return { success: false, error: getFriendlyError(error, 'Error interno del servidor al actualizar el producto.') };
   }
 }
+
+// Acción para actualizar la configuración de ubicación (Google Maps embed URL)
+export async function updateMapUrlAction(url: string) {
+  try {
+    const cookieStore = await cookies();
+    const session = cookieStore.get('admin_session')?.value;
+    if (session !== 'session_active') {
+      return { success: false, error: 'No autorizado.' };
+    }
+
+    if (!url || !url.startsWith('https://')) {
+      return { success: false, error: 'Por favor, ingrese un enlace de inserción de Google Maps válido (comenzando con https://).' };
+    }
+
+    const client = await clientPromise;
+    const db = client.db('tio_willy_db');
+
+    await (db.collection('configuracion') as any).updateOne(
+      { _id: 'mapa' },
+      { $set: { url } },
+      { upsert: true }
+    );
+
+    revalidatePath('/');
+    revalidatePath('/admin');
+
+    return { success: true, message: 'Ubicación de Google Maps actualizada con éxito.' };
+  } catch (error: any) {
+    console.error('Error al actualizar el enlace del mapa:', error);
+    return { success: false, error: getFriendlyError(error, 'Error interno al actualizar la ubicación.') };
+  }
+}

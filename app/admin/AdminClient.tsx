@@ -10,7 +10,8 @@ import {
   deleteCategoryAction,
   deleteProductAction,
   updateProductPricesAction,
-  updateProductAction 
+  updateProductAction,
+  updateMapUrlAction 
 } from './adminActions';
 
 // Interfaces locales coincidentes con Catalog.tsx
@@ -88,9 +89,10 @@ interface AdminClientProps {
   isAuthorized: boolean;
   categories: Category[];
   initialProducts: Product[];
+  initialMapUrl: string;
 }
 
-export default function AdminClient({ isAuthorized, categories: serverCategories, initialProducts }: AdminClientProps) {
+export default function AdminClient({ isAuthorized, categories: serverCategories, initialProducts, initialMapUrl }: AdminClientProps) {
   const router = useRouter();
 
   // Estado reactivo local para sincronización instantánea
@@ -138,6 +140,12 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
   const [editingProductId, setEditingProductId] = useState<string | null>(null);
   const [existingImages, setExistingImages] = useState<string[]>([]);
   const [compressing, setCompressing] = useState<boolean>(false);
+
+  // Estados del mapa
+  const [mapUrlInput, setMapUrlInput] = useState(initialMapUrl || '');
+  const [mapLoading, setMapLoading] = useState(false);
+  const [mapSuccessMsg, setMapSuccessMsg] = useState('');
+  const [mapErrorMsg, setMapErrorMsg] = useState('');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -368,6 +376,28 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
     } catch (err) {
       console.error(err);
       alert('Error de red al eliminar la categoría');
+    }
+  };
+
+  // Actualizar Ubicación de Mapa
+  const handleUpdateMapUrl = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setMapLoading(true);
+    setMapSuccessMsg('');
+    setMapErrorMsg('');
+
+    try {
+      const res = await updateMapUrlAction(mapUrlInput);
+      if (res.success) {
+        setMapSuccessMsg(res.message || 'Ubicación actualizada con éxito.');
+        router.refresh();
+      } else {
+        setMapErrorMsg(res.error || 'Error al actualizar la ubicación.');
+      }
+    } catch (err: any) {
+      setMapErrorMsg(err.message || 'Error de red al actualizar la ubicación.');
+    } finally {
+      setMapLoading(false);
     }
   };
 
@@ -815,6 +845,57 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
               </div>
             </div>
 
+            {/* 3. Configuración de Ubicación (Google Maps) Card */}
+            <div className="p-6 rounded-3xl bg-zinc-950 border border-zinc-900 shadow-xl shadow-black/60 flex flex-col gap-5">
+              <div>
+                <h2 className="text-lg font-bold tracking-wide text-white">Ubicación del Negocio</h2>
+                <p className="text-zinc-500 text-xs mt-1">Configura el mapa de Google Maps que se muestra en tu catálogo.</p>
+              </div>
+
+              {mapSuccessMsg && (
+                <div className="p-3 rounded-xl bg-emerald-950/20 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">
+                  {mapSuccessMsg}
+                </div>
+              )}
+
+              {mapErrorMsg && (
+                <div className="p-3 rounded-xl bg-red-950/20 border border-red-500/30 text-red-400 text-xs font-semibold">
+                  {mapErrorMsg}
+                </div>
+              )}
+
+              <form onSubmit={handleUpdateMapUrl} className="flex flex-col gap-3">
+                <div className="flex flex-col gap-1">
+                  <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Enlace del iframe (src)</span>
+                  <input
+                    type="url"
+                    placeholder="https://www.google.com/maps/embed?pb=..."
+                    value={mapUrlInput}
+                    onChange={(e) => setMapUrlInput(e.target.value)}
+                    className="w-full px-3.5 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white placeholder-zinc-650 focus:outline-none transition-all text-xs font-mono"
+                    required
+                  />
+                </div>
+                
+                <button
+                  type="submit"
+                  disabled={mapLoading}
+                  className="w-full py-2.5 bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 text-zinc-350 hover:text-white rounded-xl font-bold transition-all text-xs cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {mapLoading ? (
+                    'Guardando...'
+                  ) : (
+                    <>
+                      <svg className="w-4.5 h-4.5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      Guardar Ubicación
+                    </>
+                  )}
+                </button>
+              </form>
+            </div>
           </div>
 
           {/* COLUMNA DERECHA: Listado de Productos (7 cols) */}
