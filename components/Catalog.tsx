@@ -70,7 +70,7 @@ function LogoTioWilly({ className = '' }: { className?: string }) {
 }
 
 // Subcomponente para cada Tarjeta de Producto (Exportado para vista previa en admin)
-export function ProductCard({ product }: { product: Product }) {
+export function ProductCard({ product, categoryName }: { product: Product; categoryName?: string }) {
   const [activeIdx, setActiveIdx] = useState(0);
 
   // Soporte de gestos táctiles (swipe) para móviles
@@ -181,8 +181,8 @@ export function ProductCard({ product }: { product: Product }) {
 
         {/* Categoría Badge */}
         <div className="absolute top-4 left-4">
-          <span className="px-3 py-1 text-xs font-semibold uppercase tracking-wider text-red-500 bg-red-950/40 border border-red-500/30 rounded-full backdrop-blur-md">
-            {product.category === 'juguetes' ? 'Juguetes' : product.category === 'hogar' ? 'Hogar' : 'Tecnología'}
+          <span className="px-3 py-1 text-xs font-semibold uppercase tracking-wider text-red-500 bg-red-950/40 border border-red-500/30 rounded-full backdrop-blur-md font-bold">
+            {categoryName || product.category}
           </span>
         </div>
       </div>
@@ -581,9 +581,17 @@ export default function Catalog({
             {/* Grid de Productos */}
             {paginatedProducts.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                {paginatedProducts.map((prod: Product) => (
-                  <ProductCard key={prod._id} product={prod} />
-                ))}
+                {paginatedProducts.map((prod: Product) => {
+                  const categoryObj = initialCategorias.find((c) => c._id === prod.category);
+                  const categoryName = categoryObj ? categoryObj.name : prod.category;
+                  return (
+                    <ProductCard 
+                      key={prod._id} 
+                      product={prod} 
+                      categoryName={categoryName} 
+                    />
+                  );
+                })}
               </div>
             ) : (
               <div className="w-full py-20 flex flex-col items-center justify-center text-center rounded-3xl bg-zinc-950/40 border border-zinc-900">
