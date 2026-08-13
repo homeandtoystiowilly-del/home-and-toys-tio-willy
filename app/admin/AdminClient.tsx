@@ -178,11 +178,16 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
   };
 
   // Manejar el cierre de sesión
-  const handleLogout = () => {
-    // Redirigir instantáneamente en el cliente para una respuesta inmediata
-    window.location.href = '/';
-    // Borrar la sesión en el servidor en segundo plano
-    logoutAction().catch((err) => console.error('Error en logout de fondo:', err));
+  const handleLogout = async () => {
+    try {
+      // Borrar la sesión en el servidor (eliminar cookies de autenticación)
+      await logoutAction();
+    } catch (err) {
+      console.error('Error al cerrar sesión:', err);
+    } finally {
+      // Redirigir automáticamente a la página principal del catálogo
+      window.location.href = '/';
+    }
   };
 
   // Manejar cambio de imágenes con compresión automática secuencial
