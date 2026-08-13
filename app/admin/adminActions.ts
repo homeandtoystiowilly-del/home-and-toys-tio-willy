@@ -136,11 +136,10 @@ export async function createProductAction(formData: FormData) {
       }
     }
 
-    // Asegurar que el número de imágenes coincida con el número de variedades
-    // Si hay más variedades que imágenes, rellenar con la primera imagen
-    const finalImages: string[] = [];
-    for (let i = 0; i < varieties.length; i++) {
-      finalImages.push(uploadedUrls[i] || uploadedUrls[0]);
+    // Asegurar que haya al menos tantas imágenes como variedades, sin recortar el exceso
+    const finalImages: string[] = [...uploadedUrls];
+    while (finalImages.length < varieties.length) {
+      finalImages.push(uploadedUrls[0] || '/images/chair_red.jpg');
     }
 
     // 4. Guardar en MongoDB
@@ -388,10 +387,10 @@ export async function updateProductAction(productId: string, formData: FormData)
     // Combinar imágenes conservadas del producto con las nuevas subidas
     const mergedImages = [...existingImages, ...uploadedUrls];
 
-    // Asegurar que el número de imágenes coincida con el número de variedades
-    const finalImages: string[] = [];
-    for (let i = 0; i < varieties.length; i++) {
-      finalImages.push(mergedImages[i] || mergedImages[0] || '/images/chair_red.jpg');
+    // Asegurar que haya al menos tantas imágenes como variedades, sin recortar el exceso
+    const finalImages: string[] = [...mergedImages];
+    while (finalImages.length < varieties.length) {
+      finalImages.push(mergedImages[0] || '/images/chair_red.jpg');
     }
 
     const client = await clientPromise;
