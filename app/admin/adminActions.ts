@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { v2 as cloudinary } from 'cloudinary';
 import clientPromise from '@/lib/stitch';
 import { ObjectId } from 'mongodb';
+import { verifySessionToken, generateSessionToken } from '@/lib/auth';
 
 // Configurar Cloudinary
 cloudinary.config({
@@ -28,8 +29,9 @@ export async function verifyPasswordAction(password: string) {
   const adminPassword = process.env.ADMIN_PASSWORD || 'adminwilly';
 
   if (password === adminPassword) {
+    const token = generateSessionToken();
     const cookieStore = await cookies();
-    cookieStore.set('admin_session', 'session_active', {
+    cookieStore.set('admin_session', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: 60 * 60 * 24, // 1 día
@@ -54,7 +56,7 @@ export async function createProductAction(formData: FormData) {
     // 1. Validar autenticación
     const cookieStore = await cookies();
     const session = cookieStore.get('admin_session')?.value;
-    if (session !== 'session_active') {
+    if (!verifySessionToken(session)) {
       return { success: false, error: 'No autorizado. Inicie sesión nuevamente.' };
     }
 
@@ -194,7 +196,7 @@ export async function createCategoryAction(name: string) {
   try {
     const cookieStore = await cookies();
     const session = cookieStore.get('admin_session')?.value;
-    if (session !== 'session_active') {
+    if (!verifySessionToken(session)) {
       return { success: false, error: 'No autorizado.' };
     }
 
@@ -232,7 +234,7 @@ export async function deleteCategoryAction(id: string) {
   try {
     const cookieStore = await cookies();
     const session = cookieStore.get('admin_session')?.value;
-    if (session !== 'session_active') {
+    if (!verifySessionToken(session)) {
       return { success: false, error: 'No autorizado.' };
     }
 
@@ -257,7 +259,7 @@ export async function deleteProductAction(id: string) {
   try {
     const cookieStore = await cookies();
     const session = cookieStore.get('admin_session')?.value;
-    if (session !== 'session_active') {
+    if (!verifySessionToken(session)) {
       return { success: false, error: 'No autorizado.' };
     }
 
@@ -282,7 +284,7 @@ export async function updateProductPricesAction(id: string, priceDetal: number, 
   try {
     const cookieStore = await cookies();
     const session = cookieStore.get('admin_session')?.value;
-    if (session !== 'session_active') {
+    if (!verifySessionToken(session)) {
       return { success: false, error: 'No autorizado.' };
     }
 
@@ -319,7 +321,7 @@ export async function updateProductAction(productId: string, formData: FormData)
   try {
     const cookieStore = await cookies();
     const session = cookieStore.get('admin_session')?.value;
-    if (session !== 'session_active') {
+    if (!verifySessionToken(session)) {
       return { success: false, error: 'No autorizado.' };
     }
 
@@ -430,8 +432,8 @@ export async function updateMapUrlAction(url: string) {
   try {
     const cookieStore = await cookies();
     const session = cookieStore.get('admin_session')?.value;
-    if (session !== 'session_active') {
-      return { success: false, error: 'No autorizado.' };
+    if (!verifySessionToken(session)) {
+      return { success: false, error: 'No unauthorized access.' };
     }
 
     if (!url || !url.startsWith('https://')) {
