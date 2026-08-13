@@ -40,8 +40,8 @@ const compressImage = (file: File): Promise<File> => {
       img.src = event.target?.result as string;
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        const MAX_WIDTH = 1000;
-        const MAX_HEIGHT = 1000;
+        const MAX_WIDTH = 800;
+        const MAX_HEIGHT = 800;
         let width = img.width;
         let height = img.height;
 
@@ -75,7 +75,7 @@ const compressImage = (file: File): Promise<File> => {
             }
           },
           'image/jpeg',
-          0.7
+          0.6
         );
       };
       img.onerror = () => resolve(file);
@@ -137,6 +137,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
   // Estados de edición de productos
   const [editingProductId, setEditingProductId] = useState<string | null>(null);
   const [existingImages, setExistingImages] = useState<string[]>([]);
+  const [compressing, setCompressing] = useState<boolean>(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -177,34 +178,39 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
   };
 
   // Manejar el cierre de sesión
-  const handleLogout = async () => {
-    try {
-      await logoutAction();
-      router.push('/');
-      router.refresh();
-    } catch (err) {
-      console.error('Error al cerrar sesión', err);
-    }
+  const handleLogout = () => {
+    // Redirigir instantáneamente en el cliente para una respuesta inmediata
+    window.location.href = '/';
+    // Borrar la sesión en el servidor en segundo plano
+    logoutAction().catch((err) => console.error('Error en logout de fondo:', err));
   };
 
-  // Manejar cambio de imágenes con compresión automática
+  // Manejar cambio de imágenes con compresión automática secuencial
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
+    if (e.target.files && e.target.files.length > 0) {
+      setCompressing(true);
       const files = Array.from(e.target.files);
+      const compressedFiles: File[] = [];
       
-      const compressedFiles = await Promise.all(
-        files.map((file) => {
-          // Solo comprimir si es una imagen y supera los 200KB
+      try {
+        // Compresión secuencial uno a uno para no congelar el hilo principal en celulares
+        for (const file of files) {
           if (file.type.startsWith('image/') && file.size > 200 * 1024) {
-            return compressImage(file);
+            const compressed = await compressImage(file);
+            compressedFiles.push(compressed);
+          } else {
+            compressedFiles.push(file);
           }
-          return Promise.resolve(file);
-        })
-      );
+        }
 
-      const urls = compressedFiles.map((file) => URL.createObjectURL(file));
-      setPreviewUrls((prev) => [...prev, ...urls]);
-      setSelectedFiles((prev) => [...prev, ...compressedFiles]);
+        const urls = compressedFiles.map((file) => URL.createObjectURL(file));
+        setPreviewUrls((prev) => [...prev, ...urls]);
+        setSelectedFiles((prev) => [...prev, ...compressedFiles]);
+      } catch (err) {
+        console.error('Error al procesar imágenes:', err);
+      } finally {
+        setCompressing(false);
+      }
     }
   };
 
@@ -526,15 +532,32 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                 <div className="flex flex-col gap-1.5">
                   <span className="text-xs font-bold text-zinc-400 uppercase tracking-wide">Imágenes del producto</span>
                   <div 
-                    onClick={() => fileInputRef.current?.click()}
-                    className="w-full border border-dashed border-zinc-800 hover:border-red-500/30 rounded-2xl py-8 px-4 text-center cursor-pointer bg-zinc-900/10 hover:bg-zinc-900/30 transition-all duration-300 flex flex-col items-center gap-2.5 group"
+                    onClick={() => {
+                      if (!compressing) fileInputRef.current?.click();
+                    }}
+                    className={`w-full border border-dashed rounded-2xl py-8 px-4 text-center bg-zinc-900/10 hover:bg-zinc-900/30 transition-all duration-300 flex flex-col items-center gap-2.5 group ${
+                      compressing 
+                        ? 'border-red-500/40 cursor-not-allowed opacity-75' 
+                        : 'border-zinc-800 hover:border-red-500/30 cursor-pointer'
+                    }`}
                   >
-                    <svg className="w-7 h-7 text-zinc-600 group-hover:text-red-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <span className="text-xs font-bold text-zinc-400 group-hover:text-white transition-colors">
-                      Haz clic para seleccionar imágenes (puedes elegir varias)
-                    </span>
+                    {compressing ? (
+                      <>
+                        <div className="w-6 h-6 border-2 border-red-500 border-t-transparent rounded-full animate-spin"></div>
+                        <span className="text-xs font-bold text-red-400 animate-pulse">
+                          Procesando y optimizando imágenes... Por favor espera.
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-7 h-7 text-zinc-600 group-hover:text-red-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <span className="text-xs font-bold text-zinc-400 group-hover:text-white transition-colors">
+                          Haz clic para seleccionar imágenes (puedes elegir varias)
+                        </span>
+                      </>
+                    )}
                   </div>
 
                   <input
@@ -690,13 +713,10 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                     className="w-full px-3.5 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white placeholder-zinc-650 focus:outline-none transition-all text-sm resize-none"
                     required
                   />
-                </div>
-
-                <div className="flex flex-col gap-2 mt-2">
-                  <button
+                   <button
                     type="submit"
-                    disabled={submitLoading}
-                    className="w-full py-3 px-4 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                    disabled={submitLoading || compressing}
+                    className="w-full py-3 px-4 bg-red-600 hover:bg-red-550 active:bg-red-700 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                   >
                     {submitLoading ? (
                       editingProductId ? 'Actualizando...' : 'Agregando...'
@@ -725,8 +745,8 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                     <button
                       type="button"
                       onClick={handleCancelEdit}
-                      disabled={submitLoading}
-                      className="w-full py-2.5 px-4 bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 text-zinc-400 hover:text-white rounded-xl font-bold transition-all cursor-pointer text-sm"
+                      disabled={submitLoading || compressing}
+                      className="w-full py-2.5 px-4 bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 text-zinc-400 hover:text-white rounded-xl font-bold transition-all cursor-pointer text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Cancelar edición
                     </button>
