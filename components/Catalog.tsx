@@ -868,43 +868,163 @@ export default function Catalog({
         </div>
       </main>
 
-      {/* Sección de Ubicación (Google Maps) con diseño dark premium */}
-      <section id="ubicacion" className="w-full py-16 bg-zinc-950/20 border-t border-zinc-900 scroll-mt-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
-          <div className="text-center max-w-2xl mb-10">
-            <span className="text-[10px] text-red-500 font-bold uppercase tracking-[0.2em] block mb-2">Visita nuestra tienda</span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white mb-3">Nuestra Ubicación</h2>
+      {/* Sección de Ubicación y Contacto con diseño dark premium */}
+      <section id="ubicacion" className="w-full py-20 bg-zinc-950/20 border-t border-zinc-900 scroll-mt-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div className="text-center max-w-2xl mx-auto mb-14">
+            <span className="text-[10px] text-red-500 font-bold uppercase tracking-[0.2em] block mb-2">Contacto & Visitas</span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white mb-3">Ubicación y Contacto</h2>
             <p className="text-zinc-400 text-xs sm:text-sm">
-              Estamos ubicados en Caracas. Ven y conoce nuestra gran variedad de productos para el hogar, juguetes y tecnología.
+              Visítanos en nuestra tienda física en Caracas o contáctanos directamente para asesoría y pedidos.
             </p>
           </div>
 
-          {/* Mapa Responsivo */}
-          <div className="w-full max-w-4xl aspect-[16/9] sm:aspect-[21/9] min-h-[320px] rounded-3xl overflow-hidden border border-zinc-800 shadow-2xl shadow-black/80">
-            <iframe
-              src={mapUrl || 'https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d3923.3670984803977!2d-66.91327300000002!3d10.506195699999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1ses-419!2sve!4v1710000000000!5m2!1ses-419!2sve'}
-              className="w-full h-full border-0 grayscale invert contrast-[1.2]"
-              allowFullScreen={false}
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              title="Google Maps Ubicación Tío Willy"
-            ></iframe>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-stretch">
+            
+            {/* Columna Izquierda: Información de Dirección y Contacto (5 cols) */}
+            <div className="lg:col-span-5 flex flex-col gap-6 justify-between bg-zinc-950/40 p-6 sm:p-8 rounded-3xl border border-zinc-900 text-left">
+              
+              <div className="flex flex-col gap-6">
+                {/* Bloque Dirección */}
+                <div className="flex gap-4">
+                  <div className="w-11 h-11 rounded-xl bg-red-950/25 border border-red-500/20 flex items-center justify-center text-red-500 shrink-0">
+                    <svg className="w-5.5 h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Dirección Física</span>
+                    <p className="text-white text-sm font-semibold leading-relaxed">
+                      Centro de Caracas, Esquina de Torres a Madrices, Edificio Arvelo, PB, Locales 1-2 y 3.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Bloque Punto de Referencia */}
+                <div className="flex gap-4">
+                  <div className="w-11 h-11 rounded-xl bg-red-950/25 border border-red-500/20 flex items-center justify-center text-red-500 shrink-0">
+                    <svg className="w-5.5 h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 113.536 0V21h2v-5.464a5.006 5.006 0 01-.002 0z" />
+                    </svg>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Punto de Referencia</span>
+                    <p className="text-zinc-300 text-sm font-medium leading-relaxed">
+                      Frente a la Panadería Picadelli (Catedral).
+                    </p>
+                  </div>
+                </div>
+
+                {/* Bloque Contactos */}
+                <div className="flex gap-4">
+                  <div className="w-11 h-11 rounded-xl bg-red-950/25 border border-red-500/20 flex items-center justify-center text-red-500 shrink-0">
+                    <svg className="w-5.5 h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                    </svg>
+                  </div>
+                  <div className="flex flex-col gap-2.5 w-full">
+                    <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Líneas de Atención</span>
+                    
+                    <div className="flex flex-col gap-3">
+                      {/* Telefono 1 */}
+                      <div className="flex items-center justify-between p-3 rounded-2xl bg-zinc-900/60 border border-zinc-900/80 hover:border-zinc-800 transition-colors">
+                        <span className="text-white text-sm font-mono font-bold">0424-4576086</span>
+                        <div className="flex items-center gap-1.5">
+                          <a
+                            href="tel:+584244576086"
+                            className="w-8 h-8 rounded-lg bg-zinc-850 hover:bg-zinc-800 text-zinc-350 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
+                            title="Llamar directamente"
+                          >
+                            <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                            </svg>
+                          </a>
+                          <a
+                            href="https://wa.me/584244576086"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-8 h-8 rounded-lg bg-emerald-950/30 hover:bg-emerald-900/40 text-emerald-500 hover:text-emerald-400 flex items-center justify-center transition-colors cursor-pointer"
+                            title="Enviar WhatsApp"
+                          >
+                            <svg className="w-4.5 h-4.5 fill-current" viewBox="0 0 24 24">
+                              <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.835-9.977c.311.089.822.112 1.134.112.31 0 .82-.112 1.131-.492.311-.38.82-1.993.899-2.15.079-.156.13-.339.028-.553-.102-.213-.822-1.994-.822-1.994-.127-.278-.261-.318-.466-.318-.17 0-.368-.012-.566-.012-.397 0-.907.146-1.22.492-.311.38-1.189 1.163-1.189 2.833 0 1.67 1.218 3.282 1.388 3.507.17.225 2.4 3.665 5.811 5.138.81.35 1.442.56 1.933.717.813.259 1.554.223 2.14.136.652-.097 1.993-.815 2.276-1.602.283-.787.283-1.46.198-1.602-.085-.142-.311-.225-.652-.393-.34-.168-1.993-.984-2.276-1.085-.283-.101-.49-.152-.697.152-.207.304-.803 1.085-.984 1.288-.18.203-.362.228-.703.06-.34-.168-1.436-.53-2.735-1.688-1.01-.902-1.693-2.016-1.892-2.355-.198-.339-.021-.523.149-.692.153-.152.34-.393.51-.59.17-.197.226-.338.339-.564.113-.225.056-.422-.028-.59-.084-.168-.703-1.692-1.01-2.434-.298-.718-.604-.621-.822-.631-.212-.01-.453-.012-.694-.012-.24 0-.631.09-.962.45-.33.36-1.26 1.23-1.26 3.003 0 1.77 1.29 3.48 1.47 3.73.18.25 2.54 3.88 6.16 5.45.86.37 1.53.59 2.06.76.87.28 1.66.24 2.28.15.69-.1 2.12-.87 2.42-1.71.3-.84.3-1.56.21-1.71-.09-.15-.33-.24-.72-.43z"/>
+                            </svg>
+                          </a>
+                        </div>
+                      </div>
+
+                      {/* Telefono 2 */}
+                      <div className="flex items-center justify-between p-3 rounded-2xl bg-zinc-900/60 border border-zinc-900/80 hover:border-zinc-800 transition-colors">
+                        <span className="text-white text-sm font-mono font-bold">0424-1439324</span>
+                        <div className="flex items-center gap-1.5">
+                          <a
+                            href="tel:+584241439324"
+                            className="w-8 h-8 rounded-lg bg-zinc-850 hover:bg-zinc-800 text-zinc-350 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
+                            title="Llamar directamente"
+                          >
+                            <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                            </svg>
+                          </a>
+                          <a
+                            href="https://wa.me/584241439324"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-8 h-8 rounded-lg bg-emerald-950/30 hover:bg-emerald-900/40 text-emerald-500 hover:text-emerald-400 flex items-center justify-center transition-colors cursor-pointer"
+                            title="Enviar WhatsApp"
+                          >
+                            <svg className="w-4.5 h-4.5 fill-current" viewBox="0 0 24 24">
+                              <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.835-9.977c.311.089.822.112 1.134.112.31 0 .82-.112 1.131-.492.311-.38.82-1.993.899-2.15.079-.156.13-.339.028-.553-.102-.213-.822-1.994-.822-1.994-.127-.278-.261-.318-.466-.318-.17 0-.368-.012-.566-.012-.397 0-.907.146-1.22.492-.311.38-1.189 1.163-1.189 2.833 0 1.67 1.218 3.282 1.388 3.507.17.225 2.4 3.665 5.811 5.138.81.35 1.442.56 1.933.717.813.259 1.554.223 2.14.136.652-.097 1.993-.815 2.276-1.602.283-.787.283-1.46.198-1.602-.085-.142-.311-.225-.652-.393-.34-.168-1.993-.984-2.276-1.085-.283-.101-.49-.152-.697.152-.207.304-.803 1.085-.984 1.288-.18.203-.362.228-.703.06-.34-.168-1.436-.53-2.735-1.688-1.01-.902-1.693-2.016-1.892-2.355-.198-.339-.021-.523.149-.692.153-.152.34-.393.51-.59.17-.197.226-.338.339-.564.113-.225.056-.422-.028-.59-.084-.168-.703-1.692-1.01-2.434-.298-.718-.604-.621-.822-.631-.212-.01-.453-.012-.694-.012-.24 0-.631.09-.962.45-.33.36-1.26 1.23-1.26 3.003 0 1.77 1.29 3.48 1.47 3.73.18.25 2.54 3.88 6.16 5.45.86.37 1.53.59 2.06.76.87.28 1.66.24 2.28.15.69-.1 2.12-.87 2.42-1.71.3-.84.3-1.56.21-1.71-.09-.15-.33-.24-.72-.43z"/>
+                            </svg>
+                          </a>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Pie de la columna izquierda */}
+              <p className="text-[10px] text-zinc-500 italic mt-6 lg:mt-0 font-medium">
+                * Para consultas y presupuestos de compras al mayor, contáctanos en cualquiera de nuestras líneas.
+              </p>
+            </div>
+
+            {/* Columna Derecha: Mapa Embebido y Botón "Cómo llegar" (7 cols) */}
+            <div className="lg:col-span-7 flex flex-col gap-6 justify-between bg-zinc-950/40 p-4 sm:p-6 rounded-3xl border border-zinc-900">
+              {/* Mapa Responsivo */}
+              <div className="w-full aspect-[16/9] sm:aspect-[21/9] lg:aspect-auto lg:flex-1 rounded-2xl overflow-hidden border border-zinc-900 shadow-2xl shadow-black/80">
+                <iframe
+                  src={mapUrl || 'https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d3923.3670984803977!2d-66.91327300000002!3d10.506195699999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1ses-419!2sve!4v1710000000000!5m2!1ses-419!2sve'}
+                  className="w-full h-full border-0 grayscale invert contrast-[1.2]"
+                  allowFullScreen={false}
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="Google Maps Ubicación Tío Willy"
+                ></iframe>
+              </div>
+
+              {/* Botón de Acción Directa */}
+              <a
+                href="https://www.google.com/maps/dir/?api=1&destination=10.5061957,-66.913273"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-4 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-2xl font-bold flex items-center justify-center gap-2.5 transition-all duration-300 shadow-lg shadow-red-950/20 active:scale-[0.98] text-xs sm:text-sm cursor-pointer select-none"
+                title="Cómo llegar con Google Maps"
+              >
+                <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                Trazar Ruta en Google Maps
+              </a>
+            </div>
+
           </div>
 
-          {/* Botón de Acción Directa ("Cómo llegar") */}
-          <a
-            href="https://www.google.com/maps/dir/?api=1&destination=10.5061957,-66.913273"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-6 px-6 py-3.5 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-xl font-bold flex items-center justify-center gap-2.5 transition-all duration-300 shadow-lg shadow-red-950/20 active:scale-[0.98] text-xs sm:text-sm cursor-pointer select-none"
-            title="Cómo llegar con Google Maps"
-          >
-            <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            Cómo llegar
-          </a>
         </div>
       </section>
 
