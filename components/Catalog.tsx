@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 
 // Interfaces para TypeScript
 export interface Product {
@@ -269,6 +269,22 @@ export default function Catalog({
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
+  const [showInactivityAlert, setShowInactivityAlert] = useState<boolean>(false);
+
+  // Comprobar si se cerró sesión por inactividad (detectar query param)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('inactivity') === '1') {
+      setShowInactivityAlert(true);
+      // Ocultar aviso tras 5 segundos y limpiar la URL de forma sutil
+      const timer = setTimeout(() => {
+        setShowInactivityAlert(false);
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, '', newUrl);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
   const ITEMS_PER_PAGE = 6;
 
   // Filtrar productos por Categoría y Búsqueda de Texto
@@ -305,6 +321,26 @@ export default function Catalog({
 
   return (
     <div className="min-h-screen bg-black text-white font-sans selection:bg-red-500 selection:text-white relative">
+      {/* Aviso de cierre de sesión por inactividad */}
+      {showInactivityAlert && (
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 animate-bounce duration-500">
+          <div className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-zinc-950/90 border border-red-500/40 text-red-500 shadow-2xl shadow-black backdrop-blur-md text-xs sm:text-sm font-bold tracking-wide">
+            <svg className="w-5 h-5 text-red-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <span>Sesión cerrada por inactividad</span>
+            <button
+              onClick={() => setShowInactivityAlert(false)}
+              className="text-zinc-500 hover:text-white transition-colors focus:outline-none ml-2 cursor-pointer"
+              aria-label="Cerrar aviso"
+            >
+              <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
       {/* Sticky Top Navbar */}
       <nav className="sticky top-0 z-30 w-full bg-black/85 border-b border-zinc-900/60 backdrop-blur-md py-4 transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">

@@ -108,6 +108,40 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
     setProducts(initialProducts);
   }, [initialProducts]);
 
+  // Temporizador de inactividad de 10 segundos
+  useEffect(() => {
+    // Solo activar el temporizador si el usuario está autorizado
+    if (!isAuthorized) return;
+
+    let timeoutId: NodeJS.Timeout;
+
+    const resetTimer = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        handleLogout(true); // Cerrar sesión y redirigir con parámetro
+      }, 10000); // 10 segundos
+    };
+
+    // Eventos a monitorear para detectar actividad
+    const events = ['mousemove', 'mousedown', 'click', 'scroll', 'keypress', 'keydown', 'touchstart'];
+
+    // Inicializar el timer
+    resetTimer();
+
+    // Agregar event listeners
+    events.forEach((event) => {
+      window.addEventListener(event, resetTimer);
+    });
+
+    // Cleanup al desmontar o desautorizar
+    return () => {
+      clearTimeout(timeoutId);
+      events.forEach((event) => {
+        window.removeEventListener(event, resetTimer);
+      });
+    };
+  }, [isAuthorized]);
+
   // Estados de Login
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
@@ -186,7 +220,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
   };
 
   // Manejar el cierre de sesión
-  const handleLogout = async () => {
+  const handleLogout = async (inactivityRedirect = false) => {
     try {
       // Borrar la sesión en el servidor (eliminar cookies de autenticación)
       await logoutAction();
@@ -194,7 +228,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
       console.error('Error al cerrar sesión:', err);
     } finally {
       // Redirigir automáticamente a la página principal del catálogo
-      window.location.href = '/';
+      window.location.href = inactivityRedirect ? '/?inactivity=1' : '/';
     }
   };
 
@@ -518,7 +552,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
           </div>
           
           <button
-            onClick={handleLogout}
+            onClick={() => handleLogout(false)}
             className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-400 font-bold text-xs transition-colors duration-300 border border-zinc-850"
           >
             Cerrar Sesión
