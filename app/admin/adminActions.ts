@@ -427,17 +427,58 @@ export async function updateProductAction(productId: string, formData: FormData)
   }
 }
 
+// Helper para parsear cualquier enlace o coordenadas de Google Maps y convertirlo en un iframe de inserción seguro (output=embed)
+function parseGoogleMapsUrl(inputUrl: string): string {
+  const url = inputUrl.trim();
+
+  // Caso 1: El usuario pegó el código iframe completo (ej: <iframe src="https://www.google.com/maps/embed... "></iframe>)
+  if (url.includes('<iframe')) {
+    const srcMatch = url.match(/src=["']([^"']+)["']/);
+    if (srcMatch && srcMatch[1]) {
+      return srcMatch[1];
+    }
+  }
+
+  // Caso 2: El usuario pegó una URL estándar con coordenadas (ej: https://www.google.com/maps/...@10.5061957,-66.913273,15z...)
+  const coordMatch = url.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/) || url.match(/place\/(-?\d+\.\d+),(-?\d+\.\d+)/);
+  if (coordMatch && coordMatch[1] && coordMatch[2]) {
+    return `https://maps.google.com/maps?q=${coordMatch[1]},${coordMatch[2]}&z=15&output=embed`;
+  }
+
+  // Caso 3: El usuario pegó coordenadas simples (ej: 10.5061957,-66.913273)
+  const simpleCoordMatch = url.match(/^(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)$/);
+  if (simpleCoordMatch && simpleCoordMatch[1] && simpleCoordMatch[2]) {
+    return `https://maps.google.com/maps?q=${simpleCoordMatch[1]},${simpleCoordMatch[2]}&z=15&output=embed`;
+  }
+
+  // Caso 4: Si ya es un enlace de inserción de Google Maps o tiene output=embed, lo dejamos tal cual
+  if (url.includes('/maps/embed') || url.includes('output=embed')) {
+    return url;
+  }
+
+  // Caso 5: URL de Google Maps normal, intentamos convertirla agregando output=embed
+  if (url.includes('google.com/maps') || url.includes('maps.google.com')) {
+    if (url.includes('q=')) {
+      return url.includes('?') ? `${url}&output=embed` : `${url}?output=embed`;
+    }
+  }
+
+  return url;
+}
+
 // Acción para actualizar la configuración de ubicación (Google Maps embed URL)
 export async function updateMapUrlAction(url: string) {
   try {
     const cookieStore = await cookies();
     const session = cookieStore.get('admin_session')?.value;
     if (!verifySessionToken(session)) {
-      return { success: false, error: 'No unauthorized access.' };
+      return { success: false, error: 'Acceso no autorizado.' };
     }
 
-    if (!url || !url.startsWith('https://')) {
-      return { success: false, error: 'Por favor, ingrese un enlace de inserción de Google Maps válido (comenzando con https://).' };
+    const formattedUrl = parseGoogleMapsUrl(url);
+
+    if (!formattedUrl || !formattedUrl.startsWith('https://')) {
+      return { success: false, error: 'Por favor, ingrese un enlace de inserción, dirección o coordenadas de Google Maps válidas.' };
     }
 
     const client = await clientPromise;
@@ -445,7 +486,7 @@ export async function updateMapUrlAction(url: string) {
 
     await (db.collection('configuracion') as any).updateOne(
       { _id: 'mapa' },
-      { $set: { url } },
+      { $set: { url: formattedUrl } },
       { upsert: true }
     );
 
