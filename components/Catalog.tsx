@@ -73,6 +73,8 @@ function LogoTioWilly({ className = '' }: { className?: string }) {
 export function ProductCard({ product, categoryName }: { product: Product; categoryName?: string }) {
   const [activeIdx, setActiveIdx] = useState(0);
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   // Soporte de gestos táctiles (swipe) para móviles
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
@@ -121,7 +123,10 @@ export function ProductCard({ product, categoryName }: { product: Product; categ
   const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(textMessage)}`;
 
   return (
-    <div className="group relative flex flex-col rounded-3xl bg-zinc-950/80 border border-zinc-800/80 hover:border-red-500/40 transition-all duration-500 overflow-hidden shadow-2xl hover:shadow-red-950/20 shadow-black/80">
+    <div 
+      onClick={() => setIsModalOpen(true)}
+      className="group relative flex flex-col rounded-3xl bg-zinc-950/80 border border-zinc-800/80 hover:border-red-500/40 transition-all duration-500 overflow-hidden shadow-2xl hover:shadow-red-950/20 shadow-black/80 cursor-pointer"
+    >
       {/* Carrusel de Imágenes con soporte híbrido de gestos swipe */}
       <div 
         className="relative aspect-square w-full bg-zinc-900 overflow-hidden cursor-grab active:cursor-grabbing select-none"
@@ -205,7 +210,10 @@ export function ProductCard({ product, categoryName }: { product: Product; categ
               {product.varieties.map((varName: string, idx: number) => (
                 <button
                   key={idx}
-                  onClick={() => setActiveIdx(idx)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActiveIdx(idx);
+                  }}
                   className={`text-xs px-2.5 py-1 rounded-lg border transition-all duration-300 ${
                     idx === activeIdx
                       ? 'bg-red-950/40 text-red-400 border-red-500/50'
@@ -238,11 +246,11 @@ export function ProductCard({ product, categoryName }: { product: Product; categ
           </div>
         </div>
 
-        {/* Botón WhatsApp */}
         <a
           href={whatsappUrl}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={(e) => e.stopPropagation()}
           className="mt-5 w-full py-3.5 px-4 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-xl font-bold flex items-center justify-center gap-2.5 transition-all duration-300 shadow-lg shadow-red-900/20 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-red-500/50"
         >
           {/* WhatsApp Icon */}
@@ -252,6 +260,180 @@ export function ProductCard({ product, categoryName }: { product: Product; categ
           Pedir por WhatsApp
         </a>
       </div>
+
+      {/* Modal flotante de información completa del producto */}
+      {isModalOpen && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md transition-all duration-300 animate-fadeIn"
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsModalOpen(false);
+          }}
+        >
+          {/* Tarjeta del Modal */}
+          <div 
+            className="w-full max-w-2xl bg-zinc-950 border border-zinc-900 rounded-3xl overflow-hidden shadow-2xl shadow-black relative flex flex-col max-h-[90vh] md:max-h-[85vh] animate-scaleUp"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Botón de Cerrar */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsModalOpen(false);
+              }}
+              className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-black/70 hover:bg-red-650 text-white flex items-center justify-center transition-colors duration-300 backdrop-blur-md cursor-pointer focus:outline-none"
+              aria-label="Cerrar modal"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            {/* Contenedor de Contenido con Scroll */}
+            <div className="overflow-y-auto flex flex-col md:flex-row gap-6 p-6 sm:p-8">
+              
+              {/* Columna Izquierda: Galería/Carrusel del Producto */}
+              <div className="w-full md:w-1/2 flex flex-col gap-4">
+                <div 
+                  className="relative aspect-square w-full bg-zinc-900 rounded-2xl overflow-hidden cursor-grab active:cursor-grabbing select-none border border-zinc-900"
+                  onTouchStart={onTouchStart}
+                  onTouchMove={onTouchMove}
+                  onTouchEnd={onTouchEnd}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <img 
+                    src={currentImage} 
+                    alt={`${product.name} - ${currentVariety}`}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent opacity-40"></div>
+
+                  {product.images.length > 1 && (
+                    <>
+                      <button 
+                        onClick={handlePrev}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/60 hover:bg-red-600/90 text-white flex items-center justify-center transition-colors duration-300 backdrop-blur-sm focus:outline-none"
+                        aria-label="Imagen anterior"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                      </button>
+                      <button 
+                        onClick={handleNext}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/60 hover:bg-red-600/90 text-white flex items-center justify-center transition-colors duration-300 backdrop-blur-sm focus:outline-none"
+                        aria-label="Siguiente imagen"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                      </button>
+                    </>
+                  )}
+
+                  {/* Puntos del Carrusel */}
+                  <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-10">
+                    {product.images.map((_, idx: number) => (
+                      <button
+                        key={idx}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveIdx(idx);
+                        }}
+                        className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                          idx === activeIdx ? 'bg-red-500 w-4' : 'bg-white/40 hover:bg-white/80'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Categoría Badge */}
+                <div className="flex items-center gap-2">
+                  <span className="px-3 py-1 text-[10px] font-extrabold uppercase tracking-widest text-red-500 bg-red-950/40 border border-red-500/30 rounded-full">
+                    {categoryName || product.category}
+                  </span>
+                </div>
+              </div>
+
+              {/* Columna Derecha: Información Detallada */}
+              <div className="w-full md:w-1/2 flex flex-col justify-between gap-5 text-left">
+                <div>
+                  <h3 className="text-xl sm:text-2xl font-black text-white tracking-wide leading-tight">
+                    {product.name}
+                  </h3>
+                  
+                  {/* Selección de Variedades en Modal */}
+                  {product.varieties.length > 1 && (
+                    <div className="mt-4">
+                      <span className="text-[10px] text-zinc-500 block mb-2 uppercase font-extrabold tracking-wider">Variedades disponibles:</span>
+                      <div className="flex flex-wrap gap-2">
+                        {product.varieties.map((varName: string, idx: number) => (
+                          <button
+                            key={idx}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setActiveIdx(idx);
+                            }}
+                            className={`text-xs px-3 py-1.5 rounded-xl border transition-all duration-300 font-medium ${
+                              idx === activeIdx
+                                ? 'bg-red-950/40 text-red-400 border-red-500/50'
+                                : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:border-zinc-700 hover:text-white'
+                            }`}
+                          >
+                            {varName}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="h-[1px] bg-zinc-900 my-4"></div>
+
+                  <span className="text-[10px] text-zinc-500 block mb-1 uppercase font-extrabold tracking-wider">Descripción del Producto:</span>
+                  <p className="text-zinc-350 text-sm leading-relaxed whitespace-pre-line font-medium overflow-y-auto max-h-[150px] md:max-h-[220px] pr-2 scrollbar-thin">
+                    {product.description}
+                  </p>
+                </div>
+
+                <div>
+                  {/* Caja de Precios en el Modal */}
+                  <div className="p-4 rounded-2xl bg-zinc-900/60 border border-zinc-900 flex flex-col gap-2.5">
+                    <div className="flex justify-between items-baseline">
+                      <span className="text-xs text-zinc-400 font-medium uppercase tracking-wide">Precio Detal:</span>
+                      <span className="text-2xl font-black text-white font-mono">${product.priceDetal.toFixed(2)}</span>
+                    </div>
+                    <div className="h-[1px] bg-zinc-800/40"></div>
+                    <div className="flex justify-between items-baseline">
+                      <div className="flex flex-col">
+                        <span className="text-xs text-red-500 font-bold uppercase tracking-wide">Precio Mayor:</span>
+                        <span className="text-[10px] text-zinc-500 italic">Mínimo {product.minMayor} unidades</span>
+                      </div>
+                      <span className="text-xl font-black text-red-400 font-mono">${product.priceMayor.toFixed(2)}</span>
+                    </div>
+                  </div>
+
+                  {/* Enlace WhatsApp de Compra */}
+                  <a
+                    href={whatsappUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="mt-4 w-full py-3.5 px-4 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-xl font-bold flex items-center justify-center gap-2.5 transition-all duration-300 shadow-lg shadow-red-900/20 active:scale-[0.98] focus:outline-none"
+                  >
+                    <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                      <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.835-9.977c.311.089.822.112 1.134.112.31 0 .82-.112 1.131-.492.311-.38.82-1.993.899-2.15.079-.156.13-.339.028-.553-.102-.213-.822-1.994-.822-1.994-.127-.278-.261-.318-.466-.318-.17 0-.368-.012-.566-.012-.397 0-.907.146-1.22.492-.311.38-1.189 1.163-1.189 2.833 0 1.67 1.218 3.282 1.388 3.507.17.225 2.4 3.665 5.811 5.138.81.35 1.442.56 1.933.717.813.259 1.554.223 2.14.136.652-.097 1.993-.815 2.276-1.602.283-.787.283-1.46.198-1.602-.085-.142-.311-.225-.652-.393-.34-.168-1.993-.984-2.276-1.085-.283-.101-.49-.152-.697.152-.207.304-.803 1.085-.984 1.288-.18.203-.362.228-.703.06-.34-.168-1.436-.53-2.735-1.688-1.01-.902-1.693-2.016-1.892-2.355-.198-.339-.021-.523.149-.692.153-.152.34-.393.51-.59.17-.197.226-.338.339-.564.113-.225.056-.422-.028-.59-.084-.168-.703-1.692-1.01-2.434-.298-.718-.604-.621-.822-.631-.212-.01-.453-.012-.694-.012-.24 0-.631.09-.962.45-.33.36-1.26 1.23-1.26 3.003 0 1.77 1.29 3.48 1.47 3.73.18.25 2.54 3.88 6.16 5.45.86.37 1.53.59 2.06.76.87.28 1.66.24 2.28.15.69-.1 2.12-.87 2.42-1.71.3-.84.3-1.56.21-1.71-.09-.15-.33-.24-.72-.43z"/>
+                    </svg>
+                    Pedir por WhatsApp
+                  </a>
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
