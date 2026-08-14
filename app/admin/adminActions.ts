@@ -442,13 +442,13 @@ function parseGoogleMapsUrl(inputUrl: string): string {
   // Caso 2: El usuario pegó una URL estándar con coordenadas (ej: https://www.google.com/maps/...@10.5061957,-66.913273,15z...)
   const coordMatch = url.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/) || url.match(/place\/(-?\d+\.\d+),(-?\d+\.\d+)/);
   if (coordMatch && coordMatch[1] && coordMatch[2]) {
-    return `https://maps.google.com/maps?q=${coordMatch[1]},${coordMatch[2]}&z=15&output=embed`;
+    return `https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d3923.3670984803977!2d${coordMatch[2]}!3d${coordMatch[1]}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1ses-419!2sve!4v1710000000000!5m2!1ses-419!2sve`;
   }
 
   // Caso 3: El usuario pegó coordenadas simples (ej: 10.5061957,-66.913273)
   const simpleCoordMatch = url.match(/^(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)$/);
   if (simpleCoordMatch && simpleCoordMatch[1] && simpleCoordMatch[2]) {
-    return `https://maps.google.com/maps?q=${simpleCoordMatch[1]},${simpleCoordMatch[2]}&z=15&output=embed`;
+    return `https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d3923.3670984803977!2d${simpleCoordMatch[2]}!3d${simpleCoordMatch[1]}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1ses-419!2sve!4v1710000000000!5m2!1ses-419!2sve`;
   }
 
   // Caso 4: Si ya es un enlace de inserción de Google Maps o tiene output=embed, lo dejamos tal cual

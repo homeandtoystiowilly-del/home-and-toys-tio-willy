@@ -664,7 +664,7 @@ export default function Catalog({
           {/* Mapa Responsivo */}
           <div className="w-full max-w-4xl aspect-[16/9] sm:aspect-[21/9] min-h-[320px] rounded-3xl overflow-hidden border border-zinc-800 shadow-2xl shadow-black/80">
             <iframe
-              src={mapUrl || 'https://maps.google.com/maps?q=10.5061957,-66.913273&z=15&output=embed'}
+              src={mapUrl || 'https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d3923.3670984803977!2d-66.91327300000002!3d10.506195699999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1ses-419!2sve!4v1710000000000!5m2!1ses-419!2sve'}
               className="w-full h-full border-0 grayscale invert contrast-[1.2]"
               allowFullScreen={false}
               loading="lazy"
@@ -672,6 +672,21 @@ export default function Catalog({
               title="Google Maps Ubicación Tío Willy"
             ></iframe>
           </div>
+
+          {/* Botón de Acción Directa ("Cómo llegar") */}
+          <a
+            href="https://www.google.com/maps/dir/?api=1&destination=10.5061957,-66.913273"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-6 px-6 py-3.5 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-xl font-bold flex items-center justify-center gap-2.5 transition-all duration-300 shadow-lg shadow-red-950/20 active:scale-[0.98] text-xs sm:text-sm cursor-pointer select-none"
+            title="Cómo llegar con Google Maps"
+          >
+            <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            Cómo llegar
+          </a>
         </div>
       </section>
 
