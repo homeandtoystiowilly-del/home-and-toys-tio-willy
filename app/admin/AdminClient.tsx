@@ -108,7 +108,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
     setProducts(initialProducts);
   }, [initialProducts]);
 
-  // Temporizador de inactividad de 30 segundos
+  // Temporizador de inactividad de 60 segundos
   useEffect(() => {
     // Solo activar el temporizador si el usuario está autorizado
     if (!isAuthorized) return;
@@ -119,7 +119,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
       clearTimeout(timeoutId);
       timeoutId = setTimeout(() => {
         handleLogout(true); // Cerrar sesión y redirigir con parámetro
-      }, 30000); // 30 segundos
+      }, 60000); // 60 segundos (1 minuto)
     };
 
     // Eventos a monitorear para detectar actividad
