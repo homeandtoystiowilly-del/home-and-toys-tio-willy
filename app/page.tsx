@@ -14,12 +14,18 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/images/chair_red.jpg',
+        url: '/images/logo.jpg',
         width: 800,
         height: 800,
-        alt: 'Silla Gamer Ergonómica Tío Willy'
+        alt: 'Home and Toys Tío Willy Logo'
       }
     ]
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Home and Toys Tío Willy - Catálogo Premium',
+    description: 'Explora nuestro catálogo exclusivo de productos para el hogar, juguetes y tecnología. Precios especiales al detal y al mayor.',
+    images: ['/images/logo.jpg']
   }
 };
 
