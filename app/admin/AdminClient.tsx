@@ -11,7 +11,8 @@ import {
   deleteProductAction,
   updateProductPricesAction,
   updateProductAction,
-  updateMapUrlAction 
+  updateMapUrlAction,
+  updateGlobalCurrencyAction 
 } from './adminActions';
 
 // Interfaces locales coincidentes con Catalog.tsx
@@ -91,9 +92,10 @@ interface AdminClientProps {
   categories: Category[];
   initialProducts: Product[];
   initialMapUrl: string;
+  initialCurrency: string;
 }
 
-export default function AdminClient({ isAuthorized, categories: serverCategories, initialProducts, initialMapUrl }: AdminClientProps) {
+export default function AdminClient({ isAuthorized, categories: serverCategories, initialProducts, initialMapUrl, initialCurrency }: AdminClientProps) {
   const router = useRouter();
 
   // Estado reactivo local para sincronización instantánea
@@ -156,7 +158,6 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
   const [priceMayor, setPriceMayor] = useState('');
   const [minMayor, setMinMayor] = useState('3');
   const [varieties, setVarieties] = useState('Estándar');
-  const [currency, setCurrency] = useState('USD');
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
@@ -182,6 +183,38 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
   const [mapLoading, setMapLoading] = useState(false);
   const [mapSuccessMsg, setMapSuccessMsg] = useState('');
   const [mapErrorMsg, setMapErrorMsg] = useState('');
+
+  // Estados de la moneda global
+  const [globalCurrency, setGlobalCurrency] = useState(initialCurrency || 'USD');
+  const [currencySuccessMsg, setCurrencySuccessMsg] = useState('');
+  const [currencyErrorMsg, setCurrencyErrorMsg] = useState('');
+  const [currencyLoading, setCurrencyLoading] = useState(false);
+
+  // Sincronizar moneda global cuando cambie desde las props del servidor
+  useEffect(() => {
+    setGlobalCurrency(initialCurrency);
+  }, [initialCurrency]);
+
+  const handleUpdateGlobalCurrency = async (newVal: string) => {
+    setGlobalCurrency(newVal);
+    setCurrencyLoading(true);
+    setCurrencySuccessMsg('');
+    setCurrencyErrorMsg('');
+
+    try {
+      const res = await updateGlobalCurrencyAction(newVal);
+      if (res.success) {
+        setCurrencySuccessMsg(`Moneda actualizada a ${newVal === 'EUR' ? 'EUR (€)' : 'USD ($)'}`);
+        router.refresh();
+      } else {
+        setCurrencyErrorMsg(res.error || 'Error al actualizar la moneda.');
+      }
+    } catch (err: any) {
+      setCurrencyErrorMsg(err.message || 'Error de red al actualizar la moneda.');
+    } finally {
+      setCurrencyLoading(false);
+    }
+  };
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -280,7 +313,6 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
     setPriceMayor(product.priceMayor.toString());
     setMinMayor(product.minMayor.toString());
     setVarieties(product.varieties.join(', '));
-    setCurrency(product.currency || 'USD');
     setExistingImages(product.images || []);
     
     // Limpiar archivos locales recién seleccionados para evitar mezclas involuntarias
@@ -302,7 +334,6 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
     setPriceMayor('');
     setMinMayor('3');
     setVarieties('Estándar');
-    setCurrency('USD');
     setExistingImages([]);
     setSelectedFiles([]);
     setPreviewUrls([]);
@@ -337,7 +368,6 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
     formData.append('priceMayor', priceMayor);
     formData.append('minMayor', minMayor);
     formData.append('varieties', varieties);
-    formData.append('currency', currency);
     
     if (editingProductId) {
       formData.append('existingImages', JSON.stringify(existingImages));
@@ -364,7 +394,6 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
         setPriceMayor('');
         setMinMayor('3');
         setVarieties('Estándar');
-        setCurrency('USD');
         setSelectedFiles([]);
         setPreviewUrls([]);
         setExistingImages([]);
@@ -703,23 +732,10 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                   />
                 </div>
 
-                {/* Moneda de Precios */}
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs font-bold text-zinc-500 uppercase tracking-wide">Moneda de Precios</label>
-                  <select
-                    value={currency}
-                    onChange={(e) => setCurrency(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white focus:outline-none transition-all text-sm font-semibold cursor-pointer"
-                  >
-                    <option value="USD" className="bg-zinc-950 text-white">Dólares (USD $)</option>
-                    <option value="EUR" className="bg-zinc-950 text-white">Euros (EUR €)</option>
-                  </select>
-                </div>
-
                 {/* Precios Detal/Mayor */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1">
-                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wide">Precio al detal ({currency})</label>
+                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wide">Precio al detal ({globalCurrency})</label>
                     <input
                       type="number"
                       step="0.01"
@@ -732,7 +748,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                   </div>
 
                   <div className="flex flex-col gap-1">
-                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wide">Precio al mayor ({currency})</label>
+                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wide">Precio al mayor ({globalCurrency})</label>
                     <input
                       type="number"
                       step="0.01"
@@ -949,6 +965,39 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                 </button>
               </form>
             </div>
+
+            {/* 4. Configuración de Moneda Global Card */}
+            <div className="p-6 rounded-3xl bg-zinc-950 border border-zinc-900 shadow-xl shadow-black/60 flex flex-col gap-5">
+              <div>
+                <h2 className="text-lg font-bold tracking-wide text-white">Moneda Global del Catálogo</h2>
+                <p className="text-zinc-500 text-xs mt-1">Configura la divisa de toda la tienda. Los cambios se guardan y aplican automáticamente.</p>
+              </div>
+
+              {currencySuccessMsg && (
+                <div className="p-3 rounded-xl bg-emerald-950/20 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">
+                  {currencySuccessMsg}
+                </div>
+              )}
+
+              {currencyErrorMsg && (
+                <div className="p-3 rounded-xl bg-red-950/20 border border-red-500/30 text-red-400 text-xs font-semibold">
+                  {currencyErrorMsg}
+                </div>
+              )}
+
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Divisa Seleccionada</span>
+                <select
+                  value={globalCurrency}
+                  onChange={(e) => handleUpdateGlobalCurrency(e.target.value)}
+                  disabled={currencyLoading}
+                  className="w-full px-3.5 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white focus:outline-none transition-all text-xs font-semibold cursor-pointer disabled:opacity-50"
+                >
+                  <option value="USD" className="bg-zinc-950 text-white">Dólares (USD $)</option>
+                  <option value="EUR" className="bg-zinc-950 text-white">Euros (EUR €)</option>
+                </select>
+              </div>
+            </div>
           </div>
 
           {/* COLUMNA DERECHA: Listado de Productos (7 cols) */}
@@ -1027,7 +1076,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                           </div>
 
                           <div className="text-[10px] text-zinc-500 italic mt-0.5 select-none font-medium">
-                            Detal {prod.currency === 'EUR' ? '€' : '$'}{prod.priceDetal.toFixed(2)} · Mayor {prod.currency === 'EUR' ? '€' : '$'}{prod.priceMayor.toFixed(2)}
+                            Detal {globalCurrency === 'EUR' ? '€' : '$'}{prod.priceDetal.toFixed(2)} · Mayor {globalCurrency === 'EUR' ? '€' : '$'}{prod.priceMayor.toFixed(2)}
                           </div>
                         </div>
                       </div>

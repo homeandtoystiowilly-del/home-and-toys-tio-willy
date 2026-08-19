@@ -71,7 +71,7 @@ function LogoTioWilly({ className = '' }: { className?: string }) {
 }
 
 // Subcomponente para cada Tarjeta de Producto (Exportado para vista previa en admin)
-export function ProductCard({ product, categoryName }: { product: Product; categoryName?: string }) {
+export function ProductCard({ product, categoryName, currency = 'USD' }: { product: Product; categoryName?: string; currency?: string }) {
   const [activeIdx, setActiveIdx] = useState(0);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -118,7 +118,7 @@ export function ProductCard({ product, categoryName }: { product: Product; categ
   const currentImage = product.images[activeIdx] || '/images/chair_red.jpg';
   const currentVariety = product.varieties[activeIdx] || product.varieties[0];
 
-  const symbol = product.currency === 'EUR' ? '€' : '$';
+  const symbol = currency === 'EUR' ? '€' : '$';
 
   // Enlace de WhatsApp
   const phone = '584244576086'; // Número del cliente
@@ -444,11 +444,13 @@ export function ProductCard({ product, categoryName }: { product: Product; categ
 export default function Catalog({ 
   initialProductos, 
   initialCategorias,
-  mapUrl
+  mapUrl,
+  currency = 'USD'
 }: { 
   initialProductos: Product[]; 
   initialCategorias: Category[]; 
   mapUrl?: string;
+  currency?: string;
 }) {
   const [selectedCategory, setSelectedCategory] = useState<string>('todos');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -810,6 +812,7 @@ export default function Catalog({
                       key={prod._id} 
                       product={prod} 
                       categoryName={categoryName} 
+                      currency={currency}
                     />
                   );
                 })}

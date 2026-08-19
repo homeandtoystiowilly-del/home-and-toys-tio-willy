@@ -505,3 +505,35 @@ export async function updateMapUrlAction(url: string) {
     return { success: false, error: getFriendlyError(error, 'Error interno al actualizar la ubicación.') };
   }
 }
+
+// Acción para actualizar la moneda global en la configuración de la tienda
+export async function updateGlobalCurrencyAction(currency: string) {
+  try {
+    const cookieStore = await cookies();
+    const session = cookieStore.get('admin_session')?.value;
+    if (!verifySessionToken(session)) {
+      return { success: false, error: 'Acceso no autorizado.' };
+    }
+
+    if (currency !== 'USD' && currency !== 'EUR') {
+      return { success: false, error: 'Moneda no soportada.' };
+    }
+
+    const client = await clientPromise;
+    const db = client.db('tio_willy_db');
+
+    await (db.collection('configuracion') as any).updateOne(
+      { _id: 'moneda' },
+      { $set: { value: currency } },
+      { upsert: true }
+    );
+
+    revalidatePath('/');
+    revalidatePath('/admin');
+
+    return { success: true, message: `Moneda global actualizada a ${currency === 'EUR' ? 'Euros (€)' : 'Dólares ($)'} con éxito.` };
+  } catch (error: any) {
+    console.error('Error al actualizar la moneda global:', error);
+    return { success: false, error: getFriendlyError(error, 'Error al actualizar la moneda global.') };
+  }
+}

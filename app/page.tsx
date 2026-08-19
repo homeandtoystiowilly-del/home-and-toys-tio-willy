@@ -31,7 +31,7 @@ export const metadata: Metadata = {
 
 export default async function Home() {
   // Intentar sembrar y obtener los datos de la base de datos (con fallback automático)
-  const { productos, categorias, mapUrl, isFallback } = await seedDatabase();
+  const { productos, categorias, mapUrl, currency, isFallback } = await seedDatabase();
 
   return (
     <>
@@ -41,7 +41,7 @@ export default async function Home() {
       )}
       
       {/* Componente de catálogo interactivo */}
-      <Catalog initialProductos={productos} initialCategorias={categorias} mapUrl={mapUrl} />
+      <Catalog initialProductos={productos} initialCategorias={categorias} mapUrl={mapUrl} currency={currency || 'USD'} />
     </>
   );
 }
