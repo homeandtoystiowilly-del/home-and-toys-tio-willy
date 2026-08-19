@@ -825,7 +825,10 @@ export default function Catalog({
             {totalPages > 1 && (
               <div className="flex items-center justify-center gap-2.5 mt-4">
                 <button
-                  onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+                  onClick={() => {
+                    setCurrentPage((p) => Math.max(p - 1, 1));
+                    document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
                   disabled={currentPage === 1}
                   className="w-11 h-11 rounded-xl bg-zinc-950 border border-zinc-900 flex items-center justify-center hover:border-red-500/40 active:bg-zinc-900 disabled:opacity-30 disabled:pointer-events-none transition-all duration-300"
                   aria-label="Página anterior"
@@ -840,7 +843,10 @@ export default function Catalog({
                   return (
                     <button
                       key={pageNum}
-                      onClick={() => setCurrentPage(pageNum)}
+                      onClick={() => {
+                        setCurrentPage(pageNum);
+                        document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' });
+                      }}
                       className={`w-11 h-11 rounded-xl font-bold transition-all duration-300 ${
                         currentPage === pageNum
                           ? 'bg-red-600 text-white shadow-lg shadow-red-950/20'
@@ -853,7 +859,10 @@ export default function Catalog({
                 })}
 
                 <button
-                  onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+                  onClick={() => {
+                    setCurrentPage((p) => Math.min(p + 1, totalPages));
+                    document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
                   disabled={currentPage === totalPages}
                   className="w-11 h-11 rounded-xl bg-zinc-950 border border-zinc-900 flex items-center justify-center hover:border-red-500/40 active:bg-zinc-900 disabled:opacity-30 disabled:pointer-events-none transition-all duration-300"
                   aria-label="Siguiente página"
