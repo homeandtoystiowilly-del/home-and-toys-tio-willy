@@ -218,6 +218,11 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Estados para buscador, paginación y confirmación
+  const [adminSearchQuery, setAdminSearchQuery] = useState('');
+  const [adminPage, setAdminPage] = useState(1);
+  const [productToDelete, setProductToDelete] = useState<string | null>(null);
+
   // Auto-seleccionar primera categoría si cambia
   useEffect(() => {
     if (categories.length > 0 && !category) {
@@ -470,9 +475,13 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
     }
   };
 
-  // Eliminar Producto
-  const handleDeleteProduct = async (id: string) => {
-    if (!confirm('¿Estás seguro de eliminar este producto del catálogo?')) return;
+  // Eliminar Producto (Disparar Modal de Confirmación)
+  const handleDeleteProduct = (id: string) => {
+    setProductToDelete(id);
+  };
+
+  // Confirmar y Ejecutar Eliminación Real
+  const executeDeleteProduct = async (id: string) => {
     try {
       const res = await deleteProductAction(id);
       if (res.success) {
@@ -567,6 +576,28 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
       </div>
     );
   }
+
+  // Filtrar y paginar productos para el listado del panel de administración
+  const filteredProducts = products.filter((prod) => {
+    const query = adminSearchQuery.toLowerCase().trim();
+    if (!query) return true;
+    return (
+      prod.name.toLowerCase().includes(query) ||
+      prod.description.toLowerCase().includes(query) ||
+      (categories.find((c) => c._id === prod.category)?.name || '').toLowerCase().includes(query)
+    );
+  });
+
+  const itemsPerPage = 10;
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  
+  // Ajustar la página si los filtros dejan al usuario fuera de rango
+  const activeAdminPage = Math.min(adminPage, Math.max(1, totalPages));
+
+  const paginatedAdminProducts = filteredProducts.slice(
+    (activeAdminPage - 1) * itemsPerPage,
+    activeAdminPage * itemsPerPage
+  );
 
   // VISTA 2: PANEL DE CONTROL
   return (
@@ -1003,7 +1034,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
           {/* COLUMNA DERECHA: Listado de Productos (7 cols) */}
           <section className="lg:col-span-7 p-6 rounded-3xl bg-zinc-950 border border-zinc-900 shadow-xl shadow-black/60 flex flex-col gap-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold tracking-wide text-white">Productos ({products.length})</h2>
+              <h2 className="text-xl font-bold tracking-wide text-white">Productos ({filteredProducts.length})</h2>
               {priceSavingId && (
                 <div className="flex items-center gap-1.5 text-xs text-emerald-500 font-bold animate-pulse">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
@@ -1012,9 +1043,28 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
               )}
             </div>
 
-            {products.length > 0 ? (
+            {/* Buscador de productos */}
+            <div className="relative">
+              <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-500">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </span>
+              <input
+                type="text"
+                placeholder="Buscar por nombre, descripción o categoría..."
+                value={adminSearchQuery}
+                onChange={(e) => {
+                  setAdminSearchQuery(e.target.value);
+                  setAdminPage(1); // Resetear a la primera página al escribir
+                }}
+                className="w-full pl-9 pr-4 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white placeholder-zinc-550 focus:outline-none transition-all text-xs font-medium"
+              />
+            </div>
+
+            {paginatedAdminProducts.length > 0 ? (
               <div className="flex flex-col gap-4">
-                {products.map((prod) => {
+                {paginatedAdminProducts.map((prod) => {
                   const prodCategory = categories.find((c) => c._id === prod.category)?.name || prod.category;
                   const totalImages = prod.images.length;
                   const thumbnail = prod.images[0] || '/images/chair_red.jpg';
@@ -1115,13 +1165,82 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 11m8 4V5M4 11v10l8 4" />
                 </svg>
                 <h3 className="text-base font-bold text-zinc-400">Sin productos</h3>
-                <p className="text-zinc-600 text-xs mt-0.5">El catálogo está vacío. Agrega uno en el formulario de la izquierda.</p>
+                <p className="text-zinc-600 text-xs mt-0.5">No hay productos que coincidan con la búsqueda.</p>
+              </div>
+            )}
+
+            {/* Controles de Paginación */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between border-t border-zinc-900/80 pt-4 mt-2">
+                <button
+                  type="button"
+                  disabled={activeAdminPage <= 1}
+                  onClick={() => setAdminPage((prev) => Math.max(1, prev - 1))}
+                  className="px-3.5 py-2 bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 disabled:opacity-30 disabled:hover:bg-zinc-900 text-zinc-450 hover:text-white rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
+                  </svg>
+                  Anterior
+                </button>
+                
+                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">
+                  Página {activeAdminPage} de {totalPages}
+                </span>
+
+                <button
+                  type="button"
+                  disabled={activeAdminPage >= totalPages}
+                  onClick={() => setAdminPage((prev) => Math.min(totalPages, prev + 1))}
+                  className="px-3.5 py-2 bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 disabled:opacity-30 disabled:hover:bg-zinc-900 text-zinc-450 hover:text-white rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5"
+                >
+                  Siguiente
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
               </div>
             )}
           </section>
 
         </div>
       </main>
+
+      {/* Modal de Confirmación de Eliminación */}
+      {productToDelete && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn">
+          <div className="w-full max-w-sm p-6 rounded-3xl bg-zinc-950 border border-zinc-900 shadow-2xl flex flex-col gap-4 animate-scaleUp">
+            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-red-950/40 border border-red-500/30 text-red-500 mx-auto">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <div className="text-center">
+              <h3 className="text-base font-bold text-white">¿Estás seguro de que deseas eliminar este producto?</h3>
+              <p className="text-xs text-zinc-500 mt-1.5">Esta acción no se puede deshacer y el producto desaparecerá del catálogo público.</p>
+            </div>
+            <div className="grid grid-cols-2 gap-3 mt-2">
+              <button
+                onClick={() => setProductToDelete(null)}
+                className="py-2.5 bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 text-zinc-350 hover:text-white rounded-xl text-xs font-bold transition-all cursor-pointer"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => {
+                  if (productToDelete) {
+                    executeDeleteProduct(productToDelete);
+                    setProductToDelete(null);
+                  }
+                }}
+                className="py-2.5 bg-red-600 hover:bg-red-550 active:bg-red-700 text-white rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center"
+              >
+                Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
