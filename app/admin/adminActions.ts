@@ -160,6 +160,8 @@ export async function createProductAction(formData: FormData) {
       category = newCategoryId;
     }
 
+    const currency = (formData.get('currency') as string) || 'USD';
+
     const newProduct = {
       name,
       description,
@@ -169,6 +171,7 @@ export async function createProductAction(formData: FormData) {
       minMayor,
       images: finalImages,
       varieties,
+      currency,
       createdAt: new Date()
     };
 
@@ -400,6 +403,8 @@ export async function updateProductAction(productId: string, formData: FormData)
 
     const queryId = ObjectId.isValid(productId) && productId.length === 24 ? new ObjectId(productId) : productId;
 
+    const currency = (formData.get('currency') as string) || 'USD';
+
     await db.collection('productos').updateOne(
       { _id: queryId as any },
       {
@@ -412,6 +417,7 @@ export async function updateProductAction(productId: string, formData: FormData)
           minMayor,
           images: finalImages,
           varieties,
+          currency,
           updatedAt: new Date()
         }
       }

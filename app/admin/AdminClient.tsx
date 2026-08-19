@@ -25,6 +25,7 @@ export interface Product {
   minMayor: number;
   images: string[];
   varieties: string[];
+  currency?: string;
 }
 
 export interface Category {
@@ -155,6 +156,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
   const [priceMayor, setPriceMayor] = useState('');
   const [minMayor, setMinMayor] = useState('3');
   const [varieties, setVarieties] = useState('Estándar');
+  const [currency, setCurrency] = useState('USD');
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
@@ -278,6 +280,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
     setPriceMayor(product.priceMayor.toString());
     setMinMayor(product.minMayor.toString());
     setVarieties(product.varieties.join(', '));
+    setCurrency(product.currency || 'USD');
     setExistingImages(product.images || []);
     
     // Limpiar archivos locales recién seleccionados para evitar mezclas involuntarias
@@ -299,6 +302,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
     setPriceMayor('');
     setMinMayor('3');
     setVarieties('Estándar');
+    setCurrency('USD');
     setExistingImages([]);
     setSelectedFiles([]);
     setPreviewUrls([]);
@@ -333,6 +337,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
     formData.append('priceMayor', priceMayor);
     formData.append('minMayor', minMayor);
     formData.append('varieties', varieties);
+    formData.append('currency', currency);
     
     if (editingProductId) {
       formData.append('existingImages', JSON.stringify(existingImages));
@@ -359,6 +364,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
         setPriceMayor('');
         setMinMayor('3');
         setVarieties('Estándar');
+        setCurrency('USD');
         setSelectedFiles([]);
         setPreviewUrls([]);
         setExistingImages([]);
@@ -697,10 +703,23 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                   />
                 </div>
 
+                {/* Moneda de Precios */}
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-bold text-zinc-500 uppercase tracking-wide">Moneda de Precios</label>
+                  <select
+                    value={currency}
+                    onChange={(e) => setCurrency(e.target.value)}
+                    className="w-full px-3.5 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white focus:outline-none transition-all text-sm font-semibold cursor-pointer"
+                  >
+                    <option value="USD" className="bg-zinc-950 text-white">Dólares (USD $)</option>
+                    <option value="EUR" className="bg-zinc-950 text-white">Euros (EUR €)</option>
+                  </select>
+                </div>
+
                 {/* Precios Detal/Mayor */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1">
-                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wide">Precio al detal (USD)</label>
+                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wide">Precio al detal ({currency})</label>
                     <input
                       type="number"
                       step="0.01"
@@ -713,7 +732,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                   </div>
 
                   <div className="flex flex-col gap-1">
-                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wide">Precio al mayor (USD)</label>
+                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wide">Precio al mayor ({currency})</label>
                     <input
                       type="number"
                       step="0.01"
@@ -1008,7 +1027,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                           </div>
 
                           <div className="text-[10px] text-zinc-500 italic mt-0.5 select-none font-medium">
-                            Detal ${prod.priceDetal.toFixed(2)} · Mayor ${prod.priceMayor.toFixed(2)}
+                            Detal {prod.currency === 'EUR' ? '€' : '$'}{prod.priceDetal.toFixed(2)} · Mayor {prod.currency === 'EUR' ? '€' : '$'}{prod.priceMayor.toFixed(2)}
                           </div>
                         </div>
                       </div>

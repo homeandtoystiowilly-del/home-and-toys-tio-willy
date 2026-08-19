@@ -13,6 +13,7 @@ export interface Product {
   minMayor: number;
   images: string[];
   varieties: string[];
+  currency?: string;
 }
 
 export interface Category {
@@ -117,9 +118,11 @@ export function ProductCard({ product, categoryName }: { product: Product; categ
   const currentImage = product.images[activeIdx] || '/images/chair_red.jpg';
   const currentVariety = product.varieties[activeIdx] || product.varieties[0];
 
+  const symbol = product.currency === 'EUR' ? '€' : '$';
+
   // Enlace de WhatsApp
   const phone = '584244576086'; // Número del cliente
-  const textMessage = `Hola Tío Willy, me interesa consultar por el producto:\n\n*${product.name}*\n- *Variedad:* ${currentVariety}\n- *Precio Detal:* $${product.priceDetal.toFixed(2)}\n- *Precio Mayor:* $${product.priceMayor.toFixed(2)} (A partir de ${product.minMayor} unidades)\n\n¿Tienen stock disponible?`;
+  const textMessage = `Hola Tío Willy, me interesa consultar por el producto:\n\n*${product.name}*\n- *Variedad:* ${currentVariety}\n- *Precio Detal:* ${symbol}${product.priceDetal.toFixed(2)}\n- *Precio Mayor:* ${symbol}${product.priceMayor.toFixed(2)} (A partir de ${product.minMayor} unidades)\n\n¿Tienen stock disponible?`;
   const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(textMessage)}`;
 
   return (
@@ -234,7 +237,7 @@ export function ProductCard({ product, categoryName }: { product: Product; categ
         <div className="mt-4 p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800/40 flex flex-col gap-2.5">
           <div className="flex justify-between items-baseline">
             <span className="text-xs text-zinc-400 font-medium uppercase tracking-wide">Precio Detal:</span>
-            <span className="text-2xl font-black text-white font-mono">${product.priceDetal.toFixed(2)}</span>
+            <span className="text-2xl font-black text-white font-mono">{symbol}{product.priceDetal.toFixed(2)}</span>
           </div>
           <div className="h-[1px] bg-zinc-800/60"></div>
           <div className="flex justify-between items-baseline">
@@ -242,7 +245,7 @@ export function ProductCard({ product, categoryName }: { product: Product; categ
               <span className="text-xs text-red-500 font-bold uppercase tracking-wide">Precio Mayor:</span>
               <span className="text-[10px] text-zinc-500 italic">Mínimo {product.minMayor} unidades</span>
             </div>
-            <span className="text-xl font-black text-red-400 font-mono">${product.priceMayor.toFixed(2)}</span>
+            <span className="text-xl font-black text-red-400 font-mono">{symbol}{product.priceMayor.toFixed(2)}</span>
           </div>
         </div>
 
@@ -401,7 +404,7 @@ export function ProductCard({ product, categoryName }: { product: Product; categ
                   <div className="p-4 rounded-2xl bg-zinc-900/60 border border-zinc-900 flex flex-col gap-2.5">
                     <div className="flex justify-between items-baseline">
                       <span className="text-xs text-zinc-400 font-medium uppercase tracking-wide">Precio Detal:</span>
-                      <span className="text-2xl font-black text-white font-mono">${product.priceDetal.toFixed(2)}</span>
+                      <span className="text-2xl font-black text-white font-mono">{symbol}{product.priceDetal.toFixed(2)}</span>
                     </div>
                     <div className="h-[1px] bg-zinc-800/40"></div>
                     <div className="flex justify-between items-baseline">
@@ -409,7 +412,7 @@ export function ProductCard({ product, categoryName }: { product: Product; categ
                         <span className="text-xs text-red-500 font-bold uppercase tracking-wide">Precio Mayor:</span>
                         <span className="text-[10px] text-zinc-500 italic">Mínimo {product.minMayor} unidades</span>
                       </div>
-                      <span className="text-xl font-black text-red-400 font-mono">${product.priceMayor.toFixed(2)}</span>
+                      <span className="text-xl font-black text-red-400 font-mono">{symbol}{product.priceMayor.toFixed(2)}</span>
                     </div>
                   </div>
 
