@@ -28,6 +28,7 @@ export interface Product {
   varieties: string[];
   currency?: string;
   subcategory?: string;
+  featured?: boolean;
 }
 
 export interface Category {
@@ -160,6 +161,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
   const [minMayor, setMinMayor] = useState('3');
   const [varieties, setVarieties] = useState('Estándar');
   const [subcategory, setSubcategory] = useState('');
+  const [featured, setFeatured] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
@@ -321,6 +323,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
     setMinMayor(product.minMayor.toString());
     setVarieties(product.varieties.join(', '));
     setSubcategory(product.subcategory || '');
+    setFeatured(!!product.featured);
     setExistingImages(product.images || []);
     
     // Limpiar archivos locales recién seleccionados para evitar mezclas involuntarias
@@ -343,6 +346,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
     setMinMayor('3');
     setVarieties('Estándar');
     setSubcategory('');
+    setFeatured(false);
     setExistingImages([]);
     setSelectedFiles([]);
     setPreviewUrls([]);
@@ -378,6 +382,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
     formData.append('minMayor', minMayor);
     formData.append('varieties', varieties);
     formData.append('subcategory', subcategory);
+    formData.append('featured', featured ? 'true' : 'false');
     
     if (editingProductId) {
       formData.append('existingImages', JSON.stringify(existingImages));
@@ -405,6 +410,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
         setMinMayor('3');
         setVarieties('Estándar');
         setSubcategory('');
+        setFeatured(false);
         setSelectedFiles([]);
         setPreviewUrls([]);
         setExistingImages([]);
@@ -856,6 +862,21 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                     onChange={(e) => setSubcategory(e.target.value)}
                     className="w-full px-3.5 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white placeholder-zinc-650 focus:outline-none transition-all text-sm font-medium"
                   />
+                </div>
+
+                {/* Producto Destacado */}
+                <div className="flex items-center gap-3 bg-zinc-900/30 border border-zinc-900 rounded-xl p-3.5 select-none">
+                  <input
+                    type="checkbox"
+                    id="featured"
+                    checked={featured}
+                    onChange={(e) => setFeatured(e.target.checked)}
+                    className="w-4 h-4 rounded text-red-650 bg-zinc-900 border-zinc-800 focus:ring-red-500/35 focus:ring-2 focus:ring-offset-0 focus:outline-none accent-red-600 cursor-pointer"
+                  />
+                  <label htmlFor="featured" className="flex flex-col cursor-pointer">
+                    <span className="text-xs font-bold text-white uppercase tracking-wide">Destacar Producto</span>
+                    <span className="text-[10px] text-zinc-500 mt-0.5">Mostrar en la sección principal superior del catálogo</span>
+                  </label>
                 </div>
 
                 {/* Descripción (Rellenado básico o amplio) */}
