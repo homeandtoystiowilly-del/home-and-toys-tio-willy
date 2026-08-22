@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
+import { jsPDF } from 'jspdf';
 
 // Interfaces para TypeScript
 export interface Product {
@@ -577,6 +578,7 @@ export default function Catalog({
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [showInactivityAlert, setShowInactivityAlert] = useState<boolean>(false);
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>('todos');
+  const [pdfLoading, setPdfLoading] = useState<boolean>(false);
 
   // Resetear subcategoría cuando cambia la categoría principal
   useEffect(() => {
@@ -596,6 +598,228 @@ export default function Catalog({
     const productsInCategory = initialProductos.filter((p) => p.category === selectedCategory);
     return getSubcategoriesForCategory(productsInCategory, initialCategorias);
   }, [selectedCategory, initialProductos, initialCategorias]);
+
+  // Helper to load an image URL and convert it to Base64
+  const getBase64ImageFromUrl = async (url: string): Promise<string> => {
+    try {
+      const controller = new AbortController();
+      const id = setTimeout(() => controller.abort(), 6000); // 6s timeout
+      const res = await fetch(url, { signal: controller.signal });
+      clearTimeout(id);
+      
+      const blob = await res.blob();
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = () => resolve('');
+        reader.readAsDataURL(blob);
+      });
+    } catch (e) {
+      console.warn("Error fetching image for PDF: ", url, e);
+      return '';
+    }
+  };
+
+  const handleGenerateCatalogPDF = async () => {
+    if (pdfLoading) return;
+    setPdfLoading(true);
+
+    try {
+      const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      const pageWidth = doc.internal.pageSize.getWidth(); // 210
+      const pageHeight = doc.internal.pageSize.getHeight(); // 297
+
+      // --- PAGINA DE PORTADA ---
+      // Fondo oscuro sutil
+      doc.setFillColor(13, 13, 15);
+      doc.rect(0, 0, pageWidth, pageHeight, 'F');
+
+      // Líneas decorativas rojas
+      doc.setDrawColor(255, 45, 45);
+      doc.setLineWidth(1.5);
+      doc.line(15, 30, pageWidth - 15, 30);
+      doc.line(15, pageHeight - 30, pageWidth - 15, pageHeight - 30);
+
+      // Título Principal
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(26);
+      doc.text("HOME & TOYS TÍO WILLY", pageWidth / 2, 75, { align: 'center' });
+
+      // Subtítulo
+      doc.setTextColor(255, 45, 45);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(16);
+      doc.text("CATÁLOGO DE PRODUCTOS", pageWidth / 2, 95, { align: 'center' });
+      
+      doc.setTextColor(200, 200, 200);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(12);
+      doc.text("Edición Especial para Colaboradores (Sin Precios)", pageWidth / 2, 105, { align: 'center' });
+
+      // Cuerpo Portada
+      doc.setTextColor(150, 150, 150);
+      doc.setFontSize(10);
+      const introText = "Este catálogo contiene el listado completo de productos de Home & Toys Tío Willy. Las imágenes y descripciones han sido optimizadas para que puedas presentarlas a tus clientes y comercializarlas bajo tus propias tarifas y márgenes de ganancia.";
+      const splitIntro = doc.splitTextToSize(introText, pageWidth - 40);
+      doc.text(splitIntro, pageWidth / 2, 140, { align: 'center' });
+
+      // Instrucciones de venta
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.text("SÉ PARTE DE NUESTRO EQUIPO:", 25, 185);
+      
+      doc.setTextColor(180, 180, 180);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9.5);
+      const points = [
+        "1. Selecciona los productos de interés en este catálogo.",
+        "2. Promociónalos en tus redes, grupos o clientes directos.",
+        "3. Establece tus propios precios de venta al detal o mayor.",
+        "4. Levanta los pedidos y contáctanos para despachar la mercancía."
+      ];
+      points.forEach((p, idx) => {
+        doc.text(p, 25, 195 + (idx * 7));
+      });
+
+      // Contacto Portada
+      doc.setTextColor(255, 45, 45);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.text("Ubicación: Centro de Caracas, Torres a Madrices, Edif. Arvelo, PB", pageWidth / 2, 245, { align: 'center' });
+      doc.setTextColor(255, 255, 255);
+      doc.text("Contacto: 0424-4576086 / 0424-1439324", pageWidth / 2, 252, { align: 'center' });
+
+      // --- PRODUCTOS ---
+      let currentY = 25;
+      const margin = 15;
+      const contentWidth = pageWidth - (margin * 2);
+
+      for (let i = 0; i < initialProductos.length; i++) {
+        const prod = initialProductos[i];
+        
+        if (i === 0 || currentY + 55 > pageHeight - 20) {
+          doc.addPage();
+          
+          doc.setFillColor(10, 10, 12);
+          doc.rect(0, 0, pageWidth, pageHeight, 'F');
+          
+          doc.setFillColor(20, 20, 25);
+          doc.rect(0, 0, pageWidth, 15, 'F');
+          doc.setDrawColor(255, 45, 45);
+          doc.setLineWidth(0.5);
+          doc.line(0, 15, pageWidth, 15);
+          
+          doc.setTextColor(255, 255, 255);
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(8);
+          doc.text("HOME & TOYS TÍO WILLY  |  CATÁLOGO DE PRODUCTOS (COLABORADORES)", margin, 10);
+
+          currentY = 25;
+        }
+
+        // Dibujar contenedor del producto
+        doc.setFillColor(18, 18, 22);
+        doc.roundedRect(margin, currentY, contentWidth, 50, 3, 3, 'F');
+        doc.setDrawColor(35, 35, 45);
+        doc.setLineWidth(0.3);
+        doc.roundedRect(margin, currentY, contentWidth, 50, 3, 3, 'D');
+
+        // Procesar Imagen de Producto (Asíncrono)
+        let imgBase64 = '';
+        if (prod.images && prod.images[0]) {
+          imgBase64 = await getBase64ImageFromUrl(prod.images[0]);
+        }
+
+        // Dibujar recuadro de imagen
+        const imgX = margin + 5;
+        const imgY = currentY + 5;
+        const imgW = 40;
+        const imgH = 40;
+
+        doc.setFillColor(25, 25, 30);
+        doc.roundedRect(imgX, imgY, imgW, imgH, 2, 2, 'F');
+
+        if (imgBase64) {
+          try {
+            doc.addImage(imgBase64, 'JPEG', imgX, imgY, imgW, imgH);
+          } catch (e) {
+            doc.setTextColor(100, 100, 100);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(7);
+            doc.text("Ver Foto Online", imgX + 11, imgY + 21);
+          }
+        } else {
+          doc.setTextColor(100, 100, 100);
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(7);
+          doc.text("Foto en Catálogo", imgX + 11, imgY + 21);
+        }
+
+        // Datos del Producto (a la derecha de la imagen)
+        const infoX = imgX + imgW + 6;
+        const infoY = currentY + 8;
+        const infoW = contentWidth - imgW - 16;
+
+        // Categoría (Badge pequeño)
+        const categoryObj = initialCategorias.find((c) => c._id === prod.category);
+        const categoryName = (categoryObj ? categoryObj.name : prod.category).toUpperCase();
+        
+        doc.setFillColor(255, 45, 45);
+        doc.roundedRect(infoX, infoY - 3, doc.getTextWidth(categoryName) + 4, 4.5, 1, 1, 'F');
+        
+        doc.setTextColor(255, 255, 255);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(6.5);
+        doc.text(categoryName, infoX + 2, infoY + 0.3);
+
+        // Nombre del Producto
+        doc.setTextColor(255, 255, 255);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(11);
+        doc.text(prod.name, infoX, infoY + 7);
+
+        // Subcategoría manual o automática (Opcional)
+        const subcat = prod.subcategory || '';
+        if (subcat) {
+          doc.setTextColor(200, 200, 200);
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(8);
+          doc.text(`Variante: ${subcat}`, infoX, infoY + 12.5);
+        }
+
+        // Descripción
+        doc.setTextColor(160, 160, 170);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8.5);
+        const splitDesc = doc.splitTextToSize(prod.description, infoW);
+        const slicedDesc = splitDesc.slice(0, 3);
+        doc.text(slicedDesc, infoX, infoY + (subcat ? 18.5 : 15.5));
+
+        // Pie de Página
+        doc.setTextColor(90, 90, 100);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(7);
+        doc.text("Catálogo Exclusivo para Socios de Ventas de Tío Willy  |  Sin Precios de Referencia", margin, pageHeight - 8);
+
+        // Incrementar Y
+        currentY += 56;
+      }
+
+      doc.save("Catalogo_Tio_Willy_Colaboradores.pdf");
+    } catch (error) {
+      console.error("Error al generar catálogo PDF: ", error);
+      alert("Ocurrió un error al compilar el catálogo PDF. Por favor intente de nuevo.");
+    } finally {
+      setPdfLoading(false);
+    }
+  };
 
   // Comprobar si se cerró sesión por inactividad (detectar query param)
   useEffect(() => {
@@ -781,6 +1005,25 @@ export default function Catalog({
 
           {/* Contact / Drawer Trigger */}
           <div className="flex items-center gap-3">
+            <button
+              onClick={handleGenerateCatalogPDF}
+              disabled={pdfLoading}
+              className="hidden md:flex items-center gap-1.5 px-4 py-2 rounded-full bg-zinc-900 border border-zinc-800 hover:border-red-500/50 hover:bg-zinc-850 text-zinc-400 hover:text-white text-xs font-bold transition-all uppercase tracking-wider cursor-pointer disabled:opacity-50"
+            >
+              {pdfLoading ? (
+                <>
+                  <span className="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+                  Generando...
+                </>
+              ) : (
+                <>
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Trabaja con nosotros
+                </>
+              )}
+            </button>
             <a 
               href="https://wa.me/584244576086"
               target="_blank"
@@ -827,6 +1070,30 @@ export default function Catalog({
               </svg>
             </button>
           </div>
+
+          {/* Botón Trabaja con nosotros Móvil */}
+          <button
+            onClick={() => {
+              handleGenerateCatalogPDF();
+              setIsDrawerOpen(false);
+            }}
+            disabled={pdfLoading}
+            className="w-full py-3.5 bg-red-950/20 hover:bg-red-900/30 border border-red-500/30 text-red-500 hover:text-white rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+          >
+            {pdfLoading ? (
+              <>
+                <span className="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+                Generando Catálogo...
+              </>
+            ) : (
+              <>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Sé parte de Tío Willy (Catálogo PDF)
+              </>
+            )}
+          </button>
 
           {/* Buscador dentro del menú móvil */}
           <div className="flex flex-col gap-2">
