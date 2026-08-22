@@ -14,6 +14,7 @@ export interface Product {
   images: string[];
   varieties: string[];
   currency?: string;
+  subcategory?: string;
 }
 
 export interface Category {
@@ -446,6 +447,12 @@ function getSubcategoriesForCategory(productsInCategory: Product[], categoriesLi
   const subcats = new Set<string>();
   
   productsInCategory.forEach(product => {
+    // 0. Priorizar la subcategoría manual si existe
+    if (product.subcategory && product.subcategory.trim().length > 0) {
+      subcats.add(product.subcategory.trim());
+      return;
+    }
+
     const nameLower = product.name.toLowerCase();
     
     // 1. Tamaños de Rin (Bicicletas y Juguetes con ruedas)
@@ -618,6 +625,11 @@ export default function Catalog({
     // 2. Filtrar por subcategoría si hay una seleccionada y no es 'todos'
     if (selectedCategory !== 'todos' && selectedSubcategory !== 'todos') {
       list = list.filter((p) => {
+        // Criterio 0: Prioridad a la subcategoría manual si existe
+        if (p.subcategory && p.subcategory.trim().length > 0) {
+          return p.subcategory.trim().toLowerCase() === selectedSubcategory.toLowerCase();
+        }
+
         const nameLower = p.name.toLowerCase();
         const subcatLower = selectedSubcategory.toLowerCase();
 

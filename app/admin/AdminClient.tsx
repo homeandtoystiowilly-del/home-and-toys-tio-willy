@@ -27,6 +27,7 @@ export interface Product {
   images: string[];
   varieties: string[];
   currency?: string;
+  subcategory?: string;
 }
 
 export interface Category {
@@ -158,6 +159,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
   const [priceMayor, setPriceMayor] = useState('');
   const [minMayor, setMinMayor] = useState('3');
   const [varieties, setVarieties] = useState('Estándar');
+  const [subcategory, setSubcategory] = useState('');
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
@@ -318,6 +320,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
     setPriceMayor(product.priceMayor.toString());
     setMinMayor(product.minMayor.toString());
     setVarieties(product.varieties.join(', '));
+    setSubcategory(product.subcategory || '');
     setExistingImages(product.images || []);
     
     // Limpiar archivos locales recién seleccionados para evitar mezclas involuntarias
@@ -339,6 +342,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
     setPriceMayor('');
     setMinMayor('3');
     setVarieties('Estándar');
+    setSubcategory('');
     setExistingImages([]);
     setSelectedFiles([]);
     setPreviewUrls([]);
@@ -373,6 +377,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
     formData.append('priceMayor', priceMayor);
     formData.append('minMayor', minMayor);
     formData.append('varieties', varieties);
+    formData.append('subcategory', subcategory);
     
     if (editingProductId) {
       formData.append('existingImages', JSON.stringify(existingImages));
@@ -399,6 +404,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
         setPriceMayor('');
         setMinMayor('3');
         setVarieties('Estándar');
+        setSubcategory('');
         setSelectedFiles([]);
         setPreviewUrls([]);
         setExistingImages([]);
@@ -835,6 +841,21 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                       </option>
                     ))}
                   </select>
+                </div>
+
+                {/* Subcategoría Manual */}
+                <div className="flex flex-col gap-1">
+                  <div className="flex justify-between items-baseline">
+                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wide">Subcategoría (Opcional)</label>
+                    <span className="text-[10px] text-zinc-650 italic">Ej: Rin 12, Rin 16, Audio, Muebles</span>
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Dejar en blanco para autodetectar"
+                    value={subcategory}
+                    onChange={(e) => setSubcategory(e.target.value)}
+                    className="w-full px-3.5 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white placeholder-zinc-650 focus:outline-none transition-all text-sm font-medium"
+                  />
                 </div>
 
                 {/* Descripción (Rellenado básico o amplio) */}

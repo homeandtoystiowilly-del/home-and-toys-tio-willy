@@ -161,6 +161,7 @@ export async function createProductAction(formData: FormData) {
     }
 
     const currency = (formData.get('currency') as string) || 'USD';
+    const subcategory = (formData.get('subcategory') as string || '').trim();
 
     const newProduct = {
       name,
@@ -172,6 +173,7 @@ export async function createProductAction(formData: FormData) {
       images: finalImages,
       varieties,
       currency,
+      subcategory: subcategory || undefined,
       createdAt: new Date()
     };
 
@@ -404,6 +406,7 @@ export async function updateProductAction(productId: string, formData: FormData)
     const queryId = ObjectId.isValid(productId) && productId.length === 24 ? new ObjectId(productId) : productId;
 
     const currency = (formData.get('currency') as string) || 'USD';
+    const subcategory = (formData.get('subcategory') as string || '').trim();
 
     await db.collection('productos').updateOne(
       { _id: queryId as any },
@@ -418,6 +421,7 @@ export async function updateProductAction(productId: string, formData: FormData)
           images: finalImages,
           varieties,
           currency,
+          subcategory: subcategory || undefined,
           updatedAt: new Date()
         }
       }
