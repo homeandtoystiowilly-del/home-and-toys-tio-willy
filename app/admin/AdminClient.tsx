@@ -270,7 +270,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
     try {
       const res = await verifyPasswordAction(password);
       if (res.success) {
-        router.refresh();
+        window.location.href = '/admin';
       } else {
         setLoginError(res.error || 'Contraseña incorrecta');
       }
