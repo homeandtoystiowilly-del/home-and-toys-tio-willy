@@ -1237,7 +1237,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
               </svg>
             </div>
             <div className="text-center">
-              <h3 className="text-base font-bold text-white">¿Estás seguro de que deseas eliminar este producto?</h3>
+              <h3 className="text-base font-bold text-white">¿Está seguro de que desea borrar este producto?</h3>
               <p className="text-xs text-zinc-500 mt-1.5">Esta acción no se puede deshacer y el producto desaparecerá del catálogo público.</p>
             </div>
             <div className="grid grid-cols-2 gap-3 mt-2">
