@@ -15,7 +15,6 @@ export interface Product {
   varieties: string[];
   currency?: string;
   subcategory?: string;
-  featured?: boolean;
 }
 
 export interface Category {
@@ -598,11 +597,6 @@ export default function Catalog({
     return getSubcategoriesForCategory(productsInCategory, initialCategorias);
   }, [selectedCategory, initialProductos, initialCategorias]);
 
-  // Obtener la lista de productos destacados
-  const featuredProducts = useMemo(() => {
-    return initialProductos.filter((p) => p.featured === true);
-  }, [initialProductos]);
-
   // Comprobar si se cerró sesión por inactividad (detectar query param)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -935,47 +929,6 @@ export default function Catalog({
 
       {/* Main Content Area */}
       <main id="catalogo" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        
-        {/* Productos Destacados Slider Section */}
-        {featuredProducts.length > 0 && (
-          <section className="w-full mb-12 flex flex-col gap-5 bg-zinc-950/20 border border-zinc-900/60 rounded-[32px] p-6 shadow-xl shadow-black/40 relative overflow-hidden">
-            {/* Luces de fondo ambientación sutil */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/5 rounded-full blur-[80px] pointer-events-none"></div>
-
-            <div className="flex items-center justify-between relative z-10">
-              <h3 className="text-lg font-black tracking-wider text-white uppercase flex items-center gap-2">
-                <span className="flex items-center justify-center w-8 h-8 rounded-xl bg-red-950/40 border border-red-500/30 text-red-500 animate-pulse">
-                  <svg className="w-4.5 h-4.5 fill-current" viewBox="0 0 24 24">
-                    <path d="M12 .587l3.668 7.431 8.2 1.191-5.934 5.784 1.4 8.168L12 18.896l-7.334 3.857 1.4-8.168L.132 9.209l8.2-1.191L12 .587z"/>
-                  </svg>
-                </span>
-                Productos Destacados
-              </h3>
-              <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest bg-zinc-900 border border-zinc-850 px-2.5 py-1 rounded-full">
-                Especiales
-              </span>
-            </div>
-
-            {/* Slider de Desplazamiento Horizontal */}
-            <div className="flex gap-5 overflow-x-auto pb-4 pt-1 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent snap-x snap-mandatory relative z-10">
-              {featuredProducts.map((prod: Product) => {
-                const categoryObj = initialCategorias.find((c) => c._id === prod.category);
-                const categoryName = categoryObj ? categoryObj.name : prod.category;
-
-                return (
-                  <div key={prod._id} className="w-64 flex-shrink-0 snap-start">
-                    <ProductCard 
-                      product={prod} 
-                      categoryName={categoryName} 
-                      currency={currency} 
-                    />
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-        )}
-
         <div className="flex flex-col lg:flex-row gap-8 lg:items-start">
           
           {/* Columna Izquierda: Filtros de Categoría y Buscador */}
