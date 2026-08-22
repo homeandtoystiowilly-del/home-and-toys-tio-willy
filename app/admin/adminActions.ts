@@ -541,3 +541,38 @@ export async function updateGlobalCurrencyAction(currency: string) {
     return { success: false, error: getFriendlyError(error, 'Error al actualizar la moneda global.') };
   }
 }
+
+// Acción ligera para registrar visitas y clics de WhatsApp (Cero autenticación requerida)
+export async function trackEventAction(type: 'visit' | 'whatsapp_click', productId?: string) {
+  try {
+    const client = await clientPromise;
+    const db = client.db('tio_willy_db');
+
+    if (type === 'visit') {
+      await (db.collection('metricas') as any).updateOne(
+        { _id: 'general' },
+        { $inc: { visitas: 1 } },
+        { upsert: true }
+      );
+    } else if (type === 'whatsapp_click') {
+      await (db.collection('metricas') as any).updateOne(
+        { _id: 'general' },
+        { $inc: { whatsapp: 1 } },
+        { upsert: true }
+      );
+
+      if (productId) {
+        const queryId = ObjectId.isValid(productId) && productId.length === 24 ? new ObjectId(productId) : productId;
+        await (db.collection('productos') as any).updateOne(
+          { _id: queryId as any },
+          { $inc: { clicks: 1 } }
+        );
+      }
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error tracking event:', error);
+    return { success: false };
+  }
+}

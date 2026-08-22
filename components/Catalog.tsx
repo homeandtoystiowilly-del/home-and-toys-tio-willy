@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { jsPDF } from 'jspdf';
+import { trackEventAction } from '../app/admin/adminActions';
 
 // Interfaces para TypeScript
 export interface Product {
@@ -16,6 +17,7 @@ export interface Product {
   varieties: string[];
   currency?: string;
   subcategory?: string;
+  clicks?: number;
 }
 
 export interface Category {
@@ -255,7 +257,10 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
           href={whatsappUrl}
           target="_blank"
           rel="noopener noreferrer"
-          onClick={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.stopPropagation();
+            trackEventAction('whatsapp_click', product._id).catch(err => console.error("Error tracking click:", err));
+          }}
           className="mt-5 w-full py-3.5 px-4 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-xl font-bold flex items-center justify-center gap-2.5 transition-all duration-300 shadow-lg shadow-red-900/20 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-red-500/50"
         >
           {/* WhatsApp Icon */}
@@ -423,7 +428,10 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
                     href={whatsappUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      trackEventAction('whatsapp_click', product._id).catch(err => console.error("Error tracking click:", err));
+                    }}
                     className="mt-4 w-full py-3.5 px-4 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-xl font-bold flex items-center justify-center gap-2.5 transition-all duration-300 shadow-lg shadow-red-900/20 active:scale-[0.98] focus:outline-none"
                   >
                     <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
@@ -848,6 +856,9 @@ export default function Catalog({
 
   // Comprobar si se cerró sesión por inactividad (detectar query param)
   useEffect(() => {
+    // Registrar la visita al sitio de forma asíncrona no bloqueante
+    trackEventAction('visit').catch(err => console.error("Error tracking visit:", err));
+
     const params = new URLSearchParams(window.location.search);
     if (params.get('inactivity') === '1') {
       setShowInactivityAlert(true);

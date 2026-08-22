@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   verifyPasswordAction, 
@@ -28,6 +28,12 @@ export interface Product {
   varieties: string[];
   currency?: string;
   subcategory?: string;
+  clicks?: number;
+}
+
+export interface Stats {
+  visitas: number;
+  whatsapp: number;
 }
 
 export interface Category {
@@ -94,14 +100,16 @@ interface AdminClientProps {
   initialProducts: Product[];
   initialMapUrl: string;
   initialCurrency: string;
+  initialStats: Stats;
 }
 
-export default function AdminClient({ isAuthorized, categories: serverCategories, initialProducts, initialMapUrl, initialCurrency }: AdminClientProps) {
+export default function AdminClient({ isAuthorized, categories: serverCategories, initialProducts, initialMapUrl, initialCurrency, initialStats }: AdminClientProps) {
   const router = useRouter();
 
   // Estado reactivo local para sincronización instantánea
   const [categories, setCategories] = useState<Category[]>(serverCategories);
   const [products, setProducts] = useState<Product[]>(initialProducts);
+  const [stats, setStats] = useState<Stats>(initialStats);
 
   // Sincronizar estados locales cuando cambian las props del servidor
   useEffect(() => {
@@ -111,6 +119,18 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
   useEffect(() => {
     setProducts(initialProducts);
   }, [initialProducts]);
+
+  useEffect(() => {
+    setStats(initialStats);
+  }, [initialStats]);
+
+  // Obtener los 5 productos más consultados
+  const topProducts = useMemo(() => {
+    return [...products]
+      .filter(p => (p.clicks || 0) > 0)
+      .sort((a, b) => (b.clicks || 0) - (a.clicks || 0))
+      .slice(0, 5);
+  }, [products]);
 
   // Temporizador de inactividad de 60 segundos
   useEffect(() => {
@@ -636,7 +656,118 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
       </nav>
 
       {/* Grid Principal */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col gap-8">
+        
+        {/* Panel de Métricas de Tráfico */}
+        <section className="bg-zinc-950/40 border border-zinc-900 rounded-3xl p-6 relative overflow-hidden backdrop-blur-sm">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-red-650/3 rounded-full blur-[80px] pointer-events-none"></div>
+          
+          <div className="flex flex-col gap-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-900/60 pb-4">
+              <div>
+                <h2 className="text-lg font-bold text-white tracking-wide flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
+                  Métricas de Actividad Comercial
+                </h2>
+                <p className="text-xs text-zinc-500 mt-0.5">Estadísticas en tiempo real de visitas e interacciones en la tienda.</p>
+              </div>
+              <span className="text-[10px] bg-red-950/40 text-red-400 border border-red-500/20 rounded-full px-3 py-1 font-bold uppercase tracking-wider self-start sm:self-center">
+                Moneda actual: {globalCurrency}
+              </span>
+            </div>
+
+            {/* Fila de Tarjetas Métricas */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              
+              {/* Tarjeta: Visitas */}
+              <div className="p-4 rounded-2xl bg-zinc-950 border border-zinc-900 flex items-center gap-4 hover:border-zinc-800 transition-all duration-300">
+                <div className="w-12 h-12 rounded-xl bg-zinc-900 border border-zinc-850 flex items-center justify-center text-zinc-400">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                </div>
+                <div>
+                  <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block">Visitas Totales</span>
+                  <span className="text-2xl font-black text-white font-mono leading-none mt-1 block">
+                    {stats.visitas.toLocaleString()}
+                  </span>
+                </div>
+              </div>
+
+              {/* Tarjeta: Clics Whatsapp */}
+              <div className="p-4 rounded-2xl bg-zinc-950 border border-zinc-900 flex items-center gap-4 hover:border-zinc-800 transition-all duration-300">
+                <div className="w-12 h-12 rounded-xl bg-zinc-900 border border-zinc-850 flex items-center justify-center text-red-500">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  </svg>
+                </div>
+                <div>
+                  <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block">Interacciones (WhatsApp)</span>
+                  <span className="text-2xl font-black text-white font-mono leading-none mt-1 block">
+                    {stats.whatsapp.toLocaleString()}
+                  </span>
+                </div>
+              </div>
+
+              {/* Tarjeta: Conversion */}
+              <div className="p-4 rounded-2xl bg-zinc-950 border border-zinc-900 flex items-center gap-4 hover:border-zinc-800 transition-all duration-300">
+                <div className="w-12 h-12 rounded-xl bg-zinc-900 border border-zinc-850 flex items-center justify-center text-zinc-400">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                  </svg>
+                </div>
+                <div>
+                  <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block">Tasa de Conversión</span>
+                  <span className="text-2xl font-black text-red-400 font-mono leading-none mt-1 block">
+                    {stats.visitas > 0 ? ((stats.whatsapp / stats.visitas) * 100).toFixed(1) : '0.0'}%
+                  </span>
+                </div>
+              </div>
+
+            </div>
+
+            {/* Ranking de Productos */}
+            <div className="border-t border-zinc-900/60 pt-4 flex flex-col gap-3">
+              <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-1.5">
+                <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                Top 5 - Productos más Consultados (Clics en WhatsApp)
+              </h3>
+              
+              {topProducts.length === 0 ? (
+                <p className="text-xs text-zinc-650 italic pl-1">
+                  Aún no se registran clics de clientes en los productos del catálogo.
+                </p>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
+                  {topProducts.map((p: Product, idx: number) => (
+                    <div key={p._id} className="p-3.5 rounded-xl bg-zinc-950 border border-zinc-900 flex flex-col justify-between hover:border-zinc-800 transition-colors duration-300">
+                      <div>
+                        <div className="flex justify-between items-start gap-2">
+                          <span className="text-[9px] text-zinc-600 font-black uppercase font-mono">#{idx + 1}</span>
+                          <span className="text-[9px] bg-zinc-900 text-zinc-500 border border-zinc-850 px-2 py-0.5 rounded font-medium">
+                            {categories.find(c => c._id === p.category)?.name || p.category}
+                          </span>
+                        </div>
+                        <h4 className="text-xs font-bold text-white mt-1.5 line-clamp-1" title={p.name}>
+                          {p.name}
+                        </h4>
+                      </div>
+                      <div className="flex justify-between items-center mt-3 pt-2 border-t border-zinc-900/80">
+                        <span className="text-[10px] text-zinc-500 font-bold">Interacciones:</span>
+                        <span className="text-xs font-black text-red-400 font-mono">{p.clicks || 0} clics</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+          </div>
+        </section>
+
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
           {/* COLUMNA IZQUIERDA: Formulario de Carga y Categorías (5 cols) */}

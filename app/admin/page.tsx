@@ -3,6 +3,7 @@ import { seedDatabase } from '@/lib/dbSeed';
 import AdminClient from './AdminClient';
 import { Metadata } from 'next';
 import { verifySessionToken } from '@/lib/auth';
+import clientPromise from '@/lib/stitch';
 
 // Forzar renderizado dinámico en cada petición para evitar caché global en el CDN de Vercel
 export const dynamic = 'force-dynamic';
@@ -22,5 +23,30 @@ export default async function AdminPage() {
   // Obtener las categorías y productos dinámicos (creados en la base de datos o fallback)
   const { categorias, productos, mapUrl, currency } = await seedDatabase();
 
-  return <AdminClient isAuthorized={isAuthorized} categories={categorias} initialProducts={productos} initialMapUrl={mapUrl} initialCurrency={currency || 'USD'} />;
+  // Obtener estadísticas de tráfico desde MongoDB de forma segura
+  let stats = { visitas: 0, whatsapp: 0 };
+  try {
+    const client = await clientPromise;
+    const db = client.db('tio_willy_db');
+    const doc = await (db.collection('metricas') as any).findOne({ _id: 'general' });
+    if (doc) {
+      stats = {
+        visitas: doc.visitas || 0,
+        whatsapp: doc.whatsapp || 0,
+      };
+    }
+  } catch (err) {
+    console.error('Error al cargar estadísticas en panel:', err);
+  }
+
+  return (
+    <AdminClient 
+      isAuthorized={isAuthorized} 
+      categories={categorias} 
+      initialProducts={productos} 
+      initialMapUrl={mapUrl} 
+      initialCurrency={currency || 'USD'} 
+      initialStats={stats} 
+    />
+  );
 }
