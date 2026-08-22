@@ -20,6 +20,20 @@ export default async function AdminPage() {
   const session = cookieStore.get('admin_session')?.value;
   const isAuthorized = verifySessionToken(session);
 
+  // Si no está autorizado, renderizar el panel de login inmediatamente sin consultar la base de datos
+  if (!isAuthorized) {
+    return (
+      <AdminClient 
+        isAuthorized={false} 
+        categories={[]} 
+        initialProducts={[]} 
+        initialMapUrl="" 
+        initialCurrency="USD" 
+        initialStats={{ visitas: 0, whatsapp: 0 }} 
+      />
+    );
+  }
+
   // Obtener las categorías y productos dinámicos (creados en la base de datos o fallback)
   const { categorias, productos, mapUrl, currency } = await seedDatabase();
 
