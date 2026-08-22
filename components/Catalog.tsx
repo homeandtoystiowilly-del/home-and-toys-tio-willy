@@ -719,16 +719,34 @@ export default function Catalog({
       doc.setFontSize(8);
       doc.text("Herramienta de ventas autorizada para distribuidores independientes.", pageWidth / 2, 265, { align: 'center' });
 
-      // --- PRODUCTOS (Exactamente 3 por página, imágenes grandes) ---
+      // --- AGRUPAR PRODUCTOS POR CATEGORÍA ---
+      const grouped: { [categoryId: string]: Product[] } = {};
+      initialCategorias.forEach((cat) => {
+        grouped[cat._id] = [];
+      });
+      const unmatchedProducts: Product[] = [];
+
+      initialProductos.forEach((prod) => {
+        if (grouped[prod.category]) {
+          grouped[prod.category].push(prod);
+        } else {
+          unmatchedProducts.push(prod);
+        }
+      });
+
       let currentY = 20;
       const margin = 15;
       const contentWidth = pageWidth - (margin * 2); // 180
+      let firstItemRendered = false;
 
-      for (let i = 0; i < initialProductos.length; i++) {
-        const prod = initialProductos[i];
-        
-        // Cada 3 productos, o en el primero, agregamos una página
-        if (i % 3 === 0) {
+      // Iterar sobre las categorías
+      for (let c = 0; c < initialCategorias.length; c++) {
+        const cat = initialCategorias[c];
+        const catProducts = grouped[cat._id];
+        if (catProducts.length === 0) continue;
+
+        // Comprobar si cabe el banner de categoría + 1 producto (98mm de espacio)
+        if (!firstItemRendered || currentY + 98 > pageHeight - 20) {
           doc.addPage();
           
           // Fondo blanco para hojas de catálogo
@@ -749,100 +767,279 @@ export default function Catalog({
           doc.text("SOCIOS COMERCIALES", pageWidth - margin - 35, 11);
 
           currentY = 20;
+          firstItemRendered = true;
         }
 
-        // Altura de tarjeta: 78mm
-        const cardH = 78;
+        // Dibujar banner de categoría sutil
+        doc.setFillColor(242, 242, 247);
+        doc.roundedRect(margin, currentY, contentWidth, 9, 2, 2, 'F');
+        doc.setDrawColor(220, 220, 225);
+        doc.setLineWidth(0.3);
+        doc.roundedRect(margin, currentY, contentWidth, 9, 2, 2, 'D');
 
-        // Dibujar contenedor del producto en blanco con borde sutil
-        doc.setFillColor(255, 255, 255);
-        doc.roundedRect(margin, currentY, contentWidth, cardH, 3, 3, 'F');
-        doc.setDrawColor(225, 225, 230);
-        doc.setLineWidth(0.4);
-        doc.roundedRect(margin, currentY, contentWidth, cardH, 3, 3, 'D');
+        doc.setTextColor(50, 50, 60);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(9);
+        doc.text(`SECCIÓN: ${cat.name.toUpperCase()}`, margin + 5, currentY + 6);
+        currentY += 14;
 
-        // Procesar Imagen de Producto (Asíncrono)
-        let imgBase64 = '';
-        if (prod.images && prod.images[0]) {
-          imgBase64 = await getBase64ImageFromUrl(prod.images[0]);
-        }
+        // Listar productos de esta categoría
+        for (let pIdx = 0; pIdx < catProducts.length; pIdx++) {
+          const prod = catProducts[pIdx];
 
-        // Dibujar recuadro de imagen grande
-        const imgX = margin + 5;
-        const imgY = currentY + 5;
-        const imgW = 68;
-        const imgH = 68;
+          // Comprobar si cabe la tarjeta actual (78mm + 6mm = 84mm)
+          if (currentY + 84 > pageHeight - 20) {
+            doc.addPage();
+            
+            // Fondo blanco
+            doc.setFillColor(255, 255, 255);
+            doc.rect(0, 0, pageWidth, pageHeight, 'F');
+            
+            // Cabecera
+            doc.setDrawColor(215, 215, 220);
+            doc.setLineWidth(0.4);
+            doc.line(margin, 15, pageWidth - margin, 15);
+            
+            doc.setTextColor(100, 100, 105);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(7.5);
+            doc.text("CATÁLOGO DE PRODUCTOS", margin, 11);
+            
+            doc.setFont('helvetica', 'normal');
+            doc.text("SOCIOS COMERCIALES", pageWidth - margin - 35, 11);
 
-        doc.setFillColor(245, 245, 248);
-        doc.roundedRect(imgX, imgY, imgW, imgH, 2, 2, 'F');
-        doc.setDrawColor(235, 235, 240);
-        doc.roundedRect(imgX, imgY, imgW, imgH, 2, 2, 'D');
+            currentY = 20;
+          }
 
-        if (imgBase64) {
-          try {
-            doc.addImage(imgBase64, 'JPEG', imgX, imgY, imgW, imgH);
-          } catch (e) {
+          // Altura de tarjeta: 78mm
+          const cardH = 78;
+
+          // Dibujar contenedor del producto
+          doc.setFillColor(255, 255, 255);
+          doc.roundedRect(margin, currentY, contentWidth, cardH, 3, 3, 'F');
+          doc.setDrawColor(225, 225, 230);
+          doc.setLineWidth(0.4);
+          doc.roundedRect(margin, currentY, contentWidth, cardH, 3, 3, 'D');
+
+          // Procesar Imagen de Producto (Asíncrono)
+          let imgBase64 = '';
+          if (prod.images && prod.images[0]) {
+            imgBase64 = await getBase64ImageFromUrl(prod.images[0]);
+          }
+
+          // Dibujar recuadro de imagen grande
+          const imgX = margin + 5;
+          const imgY = currentY + 5;
+          const imgW = 68;
+          const imgH = 68;
+
+          doc.setFillColor(245, 245, 248);
+          doc.roundedRect(imgX, imgY, imgW, imgH, 2, 2, 'F');
+          doc.setDrawColor(235, 235, 240);
+          doc.roundedRect(imgX, imgY, imgW, imgH, 2, 2, 'D');
+
+          if (imgBase64) {
+            try {
+              doc.addImage(imgBase64, 'JPEG', imgX, imgY, imgW, imgH);
+            } catch (e) {
+              doc.setTextColor(140, 140, 145);
+              doc.setFont('helvetica', 'normal');
+              doc.setFontSize(8);
+              doc.text("Imagen del producto", imgX + 20, imgY + 35);
+            }
+          } else {
             doc.setTextColor(140, 140, 145);
             doc.setFont('helvetica', 'normal');
             doc.setFontSize(8);
-            doc.text("Imagen del producto", imgX + 20, imgY + 35);
+            doc.text("Imagen en catálogo", imgX + 21, imgY + 35);
           }
-        } else {
-          doc.setTextColor(140, 140, 145);
+
+          // Datos del Producto (a la derecha de la imagen)
+          const infoX = imgX + imgW + 6;
+          const infoY = currentY + 9;
+          const infoW = contentWidth - imgW - 16;
+
+          // Categoría (Badge pequeño gris)
+          doc.setFillColor(240, 240, 245);
+          doc.roundedRect(infoX, infoY - 3, doc.getTextWidth(cat.name.toUpperCase()) + 5, 4.5, 1, 1, 'F');
+          
+          doc.setTextColor(100, 100, 110);
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(6.5);
+          doc.text(cat.name.toUpperCase(), infoX + 2.5, infoY + 0.3);
+
+          // Nombre del Producto (Título grande)
+          doc.setTextColor(30, 30, 35);
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(12);
+          doc.text(prod.name, infoX, infoY + 7.5);
+
+          // Subcategoría o variantes
+          const subcat = prod.subcategory || '';
+          if (subcat) {
+            doc.setTextColor(120, 120, 125);
+            doc.setFont('helvetica', 'oblique');
+            doc.setFontSize(8.5);
+            doc.text(`Categoría secundaria: ${subcat}`, infoX, infoY + 13.5);
+          }
+
+          // Descripción (Salto automático, espacio generoso)
+          doc.setTextColor(75, 75, 80);
           doc.setFont('helvetica', 'normal');
-          doc.setFontSize(8);
-          doc.text("Imagen en catálogo", imgX + 21, imgY + 35);
+          doc.setFontSize(9);
+          const splitDesc = doc.splitTextToSize(prod.description, infoW);
+          const slicedDesc = splitDesc.slice(0, 4);
+          doc.text(slicedDesc, infoX, infoY + (subcat ? 20 : 16.5));
+
+          // Pie de Página
+          doc.setTextColor(150, 150, 155);
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(7);
+          doc.text("Catálogo de Referencia de Productos  |  Libre de Precios al Consumidor", margin, pageHeight - 8);
+
+          currentY += cardH + 6;
+        }
+      }
+
+      // Procesar productos huérfanos/sin categoría asignada al final
+      if (unmatchedProducts.length > 0) {
+        if (!firstItemRendered || currentY + 98 > pageHeight - 20) {
+          doc.addPage();
+          
+          doc.setFillColor(255, 255, 255);
+          doc.rect(0, 0, pageWidth, pageHeight, 'F');
+          
+          doc.setDrawColor(215, 215, 220);
+          doc.setLineWidth(0.4);
+          doc.line(margin, 15, pageWidth - margin, 15);
+          
+          doc.setTextColor(100, 100, 105);
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(7.5);
+          doc.text("CATÁLOGO DE PRODUCTOS", margin, 11);
+          
+          doc.setFont('helvetica', 'normal');
+          doc.text("SOCIOS COMERCIALES", pageWidth - margin - 35, 11);
+
+          currentY = 20;
+          firstItemRendered = true;
         }
 
-        // Datos del Producto (a la derecha de la imagen)
-        const infoX = imgX + imgW + 6; // 15 + 5 + 68 + 6 = 94
-        const infoY = currentY + 9;
-        const infoW = contentWidth - imgW - 16; // 180 - 68 - 16 = 96
+        // Dibujar banner "OTROS PRODUCTOS"
+        doc.setFillColor(242, 242, 247);
+        doc.roundedRect(margin, currentY, contentWidth, 9, 2, 2, 'F');
+        doc.setDrawColor(220, 220, 225);
+        doc.setLineWidth(0.3);
+        doc.roundedRect(margin, currentY, contentWidth, 9, 2, 2, 'D');
 
-        // Categoría (Badge pequeño gris)
-        const categoryObj = initialCategorias.find((c) => c._id === prod.category);
-        const categoryName = (categoryObj ? categoryObj.name : prod.category).toUpperCase();
-        
-        doc.setFillColor(240, 240, 245);
-        doc.roundedRect(infoX, infoY - 3, doc.getTextWidth(categoryName) + 5, 4.5, 1, 1, 'F');
-        
-        doc.setTextColor(100, 100, 110);
+        doc.setTextColor(50, 50, 60);
         doc.setFont('helvetica', 'bold');
-        doc.setFontSize(6.5);
-        doc.text(categoryName, infoX + 2.5, infoY + 0.3);
-
-        // Nombre del Producto (Título grande)
-        doc.setTextColor(30, 30, 35);
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(12);
-        doc.text(prod.name, infoX, infoY + 7.5);
-
-        // Subcategoría o variantes
-        const subcat = prod.subcategory || '';
-        if (subcat) {
-          doc.setTextColor(120, 120, 125);
-          doc.setFont('helvetica', 'oblique');
-          doc.setFontSize(8.5);
-          doc.text(`Categoría secundaria: ${subcat}`, infoX, infoY + 13.5);
-        }
-
-        // Descripción (Salto automático, espacio generoso)
-        doc.setTextColor(75, 75, 80);
-        doc.setFont('helvetica', 'normal');
         doc.setFontSize(9);
-        const splitDesc = doc.splitTextToSize(prod.description, infoW);
-        // Mostrar hasta 4 líneas
-        const slicedDesc = splitDesc.slice(0, 4);
-        doc.text(slicedDesc, infoX, infoY + (subcat ? 20 : 16.5));
+        doc.text("SECCIÓN: OTROS PRODUCTOS", margin + 5, currentY + 6);
+        currentY += 14;
 
-        // Pie de Página
-        doc.setTextColor(150, 150, 155);
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(7);
-        doc.text("Catálogo de Referencia de Productos  |  Libre de Precios al Consumidor", margin, pageHeight - 8);
+        for (let pIdx = 0; pIdx < unmatchedProducts.length; pIdx++) {
+          const prod = unmatchedProducts[pIdx];
 
-        // Incrementar Y para el siguiente producto (78mm + 6mm de espacio)
-        currentY += cardH + 6;
+          if (currentY + 84 > pageHeight - 20) {
+            doc.addPage();
+            
+            doc.setFillColor(255, 255, 255);
+            doc.rect(0, 0, pageWidth, pageHeight, 'F');
+            
+            doc.setDrawColor(215, 215, 220);
+            doc.setLineWidth(0.4);
+            doc.line(margin, 15, pageWidth - margin, 15);
+            
+            doc.setTextColor(100, 100, 105);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(7.5);
+            doc.text("CATÁLOGO DE PRODUCTOS", margin, 11);
+            
+            doc.setFont('helvetica', 'normal');
+            doc.text("SOCIOS COMERCIALES", pageWidth - margin - 35, 11);
+
+            currentY = 20;
+          }
+
+          const cardH = 78;
+
+          doc.setFillColor(255, 255, 255);
+          doc.roundedRect(margin, currentY, contentWidth, cardH, 3, 3, 'F');
+          doc.setDrawColor(225, 225, 230);
+          doc.setLineWidth(0.4);
+          doc.roundedRect(margin, currentY, contentWidth, cardH, 3, 3, 'D');
+
+          let imgBase64 = '';
+          if (prod.images && prod.images[0]) {
+            imgBase64 = await getBase64ImageFromUrl(prod.images[0]);
+          }
+
+          const imgX = margin + 5;
+          const imgY = currentY + 5;
+          const imgW = 68;
+          const imgH = 68;
+
+          doc.setFillColor(245, 245, 248);
+          doc.roundedRect(imgX, imgY, imgW, imgH, 2, 2, 'F');
+          doc.setDrawColor(235, 235, 240);
+          doc.roundedRect(imgX, imgY, imgW, imgH, 2, 2, 'D');
+
+          if (imgBase64) {
+            try {
+              doc.addImage(imgBase64, 'JPEG', imgX, imgY, imgW, imgH);
+            } catch (e) {
+              doc.setTextColor(140, 140, 145);
+              doc.setFont('helvetica', 'normal');
+              doc.setFontSize(8);
+              doc.text("Imagen del producto", imgX + 20, imgY + 35);
+            }
+          } else {
+            doc.setTextColor(140, 140, 145);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8);
+            doc.text("Imagen en catálogo", imgX + 21, imgY + 35);
+          }
+
+          const infoX = imgX + imgW + 6;
+          const infoY = currentY + 9;
+          const infoW = contentWidth - imgW - 16;
+
+          doc.setFillColor(240, 240, 245);
+          doc.roundedRect(infoX, infoY - 3, doc.getTextWidth("OTROS") + 5, 4.5, 1, 1, 'F');
+          
+          doc.setTextColor(100, 100, 110);
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(6.5);
+          doc.text("OTROS", infoX + 2.5, infoY + 0.3);
+
+          doc.setTextColor(30, 30, 35);
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(12);
+          doc.text(prod.name, infoX, infoY + 7.5);
+
+          const subcat = prod.subcategory || '';
+          if (subcat) {
+            doc.setTextColor(120, 120, 125);
+            doc.setFont('helvetica', 'oblique');
+            doc.setFontSize(8.5);
+            doc.text(`Categoría secundaria: ${subcat}`, infoX, infoY + 13.5);
+          }
+
+          doc.setTextColor(75, 75, 80);
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(9);
+          const splitDesc = doc.splitTextToSize(prod.description, infoW);
+          const slicedDesc = splitDesc.slice(0, 4);
+          doc.text(slicedDesc, infoX, infoY + (subcat ? 20 : 16.5));
+
+          doc.setTextColor(150, 150, 155);
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(7);
+          doc.text("Catálogo de Referencia de Productos  |  Libre de Precios al Consumidor", margin, pageHeight - 8);
+
+          currentY += cardH + 6;
+        }
       }
 
       doc.save("Catalogo_General_Productos.pdf");
