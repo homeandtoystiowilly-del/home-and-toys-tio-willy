@@ -634,102 +634,124 @@ export default function Catalog({
       const pageWidth = doc.internal.pageSize.getWidth(); // 210
       const pageHeight = doc.internal.pageSize.getHeight(); // 297
 
-      // --- PAGINA DE PORTADA ---
-      // Fondo oscuro sutil
-      doc.setFillColor(13, 13, 15);
+      // --- PAGINA DE PORTADA (Blanca / Minimalista) ---
+      // Fondo blanco
+      doc.setFillColor(255, 255, 255);
       doc.rect(0, 0, pageWidth, pageHeight, 'F');
 
-      // Líneas decorativas rojas
-      doc.setDrawColor(255, 45, 45);
-      doc.setLineWidth(1.5);
-      doc.line(15, 30, pageWidth - 15, 30);
-      doc.line(15, pageHeight - 30, pageWidth - 15, pageHeight - 30);
+      // Bordes decorativos finos en gris
+      doc.setDrawColor(220, 220, 225);
+      doc.setLineWidth(0.5);
+      doc.rect(10, 10, pageWidth - 20, pageHeight - 20, 'D');
+      doc.rect(12, 12, pageWidth - 24, pageHeight - 24, 'D');
 
       // Título Principal
-      doc.setTextColor(255, 255, 255);
+      doc.setTextColor(30, 30, 35);
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(26);
-      doc.text("HOME & TOYS TÍO WILLY", pageWidth / 2, 75, { align: 'center' });
+      doc.setFontSize(28);
+      doc.text("CATÁLOGO DE PRODUCTOS", pageWidth / 2, 70, { align: 'center' });
+
+      // Línea divisoria decorativa roja/gris
+      doc.setDrawColor(230, 50, 50);
+      doc.setLineWidth(1.5);
+      doc.line(40, 80, pageWidth - 40, 80);
 
       // Subtítulo
-      doc.setTextColor(255, 45, 45);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(16);
-      doc.text("CATÁLOGO DE PRODUCTOS", pageWidth / 2, 95, { align: 'center' });
-      
-      doc.setTextColor(200, 200, 200);
+      doc.setTextColor(100, 100, 105);
       doc.setFont('helvetica', 'normal');
-      doc.setFontSize(12);
-      doc.text("Edición Especial para Colaboradores (Sin Precios)", pageWidth / 2, 105, { align: 'center' });
-
-      // Cuerpo Portada
-      doc.setTextColor(150, 150, 150);
+      doc.setFontSize(14);
+      doc.text("Catálogo General de Artículos y Variantes", pageWidth / 2, 92, { align: 'center' });
+      
+      doc.setTextColor(140, 140, 145);
       doc.setFontSize(10);
-      const introText = "Este catálogo contiene el listado completo de productos de Home & Toys Tío Willy. Las imágenes y descripciones han sido optimizadas para que puedas presentarlas a tus clientes y comercializarlas bajo tus propias tarifas y márgenes de ganancia.";
-      const splitIntro = doc.splitTextToSize(introText, pageWidth - 40);
-      doc.text(splitIntro, pageWidth / 2, 140, { align: 'center' });
+      doc.text("Información de referencia sin precios de venta", pageWidth / 2, 100, { align: 'center' });
 
-      // Instrucciones de venta
-      doc.setTextColor(255, 255, 255);
+      // Descripción
+      doc.setTextColor(80, 80, 85);
+      doc.setFontSize(10.5);
+      const introText = "Este catálogo contiene la descripción técnica y visual de nuestro inventario completo de productos. Se distribuye como una herramienta de apoyo comercial de marca blanca para que colaboradores y distribuidores puedan comercializar los artículos utilizando sus propias tarifas y márgenes de ganancia.";
+      const splitIntro = doc.splitTextToSize(introText, pageWidth - 50);
+      doc.text(splitIntro, pageWidth / 2, 125, { align: 'center' });
+
+      // --- RECUADRO PARA DATOS DEL DISTRIBUIDOR / COLABORADOR ---
+      const boxX = 25;
+      const boxY = 175;
+      const boxW = pageWidth - 50;
+      const boxH = 65;
+
+      // Caja gris claro de fondo
+      doc.setFillColor(248, 248, 250);
+      doc.roundedRect(boxX, boxY, boxW, boxH, 4, 4, 'F');
+      
+      // Borde punteado
+      doc.setDrawColor(180, 180, 190);
+      doc.setLineWidth(0.4);
+      // Simular borde dashed
+      doc.line(boxX + 2, boxY, boxX + boxW - 2, boxY);
+      doc.line(boxX + boxW, boxY + 2, boxX + boxW, boxY + boxH - 2);
+      doc.line(boxX + 2, boxY + boxH, boxX + boxW - 2, boxY + boxH);
+      doc.line(boxX, boxY + 2, boxX, boxY + boxH - 2);
+
+      // Título en la caja
+      doc.setTextColor(50, 50, 60);
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(11);
-      doc.text("SÉ PARTE DE NUESTRO EQUIPO:", 25, 185);
-      
-      doc.setTextColor(180, 180, 180);
+      doc.text("ATENDIDO POR (CONTACTO COMERCIAL):", boxX + 10, boxY + 12);
+
+      // Campos en blanco para rellenar
+      doc.setTextColor(110, 110, 120);
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(9.5);
-      const points = [
-        "1. Selecciona los productos de interés en este catálogo.",
-        "2. Promociónalos en tus redes, grupos o clientes directos.",
-        "3. Establece tus propios precios de venta al detal o mayor.",
-        "4. Levanta los pedidos y contáctanos para despachar la mercancía."
-      ];
-      points.forEach((p, idx) => {
-        doc.text(p, 25, 195 + (idx * 7));
-      });
+      doc.text("Nombre: _________________________________________________", boxX + 10, boxY + 26);
+      doc.text("Teléfono: ________________________________________________", boxX + 10, boxY + 38);
+      doc.text("Correo/Red Social: _________________________________________", boxX + 10, boxY + 50);
 
-      // Contacto Portada
-      doc.setTextColor(255, 45, 45);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(10);
-      doc.text("Ubicación: Centro de Caracas, Torres a Madrices, Edif. Arvelo, PB", pageWidth / 2, 245, { align: 'center' });
-      doc.setTextColor(255, 255, 255);
-      doc.text("Contacto: 0424-4576086 / 0424-1439324", pageWidth / 2, 252, { align: 'center' });
+      // Pie de portada
+      doc.setTextColor(160, 160, 165);
+      doc.setFontSize(8);
+      doc.text("Herramienta de ventas autorizada para distribuidores independientes.", pageWidth / 2, 265, { align: 'center' });
 
-      // --- PRODUCTOS ---
-      let currentY = 25;
+      // --- PRODUCTOS (Exactamente 3 por página, imágenes grandes) ---
+      let currentY = 20;
       const margin = 15;
-      const contentWidth = pageWidth - (margin * 2);
+      const contentWidth = pageWidth - (margin * 2); // 180
 
       for (let i = 0; i < initialProductos.length; i++) {
         const prod = initialProductos[i];
         
-        if (i === 0 || currentY + 55 > pageHeight - 20) {
+        // Cada 3 productos, o en el primero, agregamos una página
+        if (i % 3 === 0) {
           doc.addPage();
           
-          doc.setFillColor(10, 10, 12);
+          // Fondo blanco para hojas de catálogo
+          doc.setFillColor(255, 255, 255);
           doc.rect(0, 0, pageWidth, pageHeight, 'F');
           
-          doc.setFillColor(20, 20, 25);
-          doc.rect(0, 0, pageWidth, 15, 'F');
-          doc.setDrawColor(255, 45, 45);
-          doc.setLineWidth(0.5);
-          doc.line(0, 15, pageWidth, 15);
+          // Cabecera fina y limpia
+          doc.setDrawColor(215, 215, 220);
+          doc.setLineWidth(0.4);
+          doc.line(margin, 15, pageWidth - margin, 15);
           
-          doc.setTextColor(255, 255, 255);
+          doc.setTextColor(100, 100, 105);
           doc.setFont('helvetica', 'bold');
-          doc.setFontSize(8);
-          doc.text("HOME & TOYS TÍO WILLY  |  CATÁLOGO DE PRODUCTOS (COLABORADORES)", margin, 10);
+          doc.setFontSize(7.5);
+          doc.text("CATÁLOGO DE PRODUCTOS", margin, 11);
+          
+          doc.setFont('helvetica', 'normal');
+          doc.text("SOCIOS COMERCIALES", pageWidth - margin - 35, 11);
 
-          currentY = 25;
+          currentY = 20;
         }
 
-        // Dibujar contenedor del producto
-        doc.setFillColor(18, 18, 22);
-        doc.roundedRect(margin, currentY, contentWidth, 50, 3, 3, 'F');
-        doc.setDrawColor(35, 35, 45);
-        doc.setLineWidth(0.3);
-        doc.roundedRect(margin, currentY, contentWidth, 50, 3, 3, 'D');
+        // Altura de tarjeta: 78mm
+        const cardH = 78;
+
+        // Dibujar contenedor del producto en blanco con borde sutil
+        doc.setFillColor(255, 255, 255);
+        doc.roundedRect(margin, currentY, contentWidth, cardH, 3, 3, 'F');
+        doc.setDrawColor(225, 225, 230);
+        doc.setLineWidth(0.4);
+        doc.roundedRect(margin, currentY, contentWidth, cardH, 3, 3, 'D');
 
         // Procesar Imagen de Producto (Asíncrono)
         let imgBase64 = '';
@@ -737,82 +759,85 @@ export default function Catalog({
           imgBase64 = await getBase64ImageFromUrl(prod.images[0]);
         }
 
-        // Dibujar recuadro de imagen
+        // Dibujar recuadro de imagen grande
         const imgX = margin + 5;
         const imgY = currentY + 5;
-        const imgW = 40;
-        const imgH = 40;
+        const imgW = 68;
+        const imgH = 68;
 
-        doc.setFillColor(25, 25, 30);
+        doc.setFillColor(245, 245, 248);
         doc.roundedRect(imgX, imgY, imgW, imgH, 2, 2, 'F');
+        doc.setDrawColor(235, 235, 240);
+        doc.roundedRect(imgX, imgY, imgW, imgH, 2, 2, 'D');
 
         if (imgBase64) {
           try {
             doc.addImage(imgBase64, 'JPEG', imgX, imgY, imgW, imgH);
           } catch (e) {
-            doc.setTextColor(100, 100, 100);
+            doc.setTextColor(140, 140, 145);
             doc.setFont('helvetica', 'normal');
-            doc.setFontSize(7);
-            doc.text("Ver Foto Online", imgX + 11, imgY + 21);
+            doc.setFontSize(8);
+            doc.text("Imagen del producto", imgX + 20, imgY + 35);
           }
         } else {
-          doc.setTextColor(100, 100, 100);
+          doc.setTextColor(140, 140, 145);
           doc.setFont('helvetica', 'normal');
-          doc.setFontSize(7);
-          doc.text("Foto en Catálogo", imgX + 11, imgY + 21);
+          doc.setFontSize(8);
+          doc.text("Imagen en catálogo", imgX + 21, imgY + 35);
         }
 
         // Datos del Producto (a la derecha de la imagen)
-        const infoX = imgX + imgW + 6;
-        const infoY = currentY + 8;
-        const infoW = contentWidth - imgW - 16;
+        const infoX = imgX + imgW + 6; // 15 + 5 + 68 + 6 = 94
+        const infoY = currentY + 9;
+        const infoW = contentWidth - imgW - 16; // 180 - 68 - 16 = 96
 
-        // Categoría (Badge pequeño)
+        // Categoría (Badge pequeño gris)
         const categoryObj = initialCategorias.find((c) => c._id === prod.category);
         const categoryName = (categoryObj ? categoryObj.name : prod.category).toUpperCase();
         
-        doc.setFillColor(255, 45, 45);
-        doc.roundedRect(infoX, infoY - 3, doc.getTextWidth(categoryName) + 4, 4.5, 1, 1, 'F');
+        doc.setFillColor(240, 240, 245);
+        doc.roundedRect(infoX, infoY - 3, doc.getTextWidth(categoryName) + 5, 4.5, 1, 1, 'F');
         
-        doc.setTextColor(255, 255, 255);
+        doc.setTextColor(100, 100, 110);
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(6.5);
-        doc.text(categoryName, infoX + 2, infoY + 0.3);
+        doc.text(categoryName, infoX + 2.5, infoY + 0.3);
 
-        // Nombre del Producto
-        doc.setTextColor(255, 255, 255);
+        // Nombre del Producto (Título grande)
+        doc.setTextColor(30, 30, 35);
         doc.setFont('helvetica', 'bold');
-        doc.setFontSize(11);
-        doc.text(prod.name, infoX, infoY + 7);
+        doc.setFontSize(12);
+        doc.text(prod.name, infoX, infoY + 7.5);
 
-        // Subcategoría manual o automática (Opcional)
+        // Subcategoría o variantes
         const subcat = prod.subcategory || '';
         if (subcat) {
-          doc.setTextColor(200, 200, 200);
-          doc.setFont('helvetica', 'normal');
-          doc.setFontSize(8);
-          doc.text(`Variante: ${subcat}`, infoX, infoY + 12.5);
+          doc.setTextColor(120, 120, 125);
+          doc.setFont('helvetica', 'oblique');
+          doc.setFontSize(8.5);
+          doc.text(`Categoría secundaria: ${subcat}`, infoX, infoY + 13.5);
         }
 
-        // Descripción
-        doc.setTextColor(160, 160, 170);
+        // Descripción (Salto automático, espacio generoso)
+        doc.setTextColor(75, 75, 80);
         doc.setFont('helvetica', 'normal');
-        doc.setFontSize(8.5);
+        doc.setFontSize(9);
         const splitDesc = doc.splitTextToSize(prod.description, infoW);
-        const slicedDesc = splitDesc.slice(0, 3);
-        doc.text(slicedDesc, infoX, infoY + (subcat ? 18.5 : 15.5));
+        // Mostrar hasta 4 líneas
+        const slicedDesc = splitDesc.slice(0, 4);
+        doc.text(slicedDesc, infoX, infoY + (subcat ? 20 : 16.5));
 
         // Pie de Página
-        doc.setTextColor(90, 90, 100);
+        doc.setTextColor(150, 150, 155);
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(7);
-        doc.text("Catálogo Exclusivo para Socios de Ventas de Tío Willy  |  Sin Precios de Referencia", margin, pageHeight - 8);
+        doc.text("Catálogo de Referencia de Productos  |  Libre de Precios al Consumidor", margin, pageHeight - 8);
 
-        // Incrementar Y
-        currentY += 56;
+        // Incrementar Y para el siguiente producto (78mm + 6mm de espacio)
+        currentY += cardH + 6;
       }
 
-      doc.save("Catalogo_Tio_Willy_Colaboradores.pdf");
+      doc.save("Catalogo_General_Productos.pdf");
     } catch (error) {
       console.error("Error al generar catálogo PDF: ", error);
       alert("Ocurrió un error al compilar el catálogo PDF. Por favor intente de nuevo.");
