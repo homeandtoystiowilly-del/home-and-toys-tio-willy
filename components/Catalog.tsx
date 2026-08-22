@@ -441,6 +441,118 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
   );
 }
 
+// Función auxiliar para extraer subcategorías de forma dinámica
+function getSubcategoriesForCategory(productsInCategory: Product[], categoriesList: Category[]) {
+  const subcats = new Set<string>();
+  
+  productsInCategory.forEach(product => {
+    const nameLower = product.name.toLowerCase();
+    
+    // 1. Tamaños de Rin (Bicicletas y Juguetes con ruedas)
+    const rinMatch = product.name.match(/Rin\s*\d+/i);
+    if (rinMatch) {
+      const normalized = rinMatch[0].replace(/\s+/g, ' ').toUpperCase(); // "RIN 16"
+      subcats.add(normalized);
+      return;
+    }
+    
+    // 2. Coincidencias de Rin implícitas
+    if (nameLower.includes('rin 12')) { subcats.add('Rin 12'); return; }
+    if (nameLower.includes('rin 16')) { subcats.add('Rin 16'); return; }
+    if (nameLower.includes('rin 20')) { subcats.add('Rin 20'); return; }
+    if (nameLower.includes('rin 24')) { subcats.add('Rin 24'); return; }
+    if (nameLower.includes('rin 26')) { subcats.add('Rin 26'); return; }
+    if (nameLower.includes('rin 29')) { subcats.add('Rin 29'); return; }
+
+    // 3. Agrupaciones de Tecnología
+    if (nameLower.includes('auricular') || nameLower.includes('audifono') || nameLower.includes('headphone') || nameLower.includes('cornetas bluetooth') || nameLower.includes('audífonos')) {
+      subcats.add('Audio');
+      return;
+    }
+    if (nameLower.includes('teclado') || nameLower.includes('keyboard')) {
+      subcats.add('Teclados');
+      return;
+    }
+    if (nameLower.includes('mouse') || nameLower.includes('raton') || nameLower.includes('ratón')) {
+      subcats.add('Mouses');
+      return;
+    }
+    if (nameLower.includes('cargador') || nameLower.includes('powerbank') || nameLower.includes('bateria') || nameLower.includes('batería')) {
+      subcats.add('Cargadores');
+      return;
+    }
+    if (nameLower.includes('reloj') || nameLower.includes('smartwatch') || nameLower.includes('pulsera')) {
+      subcats.add('Relojes');
+      return;
+    }
+
+    // 4. Agrupaciones de Juguetes
+    if (nameLower.includes('robot') || nameLower.includes('interactivo')) {
+      subcats.add('Robots y Tech');
+      return;
+    }
+    if (nameLower.includes('muñec') || nameLower.includes('barbie') || nameLower.includes('lol')) {
+      subcats.add('Muñecas');
+      return;
+    }
+    if (nameLower.includes('carro') || nameLower.includes('pista') || nameLower.includes('auto') || nameLower.includes('camion') || nameLower.includes('camión')) {
+      subcats.add('Vehículos');
+      return;
+    }
+    if (nameLower.includes('juego de mesa') || nameLower.includes('monopoly') || nameLower.includes('ludo') || nameLower.includes('rompecabezas') || nameLower.includes('puzzle')) {
+      subcats.add('Juegos de Mesa');
+      return;
+    }
+    if (nameLower.includes('lego') || nameLower.includes('bloques') || nameLower.includes('armar')) {
+      subcats.add('Construcción');
+      return;
+    }
+
+    // 5. Agrupaciones de Hogar
+    if (nameLower.includes('silla') || nameLower.includes('sillon') || nameLower.includes('sillón') || nameLower.includes('mueble') || nameLower.includes('escritorio')) {
+      subcats.add('Muebles');
+      return;
+    }
+    if (nameLower.includes('lampara') || nameLower.includes('lámpara') || nameLower.includes('led') || nameLower.includes('luz')) {
+      subcats.add('Iluminación');
+      return;
+    }
+    if (nameLower.includes('organizador') || nameLower.includes('estante') || nameLower.includes('repisa') || nameLower.includes('caja')) {
+      subcats.add('Organizadores');
+      return;
+    }
+    if (nameLower.includes('cocina') || nameLower.includes('licuadora') || nameLower.includes('sarten') || nameLower.includes('olla') || nameLower.includes('vaso')) {
+      subcats.add('Cocina');
+      return;
+    }
+
+    // Fallback: usar la primera palabra del nombre si califica como término válido
+    const words = product.name.trim().split(/\s+/);
+    if (words.length > 0) {
+      const firstWord = words[0];
+      const capitalized = firstWord.charAt(0).toUpperCase() + firstWord.slice(1).toLowerCase();
+      if (capitalized.length > 2 && !['con', 'del', 'para', 'los', 'las', 'uno', 'una'].includes(capitalized.toLowerCase())) {
+        subcats.add(capitalized);
+        return;
+      }
+    }
+    
+    subcats.add('Otros');
+  });
+
+  return Array.from(subcats).sort((a, b) => {
+    // Si contiene "Rin", ordenar numéricamente
+    const aRin = a.match(/\d+/);
+    const bRin = b.match(/\d+/);
+    if (aRin && bRin) {
+      return parseInt(aRin[0]) - parseInt(bRin[0]);
+    }
+    if (a === 'Otros') return 1;
+    if (b === 'Otros') return -1;
+    return a.localeCompare(b);
+  });
+}
+
 export default function Catalog({ 
   initialProductos, 
   initialCategorias,
@@ -457,6 +569,26 @@ export default function Catalog({
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [showInactivityAlert, setShowInactivityAlert] = useState<boolean>(false);
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string>('todos');
+
+  // Resetear subcategoría cuando cambia la categoría principal
+  useEffect(() => {
+    setSelectedSubcategory('todos');
+    setCurrentPage(1);
+  }, [selectedCategory]);
+
+  // Resetear subcategoría cuando cambia la búsqueda
+  useEffect(() => {
+    setSelectedSubcategory('todos');
+    setCurrentPage(1);
+  }, [searchQuery]);
+
+  // Obtener las subcategorías dinámicas para la categoría seleccionada
+  const subcategories = useMemo(() => {
+    if (selectedCategory === 'todos') return [];
+    const productsInCategory = initialProductos.filter((p) => p.category === selectedCategory);
+    return getSubcategoriesForCategory(productsInCategory, initialCategorias);
+  }, [selectedCategory, initialProductos, initialCategorias]);
 
   // Comprobar si se cerró sesión por inactividad (detectar query param)
   useEffect(() => {
@@ -474,16 +606,89 @@ export default function Catalog({
   }, []);
   const ITEMS_PER_PAGE = 6;
 
-  // Filtrar productos por Categoría y Búsqueda de Texto
+  // Filtrar productos por Categoría, Subcategoría y Búsqueda de Texto
   const filteredProducts = useMemo(() => {
-    return initialProductos.filter((prod: Product) => {
-      const matchesCategory = selectedCategory === 'todos' || prod.category === selectedCategory;
-      const matchesSearch = 
-        prod.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        prod.description.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchesCategory && matchesSearch;
-    });
-  }, [initialProductos, selectedCategory, searchQuery]);
+    let list = initialProductos;
+
+    // 1. Filtrar por categoría principal
+    if (selectedCategory !== 'todos') {
+      list = list.filter((p) => p.category === selectedCategory);
+    }
+
+    // 2. Filtrar por subcategoría si hay una seleccionada y no es 'todos'
+    if (selectedCategory !== 'todos' && selectedSubcategory !== 'todos') {
+      list = list.filter((p) => {
+        const nameLower = p.name.toLowerCase();
+        const subcatLower = selectedSubcategory.toLowerCase();
+
+        // Criterio 1: Rin (ej: Rin 16)
+        if (subcatLower.startsWith('rin')) {
+          const cleanSub = subcatLower.replace(/\s+/g, '');
+          const cleanName = nameLower.replace(/\s+/g, '');
+          return cleanName.includes(cleanSub);
+        }
+
+        // Criterio 2: Coincidencia de etiquetas/clasificaciones preestablecidas
+        if (selectedSubcategory === 'Audio') {
+          return nameLower.includes('auricular') || nameLower.includes('audifono') || nameLower.includes('headphone') || nameLower.includes('cornetas bluetooth') || nameLower.includes('audífonos');
+        }
+        if (selectedSubcategory === 'Teclados') {
+          return nameLower.includes('teclado') || nameLower.includes('keyboard');
+        }
+        if (selectedSubcategory === 'Mouses') {
+          return nameLower.includes('mouse') || nameLower.includes('raton') || nameLower.includes('ratón');
+        }
+        if (selectedSubcategory === 'Cargadores') {
+          return nameLower.includes('cargador') || nameLower.includes('powerbank') || nameLower.includes('bateria') || nameLower.includes('batería');
+        }
+        if (selectedSubcategory === 'Relojes') {
+          return nameLower.includes('reloj') || nameLower.includes('smartwatch') || nameLower.includes('pulsera');
+        }
+        if (selectedSubcategory === 'Robots y Tech') {
+          return nameLower.includes('robot') || nameLower.includes('interactivo');
+        }
+        if (selectedSubcategory === 'Muñecas') {
+          return nameLower.includes('muñec') || nameLower.includes('barbie') || nameLower.includes('lol');
+        }
+        if (selectedSubcategory === 'Vehículos') {
+          return nameLower.includes('carro') || nameLower.includes('pista') || nameLower.includes('auto') || nameLower.includes('camion') || nameLower.includes('camión');
+        }
+        if (selectedSubcategory === 'Juegos de Mesa') {
+          return nameLower.includes('juego de mesa') || nameLower.includes('monopoly') || nameLower.includes('ludo') || nameLower.includes('rompecabezas') || nameLower.includes('puzzle');
+        }
+        if (selectedSubcategory === 'Construcción') {
+          return nameLower.includes('lego') || nameLower.includes('bloques') || nameLower.includes('armar');
+        }
+        if (selectedSubcategory === 'Muebles') {
+          return nameLower.includes('silla') || nameLower.includes('sillon') || nameLower.includes('sillón') || nameLower.includes('mueble') || nameLower.includes('escritorio');
+        }
+        if (selectedSubcategory === 'Iluminación') {
+          return nameLower.includes('lampara') || nameLower.includes('lámpara') || nameLower.includes('led') || nameLower.includes('luz');
+        }
+        if (selectedSubcategory === 'Organizadores') {
+          return nameLower.includes('organizador') || nameLower.includes('estante') || nameLower.includes('repisa') || nameLower.includes('caja');
+        }
+        if (selectedSubcategory === 'Cocina') {
+          return nameLower.includes('cocina') || nameLower.includes('licuadora') || nameLower.includes('sarten') || nameLower.includes('olla') || nameLower.includes('vaso');
+        }
+
+        // Fallback: coincidencia general por texto
+        return nameLower.includes(subcatLower);
+      });
+    }
+
+    // 3. Filtrar por búsqueda
+    if (searchQuery.trim() !== '') {
+      const q = searchQuery.toLowerCase();
+      list = list.filter(
+        (p) =>
+          p.name.toLowerCase().includes(q) ||
+          p.description.toLowerCase().includes(q)
+      );
+    }
+
+    return list;
+  }, [initialProductos, selectedCategory, selectedSubcategory, searchQuery]);
 
   // Contadores de productos por categoría
   const categoryCounts = useMemo(() => {
@@ -801,6 +1006,56 @@ export default function Catalog({
                 Filtrar y Buscar
               </button>
             </div>
+
+            {/* Filtro de Subcategorías / Variantes por Categoría */}
+            {selectedCategory !== 'todos' && subcategories.length > 0 && (
+              <div className="w-full bg-zinc-950/45 border border-zinc-900 rounded-3xl p-5 shadow-lg shadow-black/30 flex flex-col gap-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] text-zinc-500 font-extrabold uppercase tracking-wider">
+                    Filtros de tamaño / tipo
+                  </span>
+                  {selectedSubcategory !== 'todos' && (
+                    <button
+                      onClick={() => setSelectedSubcategory('todos')}
+                      className="text-[10px] text-red-500 hover:text-red-400 font-bold uppercase tracking-wider transition-colors cursor-pointer"
+                    >
+                      Limpiar Filtro
+                    </button>
+                  )}
+                </div>
+                
+                {/* Contenedor con Scroll Lateral Suave */}
+                <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent">
+                  {/* Botón Ver Todo */}
+                  <button
+                    onClick={() => setSelectedSubcategory('todos')}
+                    className={`flex-shrink-0 text-xs px-3.5 py-2 rounded-xl font-bold transition-all duration-300 cursor-pointer ${
+                      selectedSubcategory === 'todos'
+                        ? 'bg-red-650 text-white shadow-md shadow-red-950/20'
+                        : 'bg-zinc-900/60 hover:bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-850'
+                    }`}
+                  >
+                    Ver Todo
+                  </button>
+
+                  {/* Botones de subcategorías */}
+                  {subcategories.map((subcat) => (
+                    <button
+                      key={subcat}
+                      onClick={() => setSelectedSubcategory(subcat)}
+                      className={`flex-shrink-0 text-xs px-3.5 py-2 rounded-xl font-bold transition-all duration-300 cursor-pointer ${
+                        selectedSubcategory === subcat
+                          ? 'bg-red-650 text-white shadow-md shadow-red-950/20'
+                          : 'bg-zinc-900/60 hover:bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-850'
+                      }`}
+                    >
+                      {subcat}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Grid de Productos */}
             {paginatedProducts.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
