@@ -1676,7 +1676,7 @@ export default function Catalog({
 
           {/* Botón de Acción Directa ("¿Cómo llegar?") */}
           <a
-            href="https://www.google.com/maps/dir/?api=1&destination=10.5061957,-66.913273"
+            href="https://www.google.com/maps/place/Edificio+Arvelo/@10.5062937,-66.9130259,20.46z/data=!4m6!3m5!1s0x8c2a5f0019dc6fb7:0x261466dc19753595!8m2!3d10.5063117!4d-66.9132688!16s%2Fg%2F11xkw4cns7?entry=ttu&g_ep=EgoyMDI2MDgxOS4wIKXMDSoASAFQAw%3D%3D"
             target="_blank"
             rel="noopener noreferrer"
             className="mt-6 w-full max-w-md py-4 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-2xl font-bold flex items-center justify-center gap-2.5 transition-all duration-300 shadow-lg shadow-red-950/20 active:scale-[0.98] text-xs sm:text-sm cursor-pointer select-none"
