@@ -24,11 +24,32 @@ function getFriendlyError(error: any, defaultMsg: string) {
   return errMsg || defaultMsg;
 }
 
+// Función auxiliar para normalizar respuestas de seguridad (sin tildes, minúsculas, sin espacios extras)
+function normalizeAnswer(ans: string): string {
+  return (ans || '')
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+}
+
 // Acción para verificar la contraseña y crear la sesión del administrador
 export async function verifyPasswordAction(password: string) {
-  const adminPassword = process.env.ADMIN_PASSWORD || 'adminwilly';
+  const defaultPassword = process.env.ADMIN_PASSWORD || 'adminwilly';
+  let validPassword = defaultPassword;
 
-  if (password === adminPassword) {
+  try {
+    const client = await clientPromise;
+    const db = client.db('tio_willy_db');
+    const secDoc = await (db.collection('configuracion') as any).findOne({ _id: 'seguridad' });
+    if (secDoc && secDoc.password) {
+      validPassword = secDoc.password;
+    }
+  } catch (err) {
+    console.warn('No se pudo verificar contraseña en BD, usando respaldo:', err);
+  }
+
+  if (password === validPassword) {
     const token = generateSessionToken();
     const cookieStore = await cookies();
     cookieStore.set('admin_session', token, {
@@ -41,6 +62,149 @@ export async function verifyPasswordAction(password: string) {
   }
 
   return { success: false, error: 'Contraseña incorrecta' };
+}
+
+// Acción para obtener la pregunta de seguridad configurada (sin revelar la respuesta)
+export async function getSecurityQuestionAction() {
+  try {
+    const client = await clientPromise;
+    const db = client.db('tio_willy_db');
+    const secDoc = await (db.collection('configuracion') as any).findOne({ _id: 'seguridad' });
+
+    if (secDoc && secDoc.securityQuestion) {
+      return { 
+        success: true, 
+        hasSecurityQuestion: true, 
+        question: secDoc.securityQuestion 
+      };
+    }
+
+    return { 
+      success: true, 
+      hasSecurityQuestion: false, 
+      question: '¿Cuál es la clave maestra de respaldo de la tienda?' 
+    };
+  } catch (err: any) {
+    console.error('Error al obtener pregunta de seguridad:', err);
+    return { 
+      success: false, 
+      hasSecurityQuestion: false, 
+      question: '¿Cuál es la clave maestra de respaldo de la tienda?',
+      error: 'Error al conectar con la base de datos' 
+    };
+  }
+}
+
+// Acción para recuperar la contraseña respondiendo a la pregunta de seguridad
+export async function recoverPasswordAction(answer: string, newPassword: string) {
+  try {
+    if (!newPassword || newPassword.trim().length < 4) {
+      return { success: false, error: 'La nueva contraseña debe tener al menos 4 caracteres.' };
+    }
+
+    const client = await clientPromise;
+    const db = client.db('tio_willy_db');
+    const secDoc = await (db.collection('configuracion') as any).findOne({ _id: 'seguridad' });
+
+    const normalizedInput = normalizeAnswer(answer);
+    let isAnswerCorrect = false;
+
+    if (secDoc && secDoc.securityAnswer) {
+      isAnswerCorrect = normalizedInput === secDoc.securityAnswer;
+    } else {
+      // Fallback si no ha configurado respuesta aún: clave por defecto o 'adminwilly'
+      const defaultPassword = process.env.ADMIN_PASSWORD || 'adminwilly';
+      isAnswerCorrect = normalizedInput === normalizeAnswer(defaultPassword);
+    }
+
+    if (!isAnswerCorrect) {
+      return { success: false, error: 'La respuesta de seguridad es incorrecta.' };
+    }
+
+    // Actualizar contraseña en MongoDB
+    await (db.collection('configuracion') as any).updateOne(
+      { _id: 'seguridad' },
+      { 
+        $set: { 
+          password: newPassword.trim(),
+          updatedAt: new Date()
+        } 
+      },
+      { upsert: true }
+    );
+
+    // Iniciar sesión automáticamente
+    const token = generateSessionToken();
+    const cookieStore = await cookies();
+    cookieStore.set('admin_session', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 60 * 60 * 24,
+      path: '/'
+    });
+
+    return { success: true, message: 'Contraseña restablecida con éxito.' };
+  } catch (err: any) {
+    console.error('Error al recuperar contraseña:', err);
+    return { success: false, error: getFriendlyError(err, 'Error al restablecer la contraseña.') };
+  }
+}
+
+// Acción para actualizar contraseña y pregunta de seguridad desde el panel de admin
+export async function updateSecurityConfigAction(formData: FormData) {
+  try {
+    // 1. Validar autenticación
+    const cookieStore = await cookies();
+    const session = cookieStore.get('admin_session')?.value;
+    if (!verifySessionToken(session)) {
+      return { success: false, error: 'No autorizado. Inicie sesión nuevamente.' };
+    }
+
+    const currentPassword = (formData.get('currentPassword') as string) || '';
+    const newPassword = (formData.get('newPassword') as string) || '';
+    const securityQuestion = (formData.get('securityQuestion') as string) || '';
+    const securityAnswer = (formData.get('securityAnswer') as string) || '';
+
+    const client = await clientPromise;
+    const db = client.db('tio_willy_db');
+    const secDoc = await (db.collection('configuracion') as any).findOne({ _id: 'seguridad' });
+
+    const activePassword = (secDoc && secDoc.password) ? secDoc.password : (process.env.ADMIN_PASSWORD || 'adminwilly');
+
+    if (currentPassword !== activePassword) {
+      return { success: false, error: 'La contraseña actual no es correcta.' };
+    }
+
+    const updateFields: any = {
+      updatedAt: new Date()
+    };
+
+    if (newPassword && newPassword.trim().length > 0) {
+      if (newPassword.trim().length < 4) {
+        return { success: false, error: 'La nueva contraseña debe tener al menos 4 caracteres.' };
+      }
+      updateFields.password = newPassword.trim();
+    }
+
+    if (securityQuestion && securityQuestion.trim().length > 0) {
+      updateFields.securityQuestion = securityQuestion.trim();
+    }
+
+    if (securityAnswer && securityAnswer.trim().length > 0) {
+      updateFields.securityAnswer = normalizeAnswer(securityAnswer);
+    }
+
+    await (db.collection('configuracion') as any).updateOne(
+      { _id: 'seguridad' },
+      { $set: updateFields },
+      { upsert: true }
+    );
+
+    return { success: true, message: 'Configuración de seguridad actualizada correctamente.' };
+  } catch (err: any) {
+    console.error('Error al actualizar configuración de seguridad:', err);
+    return { success: false, error: getFriendlyError(err, 'Error al actualizar seguridad.') };
+  }
 }
 
 // Acción para cerrar sesión

@@ -12,7 +12,10 @@ import {
   updateProductPricesAction,
   updateProductAction,
   updateMapUrlAction,
-  updateGlobalCurrencyAction 
+  updateGlobalCurrencyAction,
+  getSecurityQuestionAction,
+  recoverPasswordAction,
+  updateSecurityConfigAction
 } from './adminActions';
 
 // Interfaces locales coincidentes con Catalog.tsx
@@ -244,6 +247,138 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
   const [adminSearchQuery, setAdminSearchQuery] = useState('');
   const [adminPage, setAdminPage] = useState(1);
   const [productToDelete, setProductToDelete] = useState<string | null>(null);
+
+  // Estados para recuperación de contraseña en Login
+  const [isRecovering, setIsRecovering] = useState(false);
+  const [recoveryQuestion, setRecoveryQuestion] = useState('');
+  const [securityAnswerInput, setSecurityAnswerInput] = useState('');
+  const [newPasswordInput, setNewPasswordInput] = useState('');
+  const [confirmPasswordInput, setConfirmPasswordInput] = useState('');
+  const [recoverLoading, setRecoverLoading] = useState(false);
+  const [recoverError, setRecoverError] = useState('');
+
+  // Estados para el módulo de Seguridad en el Panel Admin
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newAdminPassword, setNewAdminPassword] = useState('');
+  const [confirmAdminPassword, setConfirmAdminPassword] = useState('');
+  const [selectedSecurityQuestion, setSelectedSecurityQuestion] = useState('¿Cuál es el nombre de tu primera mascota?');
+  const [customSecurityQuestion, setCustomSecurityQuestion] = useState('');
+  const [adminSecurityAnswer, setAdminSecurityAnswer] = useState('');
+  const [securityLoading, setSecurityLoading] = useState(false);
+  const [securitySuccessMsg, setSecuritySuccessMsg] = useState('');
+  const [securityErrorMsg, setSecurityErrorMsg] = useState('');
+
+  // Abrir vista de recuperación y cargar la pregunta
+  const handleStartRecovery = async () => {
+    setIsRecovering(true);
+    setRecoverError('');
+    setSecurityAnswerInput('');
+    setNewPasswordInput('');
+    setConfirmPasswordInput('');
+    setRecoverLoading(true);
+
+    try {
+      const res = await getSecurityQuestionAction();
+      if (res.success && res.question) {
+        setRecoveryQuestion(res.question);
+      } else {
+        setRecoveryQuestion('¿Cuál es la clave de seguridad o respaldo de la tienda?');
+      }
+    } catch (err) {
+      setRecoveryQuestion('¿Cuál es la clave de seguridad o respaldo de la tienda?');
+    } finally {
+      setRecoverLoading(false);
+    }
+  };
+
+  // Enviar recuperación de contraseña
+  const handleRecoverPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setRecoverError('');
+
+    if (!securityAnswerInput.trim()) {
+      setRecoverError('Por favor ingresa la respuesta a tu pregunta de seguridad.');
+      return;
+    }
+
+    if (!newPasswordInput || newPasswordInput.trim().length < 4) {
+      setRecoverError('La nueva contraseña debe tener al menos 4 caracteres.');
+      return;
+    }
+
+    if (newPasswordInput !== confirmPasswordInput) {
+      setRecoverError('Las contraseñas no coinciden.');
+      return;
+    }
+
+    setRecoverLoading(true);
+    try {
+      const res = await recoverPasswordAction(securityAnswerInput, newPasswordInput);
+      if (res.success) {
+        window.location.href = '/admin';
+      } else {
+        setRecoverError(res.error || 'Respuesta de seguridad incorrecta.');
+      }
+    } catch (err: any) {
+      setRecoverError(err.message || 'Error al procesar la recuperación.');
+    } finally {
+      setRecoverLoading(false);
+    }
+  };
+
+  // Guardar cambios de seguridad desde el panel admin
+  const handleUpdateSecurity = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSecuritySuccessMsg('');
+    setSecurityErrorMsg('');
+
+    if (!currentPassword) {
+      setSecurityErrorMsg('Debes ingresar tu contraseña actual para confirmar los cambios.');
+      return;
+    }
+
+    if (newAdminPassword && newAdminPassword.length < 4) {
+      setSecurityErrorMsg('La nueva contraseña debe tener al menos 4 caracteres.');
+      return;
+    }
+
+    if (newAdminPassword && newAdminPassword !== confirmAdminPassword) {
+      setSecurityErrorMsg('La nueva contraseña y su confirmación no coinciden.');
+      return;
+    }
+
+    const questionToSave = selectedSecurityQuestion === 'custom' ? customSecurityQuestion.trim() : selectedSecurityQuestion;
+    
+    if (adminSecurityAnswer && !questionToSave) {
+      setSecurityErrorMsg('Por favor escribe tu pregunta personalizada.');
+      return;
+    }
+
+    setSecurityLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append('currentPassword', currentPassword);
+      formData.append('newPassword', newAdminPassword);
+      formData.append('securityQuestion', questionToSave);
+      formData.append('securityAnswer', adminSecurityAnswer);
+
+      const res = await updateSecurityConfigAction(formData);
+      if (res.success) {
+        setSecuritySuccessMsg(res.message || 'Seguridad actualizada exitosamente.');
+        setCurrentPassword('');
+        setNewAdminPassword('');
+        setConfirmAdminPassword('');
+        setAdminSecurityAnswer('');
+        setCustomSecurityQuestion('');
+      } else {
+        setSecurityErrorMsg(res.error || 'Error al actualizar seguridad.');
+      }
+    } catch (err: any) {
+      setSecurityErrorMsg(err.message || 'Error de red al actualizar seguridad.');
+    } finally {
+      setSecurityLoading(false);
+    }
+  };
 
   // Auto-seleccionar primera categoría si cambia
   useEffect(() => {
@@ -556,48 +691,145 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-80 h-80 bg-red-650/5 rounded-full blur-[80px] pointer-events-none"></div>
 
         <div className="w-full max-w-md p-8 rounded-3xl bg-zinc-950/80 border border-zinc-900/60 shadow-2xl shadow-black/90 backdrop-blur-md relative z-10 text-center">
-          <div className="flex flex-col items-center mb-8">
+          <div className="flex flex-col items-center mb-6">
             <svg className="w-14 h-14 mb-2 drop-shadow-[0_0_8px_rgba(255,45,45,0.4)]" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M50 85C42 77 15 54 15 37C15 17 31 5 50 5C69 5 85 17 85 37C85 54 58 77 50 85Z" stroke="#FF2D2D" strokeWidth="6"/>
               <path d="M38 48V62H62V48M32 48L50 32L68 48" stroke="#FF2D2D" strokeWidth="5"/>
               <rect x="46" y="52" width="8" height="10" fill="#FF2D2D" />
             </svg>
             <h2 className="text-xl font-bold tracking-[0.25em] text-white uppercase leading-none font-sans">
-              Acceso Admin
+              {isRecovering ? 'Recuperar Acceso' : 'Acceso Admin'}
             </h2>
             <h3 className="text-xs tracking-wider text-red-500 font-semibold uppercase mt-1">
               Tío Willy
             </h3>
           </div>
 
-          <form onSubmit={handleLogin} className="flex flex-col gap-4">
-            <div className="flex flex-col gap-2 text-left">
-              <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Contraseña del Sistema</label>
-              <input
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-xl focus:border-red-500/85 focus:ring-1 focus:ring-red-500/30 text-white placeholder-zinc-700 focus:outline-none transition-all duration-300 font-mono text-center"
+          {!isRecovering ? (
+            <form onSubmit={handleLogin} className="flex flex-col gap-4">
+              <div className="flex flex-col gap-2 text-left">
+                <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Contraseña del Sistema</label>
+                <input
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-xl focus:border-red-500/85 focus:ring-1 focus:ring-red-500/30 text-white placeholder-zinc-700 focus:outline-none transition-all duration-300 font-mono text-center"
+                  disabled={loginLoading}
+                  required
+                />
+              </div>
+
+              {loginError && (
+                <p className="text-xs text-red-500 font-bold bg-red-950/20 border border-red-950/40 p-3 rounded-lg text-center">
+                  {loginError}
+                </p>
+              )}
+
+              <button
+                type="submit"
                 disabled={loginLoading}
-                required
-              />
-            </div>
+                className="mt-2 py-3 bg-red-650 hover:bg-red-550 active:bg-red-750 text-white font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              >
+                {loginLoading ? 'Verificando...' : 'Ingresar al Panel'}
+              </button>
 
-            {loginError && (
-              <p className="text-xs text-red-500 font-bold bg-red-950/20 border border-red-950/40 p-3 rounded-lg text-center">
-                {loginError}
-              </p>
-            )}
+              <div className="mt-2 pt-4 border-t border-zinc-900 flex flex-col items-center">
+                <button
+                  type="button"
+                  onClick={handleStartRecovery}
+                  className="text-xs text-zinc-500 hover:text-red-400 transition-colors font-medium cursor-pointer"
+                >
+                  ¿Olvidaste tu contraseña?
+                </button>
+              </div>
+            </form>
+          ) : (
+            <form onSubmit={handleRecoverPassword} className="flex flex-col gap-4 text-left">
+              {recoverLoading && !recoveryQuestion ? (
+                <div className="py-8 text-center text-zinc-500 text-xs animate-pulse">
+                  Cargando información de seguridad...
+                </div>
+              ) : (
+                <>
+                  <div className="p-3.5 bg-red-950/20 border border-red-500/30 rounded-2xl">
+                    <span className="text-[10px] text-red-400 font-bold uppercase tracking-wider block">
+                      Pregunta de Seguridad
+                    </span>
+                    <p className="text-white text-xs font-semibold mt-1 leading-snug">
+                      {recoveryQuestion}
+                    </p>
+                  </div>
 
-            <button
-              type="submit"
-              disabled={loginLoading}
-              className="mt-2 py-3 bg-red-650 hover:bg-red-550 active:bg-red-750 text-white font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-            >
-              {loginLoading ? 'Verificando...' : 'Ingresar al Panel'}
-            </button>
-          </form>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Tu Respuesta</label>
+                    <input
+                      type="text"
+                      placeholder="Escribe tu respuesta..."
+                      value={securityAnswerInput}
+                      onChange={(e) => setSecurityAnswerInput(e.target.value)}
+                      className="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/30 text-white placeholder-zinc-650 focus:outline-none transition-all text-xs"
+                      disabled={recoverLoading}
+                      required
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Nueva Contraseña</label>
+                    <input
+                      type="password"
+                      placeholder="Mínimo 4 caracteres"
+                      value={newPasswordInput}
+                      onChange={(e) => setNewPasswordInput(e.target.value)}
+                      className="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/30 text-white placeholder-zinc-650 focus:outline-none transition-all text-xs"
+                      disabled={recoverLoading}
+                      required
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Confirmar Nueva Contraseña</label>
+                    <input
+                      type="password"
+                      placeholder="Repite la contraseña"
+                      value={confirmPasswordInput}
+                      onChange={(e) => setConfirmPasswordInput(e.target.value)}
+                      className="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/30 text-white placeholder-zinc-650 focus:outline-none transition-all text-xs"
+                      disabled={recoverLoading}
+                      required
+                    />
+                  </div>
+
+                  {recoverError && (
+                    <p className="text-xs text-red-500 font-bold bg-red-950/20 border border-red-950/40 p-3 rounded-lg text-center">
+                      {recoverError}
+                    </p>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={recoverLoading}
+                    className="mt-1 py-3 bg-red-650 hover:bg-red-550 active:bg-red-750 text-white font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 text-xs uppercase tracking-wider"
+                  >
+                    {recoverLoading ? 'Restableciendo...' : 'Restablecer y Entrar'}
+                  </button>
+
+                  <div className="pt-2 flex flex-col items-center">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsRecovering(false);
+                        setRecoverError('');
+                      }}
+                      className="text-xs text-zinc-500 hover:text-white transition-colors cursor-pointer"
+                    >
+                      ← Volver a Iniciar Sesión
+                    </button>
+                  </div>
+                </>
+              )}
+            </form>
+          )}
         </div>
       </div>
     );
@@ -1180,6 +1412,128 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                   <option value="EUR" className="bg-zinc-950 text-white">Euros (EUR €)</option>
                 </select>
               </div>
+            </div>
+
+            {/* 5. Configuración de Seguridad y Contraseña Card */}
+            <div className="p-6 rounded-3xl bg-zinc-950 border border-zinc-900 shadow-xl shadow-black/60 flex flex-col gap-5">
+              <div>
+                <div className="flex items-center gap-2">
+                  <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                  <h2 className="text-lg font-bold tracking-wide text-white">Seguridad y Acceso</h2>
+                </div>
+                <p className="text-zinc-500 text-xs mt-1">Cambia tu contraseña de administrador y configura tu pregunta de recuperación en caso de olvido.</p>
+              </div>
+
+              {securitySuccessMsg && (
+                <div className="p-3 rounded-xl bg-emerald-950/20 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">
+                  {securitySuccessMsg}
+                </div>
+              )}
+
+              {securityErrorMsg && (
+                <div className="p-3 rounded-xl bg-red-950/20 border border-red-500/30 text-red-400 text-xs font-semibold">
+                  {securityErrorMsg}
+                </div>
+              )}
+
+              <form onSubmit={handleUpdateSecurity} className="flex flex-col gap-4">
+                <div className="flex flex-col gap-1">
+                  <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Contraseña Actual (Requerida)</label>
+                  <input
+                    type="password"
+                    placeholder="Escribe tu clave actual"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    className="w-full px-3.5 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white placeholder-zinc-650 focus:outline-none transition-all text-xs font-mono"
+                    required
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Nueva Contraseña</label>
+                    <input
+                      type="password"
+                      placeholder="Mínimo 4 caracteres"
+                      value={newAdminPassword}
+                      onChange={(e) => setNewAdminPassword(e.target.value)}
+                      className="w-full px-3.5 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white placeholder-zinc-650 focus:outline-none transition-all text-xs font-mono"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Confirmar Contraseña</label>
+                    <input
+                      type="password"
+                      placeholder="Repite la nueva clave"
+                      value={confirmAdminPassword}
+                      onChange={(e) => setConfirmAdminPassword(e.target.value)}
+                      className="w-full px-3.5 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white placeholder-zinc-650 focus:outline-none transition-all text-xs font-mono"
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-zinc-900 flex flex-col gap-3">
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Pregunta de Seguridad</label>
+                    <select
+                      value={selectedSecurityQuestion}
+                      onChange={(e) => setSelectedSecurityQuestion(e.target.value)}
+                      className="w-full px-3.5 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white focus:outline-none transition-all text-xs font-medium cursor-pointer"
+                    >
+                      <option value="¿Cuál es el nombre de tu primera mascota?" className="bg-zinc-950 text-white">¿Cuál es el nombre de tu primera mascota?</option>
+                      <option value="¿En qué ciudad naciste?" className="bg-zinc-950 text-white">¿En qué ciudad naciste?</option>
+                      <option value="¿Cuál es el nombre de tu colegio o escuela primaria?" className="bg-zinc-950 text-white">¿Cuál es el nombre de tu colegio o escuela primaria?</option>
+                      <option value="¿Cuál es tu comida o color favorito?" className="bg-zinc-950 text-white">¿Cuál es tu comida o color favorito?</option>
+                      <option value="custom" className="bg-zinc-950 text-white">Pregunta Personalizada (Escribir)</option>
+                    </select>
+                  </div>
+
+                  {selectedSecurityQuestion === 'custom' && (
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Tu Pregunta Personalizada</label>
+                      <input
+                        type="text"
+                        placeholder="Ej. ¿Cuál es el nombre de mi abuela?"
+                        value={customSecurityQuestion}
+                        onChange={(e) => setCustomSecurityQuestion(e.target.value)}
+                        className="w-full px-3.5 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white placeholder-zinc-650 focus:outline-none transition-all text-xs"
+                      />
+                    </div>
+                  )}
+
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Respuesta Secreta</label>
+                    <input
+                      type="text"
+                      placeholder="Escribe tu respuesta de seguridad"
+                      value={adminSecurityAnswer}
+                      onChange={(e) => setAdminSecurityAnswer(e.target.value)}
+                      className="w-full px-3.5 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white placeholder-zinc-650 focus:outline-none transition-all text-xs"
+                    />
+                    <span className="text-[10px] text-zinc-600">Esta respuesta te permitirá recuperar la clave en la pantalla de inicio si la olvidas.</span>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={securityLoading}
+                  className="w-full py-2.5 bg-red-650 hover:bg-red-550 active:bg-red-750 text-white rounded-xl font-bold transition-all text-xs cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 mt-1"
+                >
+                  {securityLoading ? (
+                    'Guardando...'
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                      Guardar Configuración de Seguridad
+                    </>
+                  )}
+                </button>
+              </form>
             </div>
           </div>
 
