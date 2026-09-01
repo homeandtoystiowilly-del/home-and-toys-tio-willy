@@ -206,10 +206,10 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
 
         {/* Badge de Oferta Especial */}
         {isOfferActive && (
-          <div className="absolute top-4 right-4 z-10 bg-red-600 text-white font-black text-[10px] tracking-wider px-2.5 py-1 rounded-full uppercase shadow-lg shadow-red-950/80 flex items-center gap-1.5 animate-pulse">
+          <div className="absolute top-4 right-4 z-10 bg-red-600 border border-red-400 text-white font-black text-xs tracking-wider px-3 py-1 rounded-full uppercase shadow-lg shadow-black/80 flex items-center gap-1.5 backdrop-blur-sm">
             <span>🔥 OFERTA</span>
             {product.priceDetal > (product.offerPrice || 0) && (
-              <span className="bg-red-800/90 px-1.5 py-0.2 rounded text-[9px] font-mono">
+              <span className="bg-black/50 text-white px-1.5 py-0.5 rounded text-[10px] font-mono font-bold">
                 -{Math.round(((product.priceDetal - (product.offerPrice || 0)) / product.priceDetal) * 100)}%
               </span>
             )}
@@ -1663,7 +1663,7 @@ export default function Catalog({
                   <h3 className="text-xl sm:text-2xl font-black text-white tracking-wide uppercase">
                     Super Ofertas Destacadas
                   </h3>
-                  <span className="bg-red-650 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider font-mono">
+                  <span className="bg-red-600 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider font-mono">
                     {offerProducts.length} {offerProducts.length === 1 ? 'Producto' : 'Productos'}
                   </span>
                 </div>
@@ -1675,7 +1675,7 @@ export default function Catalog({
                 href="https://wa.me/584244576086?text=¡Hola!%20Quisiera%20consultar%20por%20las%20super%20ofertas%20destacadas%20de%20la%20tienda"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="self-start sm:self-auto flex items-center gap-2 px-4 py-2 rounded-xl bg-red-950/60 border border-red-500/40 text-red-400 hover:text-white hover:bg-red-650 text-xs font-bold transition-all uppercase tracking-wider"
+                className="self-start sm:self-auto flex items-center gap-2 px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 active:bg-red-700 text-white text-xs font-extrabold transition-all uppercase tracking-wider shadow-lg shadow-red-950/60"
               >
                 <span>Consultar en WhatsApp</span>
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1698,7 +1698,7 @@ export default function Catalog({
                 return (
                   <div 
                     key={`offer-${offerProd._id}`}
-                    className="w-72 sm:w-80 flex-shrink-0 bg-zinc-900/90 border border-red-500/30 hover:border-red-500 rounded-2xl overflow-hidden flex flex-col group transition-all duration-300 hover:shadow-xl hover:shadow-red-950/40"
+                    className="w-72 sm:w-80 flex-shrink-0 bg-zinc-900/95 border border-red-500/40 hover:border-red-500 rounded-2xl overflow-hidden flex flex-col group transition-all duration-300 hover:shadow-2xl hover:shadow-red-950/50"
                   >
                     {/* Imagen con Badges */}
                     <div className="relative aspect-video w-full bg-zinc-950 overflow-hidden">
@@ -1710,12 +1710,16 @@ export default function Catalog({
                       <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent opacity-60"></div>
                       
                       {/* Badge Oferta / Descuento */}
-                      <div className="absolute top-3 left-3 bg-red-650 text-white font-black text-[10px] tracking-wider px-2.5 py-1 rounded-full uppercase shadow-lg shadow-red-950/80 flex items-center gap-1">
+                      <div className="absolute top-3 left-3 z-10 bg-red-600 border border-red-400 text-white font-black text-xs tracking-wider px-3 py-1 rounded-full uppercase shadow-lg shadow-black/80 flex items-center gap-1.5 backdrop-blur-sm">
                         <span>🔥 OFERTA</span>
-                        {discountPct && <span>-{discountPct}%</span>}
+                        {discountPct && (
+                          <span className="bg-black/50 text-white px-1.5 py-0.5 rounded text-[10px] font-mono font-bold">
+                            -{discountPct}%
+                          </span>
+                        )}
                       </div>
 
-                      <div className="absolute top-3 right-3 bg-zinc-950/80 border border-zinc-800 text-zinc-400 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">
+                      <div className="absolute top-3 right-3 z-10 bg-black/80 border border-zinc-700 text-zinc-300 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase backdrop-blur-sm">
                         {catName}
                       </div>
                     </div>
@@ -1746,7 +1750,7 @@ export default function Catalog({
                             e.stopPropagation();
                             trackEventAction('whatsapp_click', offerProd._id).catch(err => console.error("Error tracking click:", err));
                           }}
-                          className="px-3.5 py-2 bg-red-650 hover:bg-red-550 active:bg-red-750 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all shadow-md shadow-red-950/30"
+                          className="px-4 py-2.5 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-xl font-extrabold text-xs flex items-center gap-2 transition-all shadow-lg shadow-red-950/60 hover:shadow-red-600/30 active:scale-95 cursor-pointer uppercase tracking-wider"
                         >
                           <span>Pedir</span>
                           <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
