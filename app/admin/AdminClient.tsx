@@ -32,6 +32,8 @@ export interface Product {
   currency?: string;
   subcategory?: string;
   clicks?: number;
+  offerPrice?: number;
+  isOffer?: boolean;
 }
 
 export interface Stats {
@@ -183,6 +185,8 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
   const [minMayor, setMinMayor] = useState('3');
   const [varieties, setVarieties] = useState('Estándar');
   const [subcategory, setSubcategory] = useState('');
+  const [isOffer, setIsOffer] = useState(false);
+  const [offerPrice, setOfferPrice] = useState('');
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
@@ -476,6 +480,8 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
     setMinMayor(product.minMayor.toString());
     setVarieties(product.varieties.join(', '));
     setSubcategory(product.subcategory || '');
+    setIsOffer(product.isOffer || false);
+    setOfferPrice(product.offerPrice ? product.offerPrice.toString() : '');
     setExistingImages(product.images || []);
     
     // Limpiar archivos locales recién seleccionados para evitar mezclas involuntarias
@@ -498,6 +504,8 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
     setMinMayor('3');
     setVarieties('Estándar');
     setSubcategory('');
+    setIsOffer(false);
+    setOfferPrice('');
     setExistingImages([]);
     setSelectedFiles([]);
     setPreviewUrls([]);
@@ -524,6 +532,12 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
       return;
     }
 
+    if (isOffer && (!offerPrice || isNaN(parseFloat(offerPrice)) || parseFloat(offerPrice) <= 0)) {
+      setErrorMsg('Por favor ingrese un precio de oferta válido.');
+      setSubmitLoading(false);
+      return;
+    }
+
     const formData = new FormData();
     formData.append('name', name);
     formData.append('description', description);
@@ -533,6 +547,10 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
     formData.append('minMayor', minMayor);
     formData.append('varieties', varieties);
     formData.append('subcategory', subcategory);
+    formData.append('isOffer', isOffer ? 'true' : 'false');
+    if (isOffer && offerPrice) {
+      formData.append('offerPrice', offerPrice);
+    }
     
     if (editingProductId) {
       formData.append('existingImages', JSON.stringify(existingImages));
@@ -560,6 +578,8 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
         setMinMayor('3');
         setVarieties('Estándar');
         setSubcategory('');
+        setIsOffer(false);
+        setOfferPrice('');
         setSelectedFiles([]);
         setPreviewUrls([]);
         setExistingImages([]);
@@ -1161,6 +1181,51 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                   </div>
                 </div>
 
+                {/* Sección de Ofertas y Descuentos */}
+                <div className="p-4 rounded-2xl bg-zinc-900/40 border border-zinc-850 flex flex-col gap-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-base">🔥</span>
+                      <div>
+                        <span className="text-xs font-bold text-white uppercase tracking-wider block">Destacar en Ofertas</span>
+                        <span className="text-[10px] text-zinc-500">Muestra el producto en la franja superior de rebajas</span>
+                      </div>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        checked={isOffer} 
+                        onChange={(e) => setIsOffer(e.target.checked)}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+                    </label>
+                  </div>
+
+                  {isOffer && (
+                    <div className="flex flex-col gap-1.5 pt-3 border-t border-zinc-800/60">
+                      <div className="flex justify-between items-center">
+                        <label className="text-xs font-bold text-red-400 uppercase tracking-wide">Precio Promocional de Oferta ({globalCurrency})</label>
+                        {priceDetal && offerPrice && parseFloat(offerPrice) < parseFloat(priceDetal) && (
+                          <span className="text-[10px] bg-red-950/60 text-red-400 border border-red-500/30 px-2 py-0.5 rounded-full font-bold">
+                            -{Math.round(((parseFloat(priceDetal) - parseFloat(offerPrice)) / parseFloat(priceDetal)) * 100)}% Dcto
+                          </span>
+                        )}
+                      </div>
+                      <input
+                        type="number"
+                        step="0.01"
+                        placeholder="Ej: 119.99"
+                        value={offerPrice}
+                        onChange={(e) => setOfferPrice(e.target.value)}
+                        className="w-full px-3.5 py-2.5 bg-zinc-950 border border-red-500/60 rounded-xl focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-white placeholder-zinc-700 focus:outline-none transition-all text-sm font-mono font-bold"
+                        required={isOffer}
+                      />
+                      <span className="text-[10px] text-zinc-500">Este valor se mostrará como el precio activo y el precio anterior ({globalCurrency} {priceDetal || '0.00'}) aparecerá tachado.</span>
+                    </div>
+                  )}
+                </div>
+
                 {/* Mínimo unidades mayorista y descripción oculta/automatizada */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1">
@@ -1601,9 +1666,17 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                             <h3 className="font-bold text-white text-sm tracking-wide truncate pr-6" title={prod.name}>
                               {prod.name}
                             </h3>
-                            <span className="text-[10px] uppercase tracking-wider text-red-500 font-bold mt-0.5 block">
-                              {prodCategory}
-                            </span>
+                            <div className="flex flex-wrap items-center gap-2 mt-0.5">
+                              <span className="text-[10px] uppercase tracking-wider text-red-500 font-bold block">
+                                {prodCategory}
+                              </span>
+                              {prod.isOffer && prod.offerPrice && (
+                                <span className="text-[9px] bg-red-650/90 text-white font-black px-1.5 py-0.5 rounded font-mono uppercase tracking-wider flex items-center gap-1 shadow-sm shadow-red-950/40">
+                                  <span>🔥 Oferta:</span>
+                                  <span>{globalCurrency === 'EUR' ? '€' : '$'}{prod.offerPrice.toFixed(2)}</span>
+                                </span>
+                              )}
+                            </div>
                           </div>
                         </div>
 

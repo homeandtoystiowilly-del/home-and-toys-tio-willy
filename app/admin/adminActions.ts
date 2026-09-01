@@ -326,6 +326,9 @@ export async function createProductAction(formData: FormData) {
 
     const currency = (formData.get('currency') as string) || 'USD';
     const subcategory = (formData.get('subcategory') as string || '').trim();
+    const isOffer = formData.get('isOffer') === 'true';
+    const offerPriceRaw = formData.get('offerPrice') as string;
+    const offerPrice = offerPriceRaw && !isNaN(parseFloat(offerPriceRaw)) ? parseFloat(offerPriceRaw) : undefined;
 
     const newProduct = {
       name,
@@ -338,6 +341,8 @@ export async function createProductAction(formData: FormData) {
       varieties,
       currency,
       subcategory: subcategory || undefined,
+      isOffer: isOffer || false,
+      offerPrice: isOffer && offerPrice ? offerPrice : undefined,
       createdAt: new Date()
     };
 
@@ -571,6 +576,9 @@ export async function updateProductAction(productId: string, formData: FormData)
 
     const currency = (formData.get('currency') as string) || 'USD';
     const subcategory = (formData.get('subcategory') as string || '').trim();
+    const isOffer = formData.get('isOffer') === 'true';
+    const offerPriceRaw = formData.get('offerPrice') as string;
+    const offerPrice = offerPriceRaw && !isNaN(parseFloat(offerPriceRaw)) ? parseFloat(offerPriceRaw) : undefined;
 
     await db.collection('productos').updateOne(
       { _id: queryId as any },
@@ -586,6 +594,8 @@ export async function updateProductAction(productId: string, formData: FormData)
           varieties,
           currency,
           subcategory: subcategory || undefined,
+          isOffer: isOffer || false,
+          offerPrice: isOffer && offerPrice ? offerPrice : undefined,
           updatedAt: new Date()
         }
       }

@@ -18,6 +18,8 @@ export interface Product {
   currency?: string;
   subcategory?: string;
   clicks?: number;
+  offerPrice?: number;
+  isOffer?: boolean;
 }
 
 export interface Category {
@@ -123,10 +125,14 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
   const currentVariety = product.varieties[activeIdx] || product.varieties[0];
 
   const symbol = currency === 'EUR' ? '€' : '$';
+  const isOfferActive = !!(product.isOffer && product.offerPrice && product.offerPrice > 0);
 
   // Enlace de WhatsApp
   const phone = '584244576086'; // Número del cliente
-  const textMessage = `Hola Tío Willy, me interesa consultar por el producto:\n\n*${product.name}*\n- *Variedad:* ${currentVariety}\n- *Precio Detal:* ${symbol}${product.priceDetal.toFixed(2)}\n- *Precio Mayor:* ${symbol}${product.priceMayor.toFixed(2)} (A partir de ${product.minMayor} unidades)\n\n¿Tienen stock disponible?`;
+  const textMessage = isOfferActive
+    ? `Hola Tío Willy, me interesa consultar por la *OFERTA ESPECIAL* del producto:\n\n📌 *${product.name}*\n- *Variedad:* ${currentVariety}\n- *Precio de Oferta:* ${symbol}${product.offerPrice!.toFixed(2)} (Antes ${symbol}${product.priceDetal.toFixed(2)})\n- *Precio Mayor:* ${symbol}${product.priceMayor.toFixed(2)} (A partir de ${product.minMayor} unidades)\n\n¿Tienen stock disponible?`
+    : `Hola Tío Willy, me interesa consultar por el producto:\n\n*${product.name}*\n- *Variedad:* ${currentVariety}\n- *Precio Detal:* ${symbol}${product.priceDetal.toFixed(2)}\n- *Precio Mayor:* ${symbol}${product.priceMayor.toFixed(2)} (A partir de ${product.minMayor} unidades)\n\n¿Tienen stock disponible?`;
+  
   const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(textMessage)}`;
 
   return (
@@ -197,6 +203,18 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
             {categoryName || product.category}
           </span>
         </div>
+
+        {/* Badge de Oferta Especial */}
+        {isOfferActive && (
+          <div className="absolute top-4 right-4 z-10 bg-red-600 text-white font-black text-[10px] tracking-wider px-2.5 py-1 rounded-full uppercase shadow-lg shadow-red-950/80 flex items-center gap-1.5 animate-pulse">
+            <span>🔥 OFERTA</span>
+            {product.priceDetal > (product.offerPrice || 0) && (
+              <span className="bg-red-800/90 px-1.5 py-0.2 rounded text-[9px] font-mono">
+                -{Math.round(((product.priceDetal - (product.offerPrice || 0)) / product.priceDetal) * 100)}%
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Cuerpo de la Tarjeta */}
@@ -239,10 +257,27 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
 
         {/* Precios */}
         <div className="mt-4 p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800/40 flex flex-col gap-2.5">
-          <div className="flex justify-between items-baseline">
-            <span className="text-xs text-zinc-400 font-medium uppercase tracking-wide">Precio Detal:</span>
-            <span className="text-2xl font-black text-white font-mono">{symbol}{product.priceDetal.toFixed(2)}</span>
-          </div>
+          {isOfferActive ? (
+            <div className="flex justify-between items-baseline">
+              <div className="flex flex-col">
+                <span className="text-[10px] text-zinc-500 line-through font-mono">
+                  Antes: {symbol}{product.priceDetal.toFixed(2)}
+                </span>
+                <span className="text-xs text-red-500 font-bold uppercase tracking-wide flex items-center gap-1">
+                  <span>🔥 Oferta:</span>
+                </span>
+              </div>
+              <span className="text-2xl font-black text-red-500 font-mono">
+                {symbol}{product.offerPrice!.toFixed(2)}
+              </span>
+            </div>
+          ) : (
+            <div className="flex justify-between items-baseline">
+              <span className="text-xs text-zinc-400 font-medium uppercase tracking-wide">Precio Detal:</span>
+              <span className="text-2xl font-black text-white font-mono">{symbol}{product.priceDetal.toFixed(2)}</span>
+            </div>
+          )}
+          
           <div className="h-[1px] bg-zinc-800/60"></div>
           <div className="flex justify-between items-baseline">
             <div className="flex flex-col">
@@ -261,7 +296,7 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
             e.stopPropagation();
             trackEventAction('whatsapp_click', product._id).catch(err => console.error("Error tracking click:", err));
           }}
-          className="mt-5 w-full py-3.5 px-4 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-xl font-bold flex items-center justify-center gap-2.5 transition-all duration-300 shadow-lg shadow-red-900/20 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-red-500/50"
+          className="mt-5 w-full py-3.5 px-4 bg-red-600 hover:bg-red-550 active:bg-red-750 text-white rounded-xl font-bold flex items-center justify-center gap-2.5 transition-all duration-300 shadow-lg shadow-red-900/20 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-red-500/50"
         >
           {/* WhatsApp Icon */}
           <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
@@ -409,10 +444,32 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
                 <div>
                   {/* Caja de Precios en el Modal */}
                   <div className="p-4 rounded-2xl bg-zinc-900/60 border border-zinc-900 flex flex-col gap-2.5">
-                    <div className="flex justify-between items-baseline">
-                      <span className="text-xs text-zinc-400 font-medium uppercase tracking-wide">Precio Detal:</span>
-                      <span className="text-2xl font-black text-white font-mono">{symbol}{product.priceDetal.toFixed(2)}</span>
-                    </div>
+                    {isOfferActive ? (
+                      <div className="flex justify-between items-baseline">
+                        <div className="flex flex-col">
+                          <span className="text-xs text-zinc-500 line-through font-mono">
+                            Antes: {symbol}{product.priceDetal.toFixed(2)}
+                          </span>
+                          <span className="text-xs text-red-500 font-bold uppercase tracking-wide flex items-center gap-1.5 mt-0.5">
+                            <span>🔥 Precio de Oferta:</span>
+                            {product.priceDetal > (product.offerPrice || 0) && (
+                              <span className="bg-red-950/80 text-red-400 border border-red-500/40 text-[10px] font-black px-2 py-0.5 rounded-full">
+                                -{Math.round(((product.priceDetal - (product.offerPrice || 0)) / product.priceDetal) * 100)}% DCTO
+                              </span>
+                            )}
+                          </span>
+                        </div>
+                        <span className="text-3xl font-black text-red-500 font-mono animate-pulse">
+                          {symbol}{product.offerPrice!.toFixed(2)}
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="flex justify-between items-baseline">
+                        <span className="text-xs text-zinc-400 font-medium uppercase tracking-wide">Precio Detal:</span>
+                        <span className="text-2xl font-black text-white font-mono">{symbol}{product.priceDetal.toFixed(2)}</span>
+                      </div>
+                    )}
+                    
                     <div className="h-[1px] bg-zinc-800/40"></div>
                     <div className="flex justify-between items-baseline">
                       <div className="flex flex-col">
@@ -569,6 +626,46 @@ function getSubcategoriesForCategory(productsInCategory: Product[], categoriesLi
   });
 }
 
+// Diapositivas para el carrusel de la cabecera (Hero Slider)
+const HERO_SLIDES = [
+  {
+    id: 1,
+    tag: 'COLECCIÓN EXCLUSIVA',
+    title: 'Hogar, Juguetería y Variedades',
+    highlight: 'Calidad Premium',
+    description: 'Encuentra las mejores marcas y modelos seleccionados al detal y con tarifas directas al mayor.',
+    badge: '✨ Catálogo 2026',
+    ctaText: 'Ver Catálogo',
+    ctaLink: '#catalogo',
+    secondaryText: 'Pedir por WhatsApp',
+    secondaryLink: 'https://wa.me/584244576086'
+  },
+  {
+    id: 2,
+    tag: 'ATENCIÓN MAYORISTA',
+    title: 'Precios de Distribución Comercial',
+    highlight: 'Impulsa tu Negocio',
+    description: 'Ventas por bulto y cajas cerradas con márgenes de ganancia inmejorables para tu comercio.',
+    badge: '💼 Mayoristas',
+    ctaText: 'Trabaja con Nosotros',
+    isPdfAction: true,
+    secondaryText: 'Cotizar Lotes',
+    secondaryLink: 'https://wa.me/584244576086?text=¡Hola!%20Deseo%20cotizar%20compras%20al%20mayor%20en%20Home%20and%20Toys%20Tío%20Willy.'
+  },
+  {
+    id: 3,
+    tag: 'REBAJAS POR TIEMPO LIMITADO',
+    title: 'Super Ofertas y Liquidaciones',
+    highlight: 'Precios Especiales',
+    description: 'Descubre artículos en promoción con descuentos imperdibles hasta agotar existencia.',
+    badge: '🔥 Super Ofertas',
+    ctaText: 'Ver Ofertas Destacadas',
+    ctaLink: '#seccion-ofertas',
+    secondaryText: 'Consultar Ofertas',
+    secondaryLink: 'https://wa.me/584244576086?text=¡Hola!%20Me%20interesa%20conocer%20las%20ofertas%20especiales%20disponibles.'
+  }
+];
+
 export default function Catalog({ 
   initialProductos, 
   initialCategorias,
@@ -587,6 +684,24 @@ export default function Catalog({
   const [showInactivityAlert, setShowInactivityAlert] = useState<boolean>(false);
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>('todos');
   const [pdfLoading, setPdfLoading] = useState<boolean>(false);
+
+  // Estados del Carrusel de la Cabecera (Hero Slider)
+  const [currentHeroSlide, setCurrentHeroSlide] = useState<number>(0);
+  const [isHeroPaused, setIsHeroPaused] = useState<boolean>(false);
+
+  // Auto-avance del Slider Hero cada 4.5 segundos
+  useEffect(() => {
+    if (isHeroPaused) return;
+    const timer = setInterval(() => {
+      setCurrentHeroSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+    }, 4500);
+    return () => clearInterval(timer);
+  }, [isHeroPaused]);
+
+  // Lista calculada de productos en oferta
+  const offerProducts = useMemo(() => {
+    return initialProductos.filter((p) => p.isOffer && p.offerPrice && p.offerPrice > 0);
+  }, [initialProductos]);
 
   // Resetear subcategoría cuando cambia la categoría principal
   useEffect(() => {
@@ -1403,32 +1518,250 @@ export default function Catalog({
         </div>
       </div>
 
-      {/* Header / Hero */}
-      <header className="relative w-full py-16 md:py-24 overflow-hidden flex flex-col items-center justify-center border-b border-zinc-900 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-red-950/20 via-black to-black">
-        {/* Luces de ambiente traseras */}
-        <div className="absolute top-0 left-1/4 -translate-x-1/2 w-96 h-96 bg-red-600/5 rounded-full blur-[120px] pointer-events-none"></div>
-        <div className="absolute top-0 right-1/4 translate-x-1/2 w-96 h-96 bg-red-600/5 rounded-full blur-[120px] pointer-events-none"></div>
-        
-        <LogoTioWilly className="relative z-10 scale-95 md:scale-100 transition-transform duration-500" />
+      {/* Header / Hero Carousel Slider */}
+      <header 
+        onMouseEnter={() => setIsHeroPaused(true)}
+        onMouseLeave={() => setIsHeroPaused(false)}
+        className="relative w-full min-h-[460px] md:min-h-[520px] overflow-hidden flex flex-col items-center justify-center border-b border-zinc-900 bg-black"
+      >
+        {/* Fondo con degradados dinámicos */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-red-950/25 via-zinc-950 to-black pointer-events-none"></div>
+        <div className="absolute top-0 left-1/4 -translate-x-1/2 w-96 h-96 bg-red-600/10 rounded-full blur-[120px] pointer-events-none"></div>
+        <div className="absolute top-0 right-1/4 translate-x-1/2 w-96 h-96 bg-red-600/10 rounded-full blur-[120px] pointer-events-none"></div>
 
-        <p className="mt-8 text-center text-sm md:text-base text-zinc-400 tracking-[0.15em] uppercase max-w-md px-6 leading-relaxed">
-          Calidad Premium al detal y mayorista
-        </p>
+        {/* Logo Superior */}
+        <div className="relative z-10 pt-8 pb-4">
+          <LogoTioWilly className="scale-90 md:scale-95 transition-transform duration-500" />
+        </div>
 
-        {/* Flecha indicadora hacia abajo */}
-        <a 
-          href="#catalogo"
-          className="absolute bottom-6 flex flex-col items-center gap-1.5 text-zinc-500 hover:text-red-500 transition-colors duration-300 group"
+        {/* Slider de Diapositivas Hero */}
+        <div className="relative z-10 w-full max-w-4xl px-4 sm:px-6 py-4 flex flex-col items-center text-center">
+          {HERO_SLIDES.map((slide, sIdx) => {
+            const isActive = sIdx === currentHeroSlide;
+            return (
+              <div
+                key={slide.id}
+                className={`transition-all duration-700 w-full flex flex-col items-center ${
+                  isActive ? 'opacity-100 scale-100 relative' : 'opacity-0 scale-95 absolute pointer-events-none'
+                }`}
+              >
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-red-950/50 border border-red-500/30 text-red-400 text-xs font-black uppercase tracking-widest mb-3 shadow-lg shadow-red-950/40 animate-pulse">
+                  {slide.badge}
+                </div>
+
+                <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-white tracking-tight max-w-2xl leading-tight">
+                  {slide.title}
+                </h2>
+
+                <p className="text-red-400 font-bold text-sm sm:text-base tracking-wider uppercase mt-2">
+                  {slide.highlight}
+                </p>
+
+                <p className="mt-3 text-zinc-400 text-xs sm:text-sm md:text-base max-w-xl leading-relaxed">
+                  {slide.description}
+                </p>
+
+                {/* Botones de acción del slide */}
+                <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+                  {slide.isPdfAction ? (
+                    <button
+                      onClick={handleGenerateCatalogPDF}
+                      disabled={pdfLoading}
+                      className="px-6 py-3 rounded-xl bg-red-600 hover:bg-red-550 active:bg-red-750 text-white text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-300 shadow-xl shadow-red-950/50 flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                    >
+                      {pdfLoading ? (
+                        <>
+                          <span className="w-2 h-2 rounded-full bg-white animate-ping"></span>
+                          Generando PDF...
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                          {slide.ctaText}
+                        </>
+                      )}
+                    </button>
+                  ) : (
+                    <a
+                      href={slide.ctaLink}
+                      className="px-6 py-3 rounded-xl bg-red-600 hover:bg-red-550 active:bg-red-750 text-white text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-300 shadow-xl shadow-red-950/50 flex items-center gap-2"
+                    >
+                      <span>{slide.ctaText}</span>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 14l-7 7-7-7" />
+                      </svg>
+                    </a>
+                  )}
+
+                  <a
+                    href={slide.secondaryLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-6 py-3 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-300 flex items-center gap-2"
+                  >
+                    <span>{slide.secondaryText}</span>
+                    <svg className="w-4 h-4 fill-current text-red-500" viewBox="0 0 24 24">
+                      <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.835-9.977c.311.089.822.112 1.134.112.31 0 .82-.112 1.131-.492.311-.38.82-1.993.899-2.15.079-.156.13-.339.028-.553-.102-.213-.822-1.994-.822-1.994-.127-.278-.261-.318-.466-.318-.17 0-.368-.012-.566-.012-.397 0-.907.146-1.22.492-.311.38-1.189 1.163-1.189 2.833 0 1.67 1.218 3.282 1.388 3.507.17.225 2.4 3.665 5.811 5.138.81.35 1.442.56 1.933.717.813.259 1.554.223 2.14.136.652-.097 1.993-.815 2.276-1.602.283-.787.283-1.46.198-1.602-.085-.142-.311-.225-.652-.393-.34-.168-1.993-.984-2.276-1.085-.283-.101-.49-.152-.697.152-.207.304-.803 1.085-.984 1.288-.18.203-.362.228-.703.06-.34-.168-1.436-.53-2.735-1.688-1.01-.902-1.693-2.016-1.892-2.355-.198-.339-.021-.523.149-.692.153-.152.34-.393.51-.59.17-.197.226-.338.339-.564.113-.225.056-.422-.028-.59-.084-.168-.703-1.692-1.01-2.434-.298-.718-.604-.621-.822-.631-.212-.01-.453-.012-.694-.012-.24 0-.631.09-.962.45-.33.36-1.26 1.23-1.26 3.003 0 1.77 1.29 3.48 1.47 3.73.18.25 2.54 3.88 6.16 5.45.86.37 1.53.59 2.06.76.87.28 1.66.24 2.28.15.69-.1 2.12-.87 2.42-1.71.3-.84.3-1.56.21-1.71-.09-.15-.33-.24-.72-.43z"/>
+                    </svg>
+                  </a>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Flechas de navegación del Slider */}
+        <button
+          onClick={() => setCurrentHeroSlide((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length)}
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-zinc-900/80 hover:bg-red-650 border border-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center transition-all cursor-pointer shadow-lg hidden sm:flex"
+          aria-label="Slide anterior"
         >
-          <span className="text-[10px] uppercase tracking-widest font-bold">Ver catálogo</span>
-          <svg className="w-5 h-5 animate-bounce group-hover:translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7-7-7" />
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
           </svg>
-        </a>
+        </button>
+        <button
+          onClick={() => setCurrentHeroSlide((prev) => (prev + 1) % HERO_SLIDES.length)}
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-zinc-900/80 hover:bg-red-650 border border-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center transition-all cursor-pointer shadow-lg hidden sm:flex"
+          aria-label="Siguiente slide"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+
+        {/* Dots / Puntos de Navegación del Hero */}
+        <div className="relative z-10 flex items-center gap-2 mt-4 pb-8">
+          {HERO_SLIDES.map((_, dotIdx) => (
+            <button
+              key={dotIdx}
+              onClick={() => setCurrentHeroSlide(dotIdx)}
+              className={`h-2 rounded-full transition-all duration-500 cursor-pointer ${
+                dotIdx === currentHeroSlide ? 'w-8 bg-red-600' : 'w-2 bg-zinc-800 hover:bg-zinc-600'
+              }`}
+              aria-label={`Ir a la diapositiva ${dotIdx + 1}`}
+            />
+          ))}
+        </div>
       </header>
 
       {/* Main Content Area */}
-      <main id="catalogo" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <main id="catalogo" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+        
+        {/* Franja de Super Ofertas Destacadas (Si existen productos con isOffer) */}
+        {offerProducts.length > 0 && (
+          <section id="seccion-ofertas" className="mb-12 sm:mb-16 p-6 sm:p-8 rounded-3xl bg-gradient-to-b from-red-950/30 via-zinc-950 to-zinc-950 border border-red-500/30 shadow-2xl shadow-red-950/20 relative overflow-hidden">
+            {/* Luces decorativas */}
+            <div className="absolute top-0 right-0 w-96 h-96 bg-red-600/10 rounded-full blur-[100px] pointer-events-none"></div>
+            
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 relative z-10">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl animate-bounce">🔥</span>
+                  <h3 className="text-xl sm:text-2xl font-black text-white tracking-wide uppercase">
+                    Super Ofertas Destacadas
+                  </h3>
+                  <span className="bg-red-650 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider font-mono">
+                    {offerProducts.length} {offerProducts.length === 1 ? 'Producto' : 'Productos'}
+                  </span>
+                </div>
+                <p className="text-zinc-400 text-xs sm:text-sm mt-1">
+                  Precios especiales por tiempo limitado en artículos seleccionados. ¡Aprovecha estas promociones!
+                </p>
+              </div>
+              <a
+                href="https://wa.me/584244576086?text=¡Hola!%20Quisiera%20consultar%20por%20las%20super%20ofertas%20destacadas%20de%20la%20tienda"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="self-start sm:self-auto flex items-center gap-2 px-4 py-2 rounded-xl bg-red-950/60 border border-red-500/40 text-red-400 hover:text-white hover:bg-red-650 text-xs font-bold transition-all uppercase tracking-wider"
+              >
+                <span>Consultar en WhatsApp</span>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </a>
+            </div>
+
+            {/* Carrusel Deslizable de Tarjetas de Oferta */}
+            <div className="flex gap-4 sm:gap-6 overflow-x-auto pb-4 pt-1 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent scroll-smooth">
+              {offerProducts.map((offerProd) => {
+                const catName = initialCategorias.find((c) => c._id === offerProd.category)?.name || offerProd.category;
+                const discountPct = offerProd.priceDetal > (offerProd.offerPrice || 0) 
+                  ? Math.round(((offerProd.priceDetal - (offerProd.offerPrice || 0)) / offerProd.priceDetal) * 100)
+                  : null;
+                const currencySymbol = currency === 'EUR' ? '€' : '$';
+                const offerWaMsg = `Hola Tío Willy, quiero comprar en *OFERTA* el producto:\n\n🔥 *${offerProd.name}*\n🏷️ *Precio Especial:* ${currencySymbol}${offerProd.offerPrice?.toFixed(2)} (Antes ${currencySymbol}${offerProd.priceDetal.toFixed(2)})\n\n¿Tienen disponibilidad inmediata?`;
+                const offerWaUrl = `https://wa.me/584244576086?text=${encodeURIComponent(offerWaMsg)}`;
+
+                return (
+                  <div 
+                    key={`offer-${offerProd._id}`}
+                    className="w-72 sm:w-80 flex-shrink-0 bg-zinc-900/90 border border-red-500/30 hover:border-red-500 rounded-2xl overflow-hidden flex flex-col group transition-all duration-300 hover:shadow-xl hover:shadow-red-950/40"
+                  >
+                    {/* Imagen con Badges */}
+                    <div className="relative aspect-video w-full bg-zinc-950 overflow-hidden">
+                      <img 
+                        src={offerProd.images[0] || '/images/chair_red.jpg'} 
+                        alt={offerProd.name} 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent opacity-60"></div>
+                      
+                      {/* Badge Oferta / Descuento */}
+                      <div className="absolute top-3 left-3 bg-red-650 text-white font-black text-[10px] tracking-wider px-2.5 py-1 rounded-full uppercase shadow-lg shadow-red-950/80 flex items-center gap-1">
+                        <span>🔥 OFERTA</span>
+                        {discountPct && <span>-{discountPct}%</span>}
+                      </div>
+
+                      <div className="absolute top-3 right-3 bg-zinc-950/80 border border-zinc-800 text-zinc-400 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">
+                        {catName}
+                      </div>
+                    </div>
+
+                    {/* Información y CTA */}
+                    <div className="p-4 sm:p-5 flex flex-col flex-1">
+                      <h4 className="text-white font-bold text-sm line-clamp-1 group-hover:text-red-400 transition-colors">
+                        {offerProd.name}
+                      </h4>
+                      <p className="text-zinc-400 text-xs mt-1 line-clamp-2">
+                        {offerProd.description}
+                      </p>
+
+                      <div className="mt-auto pt-4 flex items-end justify-between border-t border-zinc-800/80">
+                        <div>
+                          <span className="text-[11px] text-zinc-500 line-through font-mono block">
+                            Antes: {currencySymbol}{offerProd.priceDetal.toFixed(2)}
+                          </span>
+                          <span className="text-xl font-black text-red-500 font-mono">
+                            {currencySymbol}{offerProd.offerPrice?.toFixed(2)}
+                          </span>
+                        </div>
+                        <a
+                          href={offerWaUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            trackEventAction('whatsapp_click', offerProd._id).catch(err => console.error("Error tracking click:", err));
+                          }}
+                          className="px-3.5 py-2 bg-red-650 hover:bg-red-550 active:bg-red-750 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all shadow-md shadow-red-950/30"
+                        >
+                          <span>Pedir</span>
+                          <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.835-9.977c.311.089.822.112 1.134.112.31 0 .82-.112 1.131-.492.311-.38.82-1.993.899-2.15.079-.156.13-.339.028-.553-.102-.213-.822-1.994-.822-1.994-.127-.278-.261-.318-.466-.318-.17 0-.368-.012-.566-.012-.397 0-.907.146-1.22.492-.311.38-1.189 1.163-1.189 2.833 0 1.67 1.218 3.282 1.388 3.507.17.225 2.4 3.665 5.811 5.138.81.35 1.442.56 1.933.717.813.259 1.554.223 2.14.136.652-.097 1.993-.815 2.276-1.602.283-.787.283-1.46.198-1.602-.085-.142-.311-.225-.652-.393-.34-.168-1.993-.984-2.276-1.085-.283-.101-.49-.152-.697.152-.207.304-.803 1.085-.984 1.288-.18.203-.362.228-.703.06-.34-.168-1.436-.53-2.735-1.688-1.01-.902-1.693-2.016-1.892-2.355-.198-.339-.021-.523.149-.692.153-.152.34-.393.51-.59.17-.197.226-.338.339-.564.113-.225.056-.422-.028-.59-.084-.168-.703-1.692-1.01-2.434-.298-.718-.604-.621-.822-.631-.212-.01-.453-.012-.694-.012-.24 0-.631.09-.962.45-.33.36-1.26 1.23-1.26 3.003 0 1.77 1.29 3.48 1.47 3.73.18.25 2.54 3.88 6.16 5.45.86.37 1.53.59 2.06.76.87.28 1.66.24 2.28.15.69-.1 2.12-.87 2.42-1.71.3-.84.3-1.56.21-1.71-.09-.15-.33-.24-.72-.43z"/>
+                          </svg>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
         <div className="flex flex-col lg:flex-row gap-8 lg:items-start">
           
           {/* Columna Izquierda: Filtros de Categoría y Buscador */}
@@ -1501,22 +1834,96 @@ export default function Catalog({
           </aside>
 
           {/* Columna Derecha: Catálogo de Productos y Paginación */}
-          <div className="flex-1 flex flex-col gap-8 lg:gap-10">
-            {/* Mobile Filter & Search Button Trigger */}
-            <div className="lg:hidden flex items-center justify-between bg-zinc-950 border border-zinc-900 rounded-3xl p-4 shadow-lg shadow-black/40">
-              <div className="flex flex-col gap-0.5">
-                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Catálogo</span>
-                <span className="text-xs font-black text-white">{filteredProducts.length} Productos</span>
+          <div className="flex-1 flex flex-col gap-6 lg:gap-10">
+            {/* Mobile Filter & Search Button Trigger + Buscador Rápido */}
+            <div className="lg:hidden flex flex-col gap-3 bg-zinc-950 border border-zinc-900 rounded-3xl p-4 shadow-lg shadow-black/40">
+              <div className="flex items-center justify-between">
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Catálogo de Productos</span>
+                  <span className="text-xs font-black text-white">{filteredProducts.length} Productos Disponibles</span>
+                </div>
+                <button
+                  onClick={() => setIsDrawerOpen(true)}
+                  className="flex items-center gap-2 px-4 py-2.5 bg-red-650 hover:bg-red-550 active:bg-red-750 text-white rounded-xl font-bold text-xs transition-colors cursor-pointer shadow-lg shadow-red-950/20"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                  </svg>
+                  Menú y Filtros
+                </button>
               </div>
-              <button
-                onClick={() => setIsDrawerOpen(true)}
-                className="flex items-center gap-2 px-4 py-2.5 bg-red-650 hover:bg-red-550 active:bg-red-750 text-white rounded-xl font-bold text-xs transition-colors cursor-pointer shadow-lg shadow-red-950/20"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+
+              {/* Buscador móvil inline */}
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Buscar en el catálogo..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl focus:border-red-500 text-white placeholder-zinc-500 focus:outline-none text-xs font-medium"
+                />
+                <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
-                Filtrar y Buscar
-              </button>
+              </div>
+            </div>
+
+            {/* Barra de Categorías Horizontal Deslizable para Móviles */}
+            <div className="lg:hidden w-full flex flex-col gap-2">
+              <div className="flex items-center justify-between px-1">
+                <span className="text-[10px] text-zinc-500 font-extrabold uppercase tracking-widest">
+                  Categorías
+                </span>
+                <span className="text-[10px] text-zinc-500">
+                  Desliza 👉
+                </span>
+              </div>
+              <div className="flex items-center gap-2 overflow-x-auto pb-2 scroll-smooth scrollbar-none">
+                <button
+                  onClick={() => {
+                    setSelectedCategory('todos');
+                    setSelectedSubcategory('todos');
+                  }}
+                  className={`flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
+                    selectedCategory === 'todos'
+                      ? 'bg-red-600 text-white shadow-lg shadow-red-950/50 scale-[1.02]'
+                      : 'bg-zinc-900/90 text-zinc-400 border border-zinc-800 hover:text-white hover:bg-zinc-850'
+                  }`}
+                >
+                  <span>Todos</span>
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full ${
+                    selectedCategory === 'todos' ? 'bg-red-800/90 text-white' : 'bg-zinc-800 text-zinc-500'
+                  }`}>
+                    {categoryCounts.todos}
+                  </span>
+                </button>
+
+                {initialCategorias.map((cat: Category) => {
+                  const isActive = selectedCategory === cat._id;
+                  const count = categoryCounts[cat._id] || 0;
+                  return (
+                    <button
+                      key={cat._id}
+                      onClick={() => {
+                        setSelectedCategory(cat._id);
+                        setSelectedSubcategory('todos');
+                      }}
+                      className={`flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
+                        isActive
+                          ? 'bg-red-600 text-white shadow-lg shadow-red-950/50 scale-[1.02]'
+                          : 'bg-zinc-900/90 text-zinc-400 border border-zinc-800 hover:text-white hover:bg-zinc-850'
+                      }`}
+                    >
+                      <span>{cat.name}</span>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full ${
+                        isActive ? 'bg-red-800/90 text-white' : 'bg-zinc-800 text-zinc-500'
+                      }`}>
+                        {count}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             {/* Filtro de Subcategorías / Variantes por Categoría */}
