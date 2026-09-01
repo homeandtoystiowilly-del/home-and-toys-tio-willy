@@ -19,6 +19,11 @@ body {
 }
 
 /* Custom premium scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #27272a #09090b;
+}
+
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -35,6 +40,15 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #ff2d2d;
+}
+
+/* Hide scrollbar utility */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 /* Modal premium animation transitions */

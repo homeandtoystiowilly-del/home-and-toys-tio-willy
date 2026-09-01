@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { jsPDF } from 'jspdf';
 import { trackEventAction } from '../app/admin/adminActions';
 
 // Interfaces para TypeScript
@@ -689,6 +688,31 @@ export default function Catalog({
   const [currentHeroSlide, setCurrentHeroSlide] = useState<number>(0);
   const [isHeroPaused, setIsHeroPaused] = useState<boolean>(false);
 
+  // Soporte de gestos táctiles (Swipe) para el Hero Slider en móviles
+  const [heroTouchStart, setHeroTouchStart] = useState<number | null>(null);
+  const [heroTouchEnd, setHeroTouchEnd] = useState<number | null>(null);
+
+  const onHeroTouchStart = (e: React.TouchEvent) => {
+    setHeroTouchEnd(null);
+    setHeroTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onHeroTouchMove = (e: React.TouchEvent) => {
+    setHeroTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onHeroTouchEnd = () => {
+    if (!heroTouchStart || !heroTouchEnd) return;
+    const distance = heroTouchStart - heroTouchEnd;
+    if (distance > 45) {
+      // Deslizar a la izquierda -> Siguiente slide
+      setCurrentHeroSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+    } else if (distance < -45) {
+      // Deslizar a la derecha -> Slide anterior
+      setCurrentHeroSlide((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
+    }
+  };
+
   // Auto-avance del Slider Hero cada 4.5 segundos
   useEffect(() => {
     if (isHeroPaused) return;
@@ -748,6 +772,9 @@ export default function Catalog({
     setPdfLoading(true);
 
     try {
+      // Carga dinámica bajo demanda para optimizar el bundle inicial
+      const { jsPDF } = await import('jspdf');
+
       const doc = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
@@ -1522,7 +1549,10 @@ export default function Catalog({
       <header 
         onMouseEnter={() => setIsHeroPaused(true)}
         onMouseLeave={() => setIsHeroPaused(false)}
-        className="relative w-full min-h-[460px] md:min-h-[520px] overflow-hidden flex flex-col items-center justify-center border-b border-zinc-900 bg-black"
+        onTouchStart={onHeroTouchStart}
+        onTouchMove={onHeroTouchMove}
+        onTouchEnd={onHeroTouchEnd}
+        className="relative w-full min-h-[460px] md:min-h-[520px] overflow-hidden flex flex-col items-center justify-center border-b border-zinc-900 bg-black cursor-grab active:cursor-grabbing select-none"
       >
         {/* Fondo con degradados dinámicos */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-red-950/25 via-zinc-950 to-black pointer-events-none"></div>
@@ -1685,7 +1715,7 @@ export default function Catalog({
             </div>
 
             {/* Carrusel Deslizable de Tarjetas de Oferta */}
-            <div className="flex gap-4 sm:gap-6 overflow-x-auto pb-4 pt-1 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent scroll-smooth">
+            <div className="flex gap-4 sm:gap-6 overflow-x-auto pb-4 pt-1 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent scroll-smooth snap-x snap-mandatory">
               {offerProducts.map((offerProd) => {
                 const catName = initialCategorias.find((c) => c._id === offerProd.category)?.name || offerProd.category;
                 const discountPct = offerProd.priceDetal > (offerProd.offerPrice || 0) 
@@ -1698,7 +1728,7 @@ export default function Catalog({
                 return (
                   <div 
                     key={`offer-${offerProd._id}`}
-                    className="w-72 sm:w-80 flex-shrink-0 bg-zinc-900/95 border border-red-500/40 hover:border-red-500 rounded-2xl overflow-hidden flex flex-col group transition-all duration-300 hover:shadow-2xl hover:shadow-red-950/50"
+                    className="w-72 sm:w-80 flex-shrink-0 bg-zinc-900/95 border border-red-500/40 hover:border-red-500 rounded-2xl overflow-hidden flex flex-col group transition-all duration-300 hover:shadow-2xl hover:shadow-red-950/50 snap-start"
                   >
                     {/* Imagen con Badges */}
                     <div className="relative aspect-video w-full bg-zinc-950 overflow-hidden">
@@ -1848,7 +1878,7 @@ export default function Catalog({
                 </div>
                 <button
                   onClick={() => setIsDrawerOpen(true)}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-red-650 hover:bg-red-550 active:bg-red-750 text-white rounded-xl font-bold text-xs transition-colors cursor-pointer shadow-lg shadow-red-950/20"
+                  className="flex items-center gap-2 px-4 py-2.5 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-xl font-bold text-xs transition-colors cursor-pointer shadow-lg shadow-red-950/20"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
@@ -1882,13 +1912,13 @@ export default function Catalog({
                   Desliza 👉
                 </span>
               </div>
-              <div className="flex items-center gap-2 overflow-x-auto pb-2 scroll-smooth scrollbar-none">
+              <div className="flex items-center gap-2 overflow-x-auto pb-2 scroll-smooth scrollbar-none snap-x snap-mandatory">
                 <button
                   onClick={() => {
                     setSelectedCategory('todos');
                     setSelectedSubcategory('todos');
                   }}
-                  className={`flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
+                  className={`flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer snap-start ${
                     selectedCategory === 'todos'
                       ? 'bg-red-600 text-white shadow-lg shadow-red-950/50 scale-[1.02]'
                       : 'bg-zinc-900/90 text-zinc-400 border border-zinc-800 hover:text-white hover:bg-zinc-850'
@@ -1912,7 +1942,7 @@ export default function Catalog({
                         setSelectedCategory(cat._id);
                         setSelectedSubcategory('todos');
                       }}
-                      className={`flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
+                      className={`flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer snap-start ${
                         isActive
                           ? 'bg-red-600 text-white shadow-lg shadow-red-950/50 scale-[1.02]'
                           : 'bg-zinc-900/90 text-zinc-400 border border-zinc-800 hover:text-white hover:bg-zinc-850'
@@ -2197,13 +2227,13 @@ export default function Catalog({
       </section>
 
       {/* Footer */}
-      <footer className="w-full py-12 border-t border-zinc-900 bg-zinc-950/40 text-center text-zinc-500 text-sm flex flex-col items-center gap-3">
-        <LogoTioWilly className="scale-75 opacity-75 mb-1" />
-        <p className="mt-2">© 2026 Home and Toys Tío Willy. Todos los derechos reservados.</p>
-        <p className="text-xs text-zinc-700 italic">Desarrollado con pasión para una experiencia de compra premium.</p>
+      <footer className="w-full py-12 border-t border-zinc-900 bg-zinc-950/60 text-center text-zinc-400 text-sm flex flex-col items-center gap-3">
+        <LogoTioWilly className="scale-75 opacity-80 mb-1" />
+        <p className="mt-2 text-zinc-400">© 2026 Home and Toys Tío Willy. Todos los derechos reservados.</p>
+        <p className="text-xs text-zinc-400 italic">Desarrollado con pasión para una experiencia de compra premium.</p>
         <a 
           href="/admin" 
-          className="text-[10px] text-zinc-700 hover:text-red-500/80 transition-colors duration-300 uppercase tracking-widest font-bold mt-2"
+          className="text-xs text-zinc-400 hover:text-red-500 transition-colors duration-300 uppercase tracking-widest font-bold mt-2"
         >
           Acceso Administrador
         </a>
