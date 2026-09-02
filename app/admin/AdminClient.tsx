@@ -15,7 +15,8 @@ import {
   updateGlobalCurrencyAction,
   getSecurityQuestionAction,
   recoverPasswordAction,
-  updateSecurityConfigAction
+  updateSecurityConfigAction,
+  toggleProductStatusAction
 } from './adminActions';
 
 // Interfaces locales coincidentes con Catalog.tsx
@@ -34,6 +35,7 @@ export interface Product {
   clicks?: number;
   offerPrice?: number;
   isOffer?: boolean;
+  status?: 'active' | 'paused';
 }
 
 export interface Stats {
@@ -673,6 +675,33 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
     } catch (err) {
       console.error(err);
       alert('Error de red al eliminar el producto');
+    }
+  };
+
+  // Pausar / Reanudar Publicación de Producto (Control de Stock)
+  const handleToggleProductStatus = async (productId: string, newStatus: 'active' | 'paused') => {
+    // Actualización optimista local
+    setProducts((prev) =>
+      prev.map((p) => (p._id === productId ? { ...p, status: newStatus } : p))
+    );
+
+    try {
+      const res = await toggleProductStatusAction(productId, newStatus);
+      if (!res.success) {
+        alert(res.error || 'Error al cambiar el estado del producto');
+        // Revertir en caso de error
+        setProducts((prev) =>
+          prev.map((p) => (p._id === productId ? { ...p, status: newStatus === 'paused' ? 'active' : 'paused' } : p))
+        );
+      } else {
+        router.refresh();
+      }
+    } catch (err) {
+      console.error('Error al cambiar estado del producto:', err);
+      alert('Error de conexión al cambiar el estado');
+      setProducts((prev) =>
+        prev.map((p) => (p._id === productId ? { ...p, status: newStatus === 'paused' ? 'active' : 'paused' } : p))
+      );
     }
   };
 
@@ -1639,20 +1668,30 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                   const prodCategory = categories.find((c) => c._id === prod.category)?.name || prod.category;
                   const totalImages = prod.images.length;
                   const thumbnail = prod.images[0] || '/images/chair_red.jpg';
+                  const isPaused = prod.status === 'paused';
 
                   return (
                     <div 
                       key={prod._id}
-                      className="group flex flex-col sm:flex-row gap-4 items-start sm:items-center bg-[#0d0d0f] border border-zinc-900 rounded-2xl p-4 relative hover:border-zinc-800 transition-colors"
+                      className={`group flex flex-col sm:flex-row gap-4 items-start sm:items-center bg-[#0d0d0f] border rounded-2xl p-4 relative transition-all ${
+                        isPaused 
+                          ? 'border-amber-500/30 bg-amber-950/5 hover:border-amber-500/50' 
+                          : 'border-zinc-900 hover:border-zinc-800'
+                      }`}
                     >
-                      {/* Miniatura de Imagen con Badge +N */}
+                      {/* Miniatura de Imagen con Badge +N y Estado Pausado */}
                       <div className="relative w-16 h-16 rounded-xl bg-zinc-900 overflow-hidden flex-shrink-0 border border-zinc-800">
                         <img 
                           src={thumbnail} 
-                          alt={prod.name}
-                          className="w-full h-full object-cover" 
+                          alt={prod.name} 
+                          className={`w-full h-full object-cover transition-opacity ${isPaused ? 'opacity-50 grayscale-[30%]' : ''}`} 
                         />
-                        {totalImages > 1 && (
+                        {isPaused && (
+                          <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-amber-400 font-black text-[9px] uppercase tracking-wider select-none">
+                            ⏸️ Pausa
+                          </div>
+                        )}
+                        {!isPaused && totalImages > 1 && (
                           <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white font-bold text-xs select-none pointer-events-none">
                             +{totalImages - 1}
                           </div>
@@ -1663,15 +1702,22 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                       <div className="flex-1 w-full min-w-0">
                         <div className="flex justify-between items-start gap-4">
                           <div>
-                            <h3 className="font-bold text-white text-sm tracking-wide truncate pr-6" title={prod.name}>
-                              {prod.name}
-                            </h3>
+                            <div className="flex items-center gap-2">
+                              <h3 className={`font-bold text-sm tracking-wide truncate pr-2 ${isPaused ? 'text-zinc-300' : 'text-white'}`} title={prod.name}>
+                                {prod.name}
+                              </h3>
+                            </div>
                             <div className="flex flex-wrap items-center gap-2 mt-0.5">
                               <span className="text-[10px] uppercase tracking-wider text-red-500 font-bold block">
                                 {prodCategory}
                               </span>
-                              {prod.isOffer && prod.offerPrice && (
-                                <span className="text-[9px] bg-red-650/90 text-white font-black px-1.5 py-0.5 rounded font-mono uppercase tracking-wider flex items-center gap-1 shadow-sm shadow-red-950/40">
+                              {isPaused && (
+                                <span className="text-[9px] bg-amber-950/80 border border-amber-500/40 text-amber-300 font-bold px-1.5 py-0.5 rounded uppercase tracking-wider flex items-center gap-1 shadow-sm">
+                                  <span>⏸️ Pausado (Oculto en tienda)</span>
+                                </span>
+                              )}
+                              {!isPaused && prod.isOffer && prod.offerPrice && (
+                                <span className="text-[9px] bg-red-600 text-white font-black px-1.5 py-0.5 rounded font-mono uppercase tracking-wider flex items-center gap-1 shadow-sm shadow-red-950/40">
                                   <span>🔥 Oferta:</span>
                                   <span>{globalCurrency === 'EUR' ? '€' : '$'}{prod.offerPrice.toFixed(2)}</span>
                                 </span>
@@ -1689,7 +1735,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                               value={prod.priceDetal}
                               onChange={(e) => handlePriceFieldChange(prod._id, 'priceDetal', e.target.value)}
                               onBlur={() => handleSavePrices(prod)}
-                              className="w-18 px-2 py-1 bg-zinc-900 border border-zinc-850 rounded-lg text-xs text-white font-mono focus:border-red-500 focus:outline-none transition-colors text-center"
+                              className="w-18 px-2 py-1 bg-zinc-900 border border-zinc-800 rounded-lg text-xs text-white font-mono focus:border-red-500 focus:outline-none transition-colors text-center"
                             />
                           </div>
 
@@ -1700,7 +1746,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                               value={prod.priceMayor}
                               onChange={(e) => handlePriceFieldChange(prod._id, 'priceMayor', e.target.value)}
                               onBlur={() => handleSavePrices(prod)}
-                              className="w-18 px-2 py-1 bg-zinc-900 border border-zinc-850 rounded-lg text-xs text-white font-mono focus:border-red-500 focus:outline-none transition-colors text-center"
+                              className="w-18 px-2 py-1 bg-zinc-900 border border-zinc-800 rounded-lg text-xs text-white font-mono focus:border-red-500 focus:outline-none transition-colors text-center"
                             />
                           </div>
 
@@ -1712,10 +1758,31 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
 
                       {/* Botones de Acción */}
                       <div className="absolute sm:relative top-4 right-4 sm:top-auto sm:right-auto flex sm:flex-row gap-2">
+                        {/* Botón para Pausar / Reanudar Publicación */}
+                        <button
+                          onClick={() => handleToggleProductStatus(prod._id, isPaused ? 'active' : 'paused')}
+                          className={`w-8 h-8 rounded-full flex items-center justify-center transition-all cursor-pointer focus:outline-none border ${
+                            isPaused
+                              ? 'bg-emerald-950/60 text-emerald-400 border-emerald-500/50 hover:bg-emerald-600 hover:text-white shadow-sm shadow-emerald-950/50'
+                              : 'bg-zinc-900 text-amber-400 border-zinc-800 hover:bg-amber-500/20 hover:text-amber-300 hover:border-amber-500/40'
+                          }`}
+                          title={isPaused ? 'Reanudar publicación (Mostrar en tienda)' : 'Pausar publicación (Ocultar de la tienda)'}
+                        >
+                          {isPaused ? (
+                            <svg className="w-3.5 h-3.5 fill-current ml-0.5" viewBox="0 0 24 24">
+                              <path d="M8 5v14l11-7z" />
+                            </svg>
+                          ) : (
+                            <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                              <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                            </svg>
+                          )}
+                        </button>
+
                         {/* Botón para Editar Producto (Pencil) */}
                         <button
                           onClick={() => handleStartEdit(prod)}
-                          className="w-8 h-8 rounded-full bg-zinc-900 hover:bg-zinc-800 hover:text-red-400 text-zinc-500 flex items-center justify-center transition-colors cursor-pointer focus:outline-none border border-zinc-850"
+                          className="w-8 h-8 rounded-full bg-zinc-900 hover:bg-zinc-800 hover:text-red-400 text-zinc-500 flex items-center justify-center transition-colors cursor-pointer focus:outline-none border border-zinc-800"
                           title="Editar producto"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1726,7 +1793,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                         {/* Botón para Eliminar Producto (Trash Can) */}
                         <button
                           onClick={() => handleDeleteProduct(prod._id)}
-                          className="w-8 h-8 rounded-full bg-zinc-900 hover:bg-red-950/60 text-zinc-650 hover:text-red-500 flex items-center justify-center transition-colors cursor-pointer focus:outline-none border border-zinc-850"
+                          className="w-8 h-8 rounded-full bg-zinc-900 hover:bg-red-950/60 text-zinc-500 hover:text-red-500 flex items-center justify-center transition-colors cursor-pointer focus:outline-none border border-zinc-800"
                           title="Eliminar producto"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

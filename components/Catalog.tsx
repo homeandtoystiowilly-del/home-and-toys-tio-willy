@@ -19,6 +19,7 @@ export interface Product {
   clicks?: number;
   offerPrice?: number;
   isOffer?: boolean;
+  status?: 'active' | 'paused';
 }
 
 export interface Category {
@@ -722,10 +723,15 @@ export default function Catalog({
     return () => clearInterval(timer);
   }, [isHeroPaused]);
 
-  // Lista calculada de productos en oferta
-  const offerProducts = useMemo(() => {
-    return initialProductos.filter((p) => p.isOffer && p.offerPrice && p.offerPrice > 0);
+  // Filtrar exclusivamente productos activos (ocultar publicaciones en pausa)
+  const activeProducts = useMemo(() => {
+    return initialProductos.filter((p) => p.status !== 'paused');
   }, [initialProductos]);
+
+  // Lista calculada de productos en oferta (solo activos)
+  const offerProducts = useMemo(() => {
+    return activeProducts.filter((p) => p.isOffer && p.offerPrice && p.offerPrice > 0);
+  }, [activeProducts]);
 
   // Resetear subcategoría cuando cambia la categoría principal
   useEffect(() => {
@@ -739,12 +745,12 @@ export default function Catalog({
     setCurrentPage(1);
   }, [searchQuery]);
 
-  // Obtener las subcategorías dinámicas para la categoría seleccionada
+  // Obtener las subcategorías dinámicas para la categoría seleccionada (solo activos)
   const subcategories = useMemo(() => {
     if (selectedCategory === 'todos') return [];
-    const productsInCategory = initialProductos.filter((p) => p.category === selectedCategory);
+    const productsInCategory = activeProducts.filter((p) => p.category === selectedCategory);
     return getSubcategoriesForCategory(productsInCategory, initialCategorias);
-  }, [selectedCategory, initialProductos, initialCategorias]);
+  }, [selectedCategory, activeProducts, initialCategorias]);
 
   // Helper to load an image URL and convert it to Base64
   const getBase64ImageFromUrl = async (url: string): Promise<string> => {
@@ -868,7 +874,7 @@ export default function Catalog({
       });
       const unmatchedProducts: Product[] = [];
 
-      initialProductos.forEach((prod) => {
+      activeProducts.forEach((prod) => {
         if (grouped[prod.category]) {
           grouped[prod.category].push(prod);
         } else {
@@ -1212,9 +1218,9 @@ export default function Catalog({
   }, []);
   const ITEMS_PER_PAGE = 6;
 
-  // Filtrar productos por Categoría, Subcategoría y Búsqueda de Texto
+  // Filtrar productos por Categoría, Subcategoría y Búsqueda de Texto (Solo activos)
   const filteredProducts = useMemo(() => {
-    let list = initialProductos;
+    let list = activeProducts;
 
     // 1. Filtrar por categoría principal
     if (selectedCategory !== 'todos') {
@@ -1299,16 +1305,16 @@ export default function Catalog({
     }
 
     return list;
-  }, [initialProductos, selectedCategory, selectedSubcategory, searchQuery]);
+  }, [activeProducts, selectedCategory, selectedSubcategory, searchQuery]);
 
-  // Contadores de productos por categoría
+  // Contadores de productos por categoría (Solo activos)
   const categoryCounts = useMemo(() => {
-    const counts: Record<string, number> = { todos: initialProductos.length };
+    const counts: Record<string, number> = { todos: activeProducts.length };
     initialCategorias.forEach((cat: Category) => {
-      counts[cat._id] = initialProductos.filter((p: Product) => p.category === cat._id).length;
+      counts[cat._id] = activeProducts.filter((p: Product) => p.category === cat._id).length;
     });
     return counts;
-  }, [initialProductos, initialCategorias]);
+  }, [activeProducts, initialCategorias]);
 
   // Paginación
   const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE) || 1;

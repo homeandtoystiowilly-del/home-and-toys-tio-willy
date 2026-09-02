@@ -750,3 +750,47 @@ export async function trackEventAction(type: 'visit' | 'whatsapp_click', product
     return { success: false };
   }
 }
+
+export async function toggleProductStatusAction(
+  productId: string,
+  status: 'active' | 'paused'
+): Promise<{ success: boolean; error?: string; message?: string }> {
+  const cookieStore = await cookies();
+  const session = cookieStore.get('admin_session')?.value;
+  if (!verifySessionToken(session)) {
+    return { success: false, error: 'No autorizado. La sesión ha expirado.' };
+  }
+
+  if (!productId) {
+    return { success: false, error: 'ID de producto no válido.' };
+  }
+
+  try {
+    const client = await clientPromise;
+    const db = client.db('tio_willy_db');
+    const queryId = ObjectId.isValid(productId) && productId.length === 24 ? new ObjectId(productId) : productId;
+
+    await db.collection('productos').updateOne(
+      { _id: queryId as any },
+      {
+        $set: {
+          status,
+          updatedAt: new Date()
+        }
+      }
+    );
+
+    revalidatePath('/');
+    revalidatePath('/admin');
+
+    return { 
+      success: true, 
+      message: status === 'paused' 
+        ? 'Publicación pausada (oculta de la tienda).' 
+        : 'Publicación reanudada (visible en la tienda).' 
+    };
+  } catch (error: any) {
+    console.error('Error al cambiar el estado del producto:', error);
+    return { success: false, error: getFriendlyError(error, 'Error interno al cambiar el estado del producto.') };
+  }
+}
