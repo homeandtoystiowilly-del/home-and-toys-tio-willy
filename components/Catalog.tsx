@@ -27,46 +27,53 @@ export interface Category {
   name: string;
 }
 
-// Replicamos el Logo Tío Willy usando SVG y Tailwind
+// Replicamos el Logo Tío Willy usando SVG y Tailwind con Animación de Radar y Resplandor
 function LogoTioWilly({ className = '' }: { className?: string }) {
   return (
     <div className={`flex flex-col items-center justify-center text-center ${className}`}>
-      {/* Icono de Casa en Pin de Ubicación / Globo de diálogo */}
-      <svg className="w-16 h-16 md:w-20 md:h-20 mb-2 drop-shadow-[0_0_8px_rgba(255,45,45,0.5)]" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path 
-          d="M50 85C42 77 15 54 15 37C15 17 31 5 50 5C69 5 85 17 85 37C85 54 58 77 50 85Z" 
-          stroke="#FF2D2D" 
-          strokeWidth="6" 
-          strokeLinecap="round" 
-          strokeLinejoin="round"
-        />
-        <path 
-          d="M38 48V62H62V48M32 48L50 32L68 48" 
-          stroke="#FF2D2D" 
-          strokeWidth="5" 
-          strokeLinecap="round" 
-          strokeLinejoin="round"
-        />
-        <rect x="46" y="52" width="8" height="10" fill="#FF2D2D" />
-      </svg>
+      {/* Icono de Casa en Pin de Ubicación con Ondas de Radar Vivas */}
+      <div className="relative flex items-center justify-center mb-1">
+        {/* Ondas concéntricas de pulso radar */}
+        <span className="absolute w-14 h-14 md:w-16 md:h-16 rounded-full bg-red-600/30 animate-radar-ping pointer-events-none"></span>
+        <span className="absolute w-20 h-20 md:w-24 md:h-24 rounded-full bg-red-500/15 blur-md pointer-events-none animate-pulse"></span>
+
+        <svg className="relative z-10 w-16 h-16 md:w-20 md:h-20 mb-1 drop-shadow-[0_0_14px_rgba(255,45,45,0.65)]" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path 
+            d="M50 85C42 77 15 54 15 37C15 17 31 5 50 5C69 5 85 17 85 37C85 54 58 77 50 85Z" 
+            stroke="#FF2D2D" 
+            strokeWidth="6" 
+            strokeLinecap="round" 
+            strokeLinejoin="round"
+          />
+          <path 
+            d="M38 48V62H62V48M32 48L50 32L68 48" 
+            stroke="#FF2D2D" 
+            strokeWidth="5" 
+            strokeLinecap="round" 
+            strokeLinejoin="round"
+          />
+          <rect x="46" y="52" width="8" height="10" fill="#FF2D2D" />
+        </svg>
+      </div>
       
       {/* HOME */}
-      <h1 className="text-4xl md:text-5xl font-black tracking-[0.2em] text-white leading-none select-none flex items-center font-sans">
+      <h1 className="text-4xl md:text-5xl font-black tracking-[0.2em] text-white leading-none select-none flex items-center font-sans drop-shadow-sm">
         H
         <span className="relative inline-flex items-center justify-center">
           O
-          <span className="absolute w-2.5 h-2.5 rounded-full bg-white animate-pulse"></span>
+          <span className="absolute w-2.5 h-2.5 rounded-full bg-red-500 animate-ping opacity-75"></span>
+          <span className="absolute w-2 h-2 rounded-full bg-white animate-pulse"></span>
         </span>
         ME
       </h1>
       
       {/* AND TOYS */}
-      <h2 className="text-2xl md:text-3xl font-extrabold tracking-[0.25em] text-[#FF2D2D] leading-none select-none mt-1 font-sans">
+      <h2 className="text-2xl md:text-3xl font-extrabold tracking-[0.25em] text-[#FF2D2D] leading-none select-none mt-1 font-sans drop-shadow-[0_0_8px_rgba(255,45,45,0.4)]">
         AND TOYS
       </h2>
       
-      {/* Línea Divisora */}
-      <div className="w-48 h-[1.5px] bg-gradient-to-r from-transparent via-zinc-400 to-transparent my-3"></div>
+      {/* Línea Divisora con resplandor central rojo */}
+      <div className="w-52 h-[1.5px] bg-gradient-to-r from-transparent via-red-500 to-transparent my-3 opacity-90"></div>
       
       {/* TÍO WILLY */}
       <h3 className="text-lg md:text-xl font-bold tracking-[0.35em] text-white leading-none select-none font-sans uppercase">
@@ -714,12 +721,12 @@ export default function Catalog({
     }
   };
 
-  // Auto-avance del Slider Hero cada 4.5 segundos
+  // Auto-avance del Slider Hero cada 5 segundos (sincronizado con la barra de progreso cinemática)
   useEffect(() => {
     if (isHeroPaused) return;
     const timer = setInterval(() => {
       setCurrentHeroSlide((prev) => (prev + 1) % HERO_SLIDES.length);
-    }, 4500);
+    }, 5000);
     return () => clearInterval(timer);
   }, [isHeroPaused]);
 
@@ -1558,21 +1565,70 @@ export default function Catalog({
         onTouchStart={onHeroTouchStart}
         onTouchMove={onHeroTouchMove}
         onTouchEnd={onHeroTouchEnd}
-        className="relative w-full min-h-[480px] md:min-h-[540px] overflow-hidden flex flex-col items-center justify-center border-b border-zinc-800/80 bg-gradient-to-b from-zinc-900 via-[#16161b] to-zinc-900 cursor-grab active:cursor-grabbing select-none"
+        className="relative w-full min-h-[500px] md:min-h-[560px] overflow-hidden flex flex-col items-center justify-center border-b border-zinc-800/80 bg-gradient-to-b from-zinc-900 via-[#15151a] to-zinc-900 cursor-grab active:cursor-grabbing select-none"
       >
-        {/* Malla Geométrica y Figuras Decorativas de Fondo */}
-        <div className="absolute inset-0 bg-brand-grid opacity-70 pointer-events-none"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,_var(--tw-gradient-stops))] from-red-600/15 via-transparent to-transparent pointer-events-none"></div>
+        {/* Malla Geométrica y Figuras Decorativas de Fondo con Aura Radial */}
+        <div className="absolute inset-0 bg-brand-grid opacity-75 pointer-events-none"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_15%,_rgba(255,45,45,0.22)_0%,_transparent_65%)] pointer-events-none"></div>
         
-        {/* Figuras geométricas sutiles flotantes */}
-        <div className="absolute top-12 left-10 w-72 h-72 bg-red-600/10 rounded-full blur-[100px] pointer-events-none animate-pulse"></div>
-        <div className="absolute bottom-10 right-10 w-80 h-80 bg-red-500/10 rounded-full blur-[110px] pointer-events-none"></div>
-        <div className="absolute top-1/4 right-[12%] w-32 h-32 border border-red-500/15 rounded-3xl rotate-12 pointer-events-none hidden lg:block"></div>
-        <div className="absolute bottom-1/4 left-[8%] w-24 h-24 border border-zinc-700/30 rounded-2xl -rotate-6 pointer-events-none hidden lg:block"></div>
+        {/* Figuras geométricas y luces volumétricas */}
+        <div className="absolute top-8 left-10 w-80 h-80 bg-red-600/15 rounded-full blur-[110px] pointer-events-none animate-pulse"></div>
+        <div className="absolute bottom-8 right-10 w-96 h-96 bg-red-500/10 rounded-full blur-[120px] pointer-events-none"></div>
+        <div className="absolute top-1/4 right-[9%] w-36 h-36 border border-red-500/20 rounded-3xl rotate-12 pointer-events-none hidden lg:block backdrop-blur-[1px]"></div>
+        <div className="absolute bottom-1/4 left-[7%] w-28 h-28 border border-zinc-700/40 rounded-2xl -rotate-6 pointer-events-none hidden lg:block backdrop-blur-[1px]"></div>
 
-        {/* Logo Superior */}
-        <div className="relative z-10 pt-8 pb-4">
+        {/* Cápsulas Flotantes de Colección (Floating Feature Pills en Desktop) */}
+        <div className="hidden xl:flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-zinc-900/85 border border-zinc-700/80 backdrop-blur-md shadow-2xl shadow-black/50 text-xs font-bold text-zinc-200 absolute top-28 left-8 xl:left-14 animate-float-slow z-20 pointer-events-none">
+          <span className="w-8 h-8 rounded-xl bg-red-600/20 border border-red-500/40 flex items-center justify-center text-base shrink-0">🚴‍♂️</span>
+          <div className="flex flex-col text-left">
+            <span className="text-[10px] text-zinc-400 uppercase tracking-widest font-semibold">Bicicletas</span>
+            <span className="text-white text-xs font-black">Rin 12 a Rin 29</span>
+          </div>
+        </div>
+
+        <div className="hidden xl:flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-zinc-900/85 border border-zinc-700/80 backdrop-blur-md shadow-2xl shadow-black/50 text-xs font-bold text-zinc-200 absolute top-24 right-8 xl:right-14 animate-float-reverse z-20 pointer-events-none">
+          <span className="w-8 h-8 rounded-xl bg-red-600/20 border border-red-500/40 flex items-center justify-center text-base shrink-0">🎧</span>
+          <div className="flex flex-col text-left">
+            <span className="text-[10px] text-zinc-400 uppercase tracking-widest font-semibold">Tecnología</span>
+            <span className="text-white text-xs font-black">Audio & Gaming</span>
+          </div>
+        </div>
+
+        <div className="hidden xl:flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-zinc-900/85 border border-zinc-700/80 backdrop-blur-md shadow-2xl shadow-black/50 text-xs font-bold text-zinc-200 absolute bottom-24 left-10 xl:left-16 animate-float-reverse z-20 pointer-events-none">
+          <span className="w-8 h-8 rounded-xl bg-red-600/20 border border-red-500/40 flex items-center justify-center text-base shrink-0">📦</span>
+          <div className="flex flex-col text-left">
+            <span className="text-[10px] text-zinc-400 uppercase tracking-widest font-semibold">Mayoristas</span>
+            <span className="text-white text-xs font-black">Tarifas de Fábrica</span>
+          </div>
+        </div>
+
+        <div className="hidden xl:flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-zinc-900/85 border border-zinc-700/80 backdrop-blur-md shadow-2xl shadow-black/50 text-xs font-bold text-zinc-200 absolute bottom-20 right-10 xl:right-16 animate-float-slow z-20 pointer-events-none">
+          <span className="w-8 h-8 rounded-xl bg-red-600/20 border border-red-500/40 flex items-center justify-center text-base shrink-0">⚡</span>
+          <div className="flex flex-col text-left">
+            <span className="text-[10px] text-zinc-400 uppercase tracking-widest font-semibold">Envíos Rápidos</span>
+            <span className="text-white text-xs font-black">Caracas & Nacional</span>
+          </div>
+        </div>
+
+        {/* Logo Superior con pulso de radar */}
+        <div className="relative z-10 pt-8 pb-3">
           <LogoTioWilly className="scale-90 md:scale-95 transition-transform duration-500" />
+        </div>
+
+        {/* Micro-Badges de Especialidad para Móvil (Scrollable horizontal muy suave) */}
+        <div className="flex xl:hidden items-center gap-2 z-10 px-4 py-1.5 mb-2 max-w-full overflow-x-auto scrollbar-none">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-850/80 border border-zinc-700/70 text-[11px] font-bold text-zinc-300 whitespace-nowrap backdrop-blur-xs">
+            <span>🚴‍♂️</span> Bicicletas
+          </span>
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-850/80 border border-zinc-700/70 text-[11px] font-bold text-zinc-300 whitespace-nowrap backdrop-blur-xs">
+            <span>🎧</span> Audio & Tech
+          </span>
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-850/80 border border-zinc-700/70 text-[11px] font-bold text-zinc-300 whitespace-nowrap backdrop-blur-xs">
+            <span>📦</span> Mayor & Detal
+          </span>
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-850/80 border border-zinc-700/70 text-[11px] font-bold text-zinc-300 whitespace-nowrap backdrop-blur-xs">
+            <span>⚡</span> Envíos 24h
+          </span>
         </div>
 
         {/* Slider de Diapositivas Hero */}
@@ -1582,37 +1638,45 @@ export default function Catalog({
             return (
               <div
                 key={slide.id}
-                className={`transition-all duration-700 w-full flex flex-col items-center ${
-                  isActive ? 'opacity-100 scale-100 relative' : 'opacity-0 scale-95 absolute pointer-events-none'
+                className={`w-full flex flex-col items-center transition-all duration-700 transform ${
+                  isActive 
+                    ? 'opacity-100 translate-y-0 scale-100 relative' 
+                    : 'opacity-0 translate-y-4 scale-95 absolute pointer-events-none'
                 }`}
               >
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-red-950/60 border border-red-500/40 text-red-300 text-xs font-black uppercase tracking-widest mb-3 shadow-lg shadow-red-950/40 animate-pulse">
-                  {slide.badge}
+                {/* Badge con borde animado de acento */}
+                <div className={`transition-all duration-700 delay-100 transform ${isActive ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'}`}>
+                  <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-950/70 border border-red-500/50 text-red-200 text-xs font-black uppercase tracking-widest mb-3 shadow-xl shadow-red-950/50 animate-pulse">
+                    <span>{slide.badge}</span>
+                  </div>
                 </div>
 
-                <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-white tracking-tight max-w-2xl leading-tight">
+                {/* Título Principal */}
+                <h2 className={`text-2xl sm:text-4xl md:text-5xl font-black text-white tracking-tight max-w-2xl leading-tight transition-all duration-700 delay-200 transform drop-shadow-md ${isActive ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0'}`}>
                   {slide.title}
                 </h2>
 
-                <p className="text-red-400 font-bold text-sm sm:text-base tracking-wider uppercase mt-2">
+                {/* Highlight / Subtítulo Corporativo */}
+                <p className={`text-red-400 font-black text-sm sm:text-base tracking-wider uppercase mt-2.5 transition-all duration-700 delay-300 transform drop-shadow-sm ${isActive ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'}`}>
                   {slide.highlight}
                 </p>
 
-                <p className="mt-3 text-zinc-300 text-xs sm:text-sm md:text-base max-w-xl leading-relaxed">
+                {/* Descripción */}
+                <p className={`mt-3 text-zinc-300 text-xs sm:text-sm md:text-base max-w-xl leading-relaxed transition-all duration-700 delay-400 transform ${isActive ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'}`}>
                   {slide.description}
                 </p>
 
-                {/* Botones de acción del slide (Touch targets >= 44px) */}
-                <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+                {/* Botones de acción del slide (Touch targets >= 44px con feedback elástico) */}
+                <div className={`mt-6 flex flex-wrap items-center justify-center gap-3.5 transition-all duration-700 delay-500 transform ${isActive ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0'}`}>
                   {slide.isPdfAction ? (
                     <button
                       onClick={handleGenerateCatalogPDF}
                       disabled={pdfLoading}
-                      className="min-h-[44px] px-6 py-3 rounded-xl bg-red-600 hover:bg-red-500 active:bg-red-700 text-white text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-300 shadow-xl shadow-red-950/50 flex items-center gap-2 cursor-pointer disabled:opacity-50 active:scale-95"
+                      className="min-h-[46px] px-6 py-3 rounded-xl bg-red-600 hover:bg-red-500 active:bg-red-700 text-white text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-300 shadow-xl shadow-red-950/60 flex items-center gap-2 cursor-pointer disabled:opacity-50 active:scale-95"
                     >
                       {pdfLoading ? (
                         <>
-                          <span className="w-2 h-2 rounded-full bg-white animate-ping"></span>
+                          <span className="w-2.5 h-2.5 rounded-full bg-white animate-ping"></span>
                           <span>Generando PDF...</span>
                         </>
                       ) : (
@@ -1627,10 +1691,10 @@ export default function Catalog({
                   ) : (
                     <a
                       href={slide.ctaLink}
-                      className="min-h-[44px] px-6 py-3 rounded-xl bg-red-600 hover:bg-red-500 active:bg-red-700 text-white text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-300 shadow-xl shadow-red-950/50 flex items-center gap-2 active:scale-95"
+                      className="min-h-[46px] px-6 py-3 rounded-xl bg-red-600 hover:bg-red-500 active:bg-red-700 text-white text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-300 shadow-xl shadow-red-950/60 flex items-center gap-2 active:scale-95"
                     >
                       <span>{slide.ctaText}</span>
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 fill-none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 14l-7 7-7-7" />
                       </svg>
                     </a>
@@ -1640,7 +1704,7 @@ export default function Catalog({
                     href={slide.secondaryLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="min-h-[44px] px-6 py-3 rounded-xl bg-zinc-800/90 hover:bg-zinc-700 border border-zinc-700 text-zinc-200 hover:text-white text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-300 flex items-center gap-2 active:scale-95 shadow-md"
+                    className="min-h-[46px] px-6 py-3 rounded-xl bg-zinc-800/95 hover:bg-zinc-750 border border-zinc-700 hover:border-zinc-600 text-zinc-200 hover:text-white text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-300 flex items-center gap-2 active:scale-95 shadow-lg shadow-black/30"
                   >
                     <span>{slide.secondaryText}</span>
                     <svg className="w-4 h-4 fill-current text-red-500" viewBox="0 0 24 24">
@@ -1656,7 +1720,7 @@ export default function Catalog({
         {/* Flechas de navegación del Slider (>= 44px) */}
         <button
           onClick={() => setCurrentHeroSlide((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length)}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-zinc-800/90 hover:bg-red-600 border border-zinc-700 text-white flex items-center justify-center transition-all cursor-pointer shadow-lg hidden sm:flex active:scale-95"
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-zinc-800/90 hover:bg-red-600 border border-zinc-700 hover:border-red-500 text-white flex items-center justify-center transition-all cursor-pointer shadow-xl hidden sm:flex active:scale-95"
           aria-label="Slide anterior"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1665,7 +1729,7 @@ export default function Catalog({
         </button>
         <button
           onClick={() => setCurrentHeroSlide((prev) => (prev + 1) % HERO_SLIDES.length)}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-zinc-800/90 hover:bg-red-600 border border-zinc-700 text-white flex items-center justify-center transition-all cursor-pointer shadow-lg hidden sm:flex active:scale-95"
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-zinc-800/90 hover:bg-red-600 border border-zinc-700 hover:border-red-500 text-white flex items-center justify-center transition-all cursor-pointer shadow-xl hidden sm:flex active:scale-95"
           aria-label="Siguiente slide"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1673,20 +1737,32 @@ export default function Catalog({
           </svg>
         </button>
 
-        {/* Dots / Puntos de Navegación del Hero (Touch Target optimizado) */}
+        {/* Indicadores Cinemáticos con Barra de Progreso en Vivo (Estilo Apple / Tesla Store) */}
         <div className="relative z-10 flex items-center gap-3 mt-4 pb-8">
-          {HERO_SLIDES.map((_, dotIdx) => (
-            <button
-              key={dotIdx}
-              onClick={() => setCurrentHeroSlide(dotIdx)}
-              className="p-2 cursor-pointer flex items-center justify-center"
-              aria-label={`Ir a la diapositiva ${dotIdx + 1}`}
-            >
-              <span className={`h-2 rounded-full transition-all duration-500 block ${
-                dotIdx === currentHeroSlide ? 'w-8 bg-red-600 shadow-md shadow-red-600/50' : 'w-2.5 bg-zinc-700 hover:bg-zinc-500'
-              }`} />
-            </button>
-          ))}
+          {HERO_SLIDES.map((_, dotIdx) => {
+            const isCurrent = dotIdx === currentHeroSlide;
+            return (
+              <button
+                key={dotIdx}
+                onClick={() => setCurrentHeroSlide(dotIdx)}
+                className="min-h-[44px] px-1 cursor-pointer flex items-center justify-center group"
+                aria-label={`Ir a la diapositiva ${dotIdx + 1}`}
+              >
+                {isCurrent ? (
+                  <div className="w-16 sm:w-20 h-2 bg-zinc-800/90 border border-zinc-700/80 rounded-full overflow-hidden relative shadow-inner">
+                    <div
+                      key={`progress-${currentHeroSlide}`}
+                      className={`h-full bg-gradient-to-r from-red-600 via-red-500 to-red-400 rounded-full animate-hero-progress ${
+                        isHeroPaused ? 'animation-paused' : ''
+                      }`}
+                    />
+                  </div>
+                ) : (
+                  <span className="w-3 h-2 rounded-full bg-zinc-700 group-hover:bg-zinc-500 transition-all block" />
+                )}
+              </button>
+            );
+          })}
         </div>
       </header>
 

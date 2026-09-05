@@ -82,3 +82,72 @@ body {
 .animate-scaleUp {
   animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* High-End Hero Animations */
+@keyframes floatSlow {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes floatReverse {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(8px);
+  }
+}
+
+@keyframes radarPing {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.7;
+  }
+  65% {
+    transform: scale(1.7);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.7);
+    opacity: 0;
+  }
+}
+
+@keyframes heroProgressBar {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+.animate-float-slow {
+  animation: floatSlow 5.5s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-float-reverse {
+  animation: floatReverse 6.5s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-radar-ping {
+  animation: radarPing 3.2s cubic-bezier(0, 0, 0.2, 1) infinite;
+  will-change: transform, opacity;
+}
+
+.animate-hero-progress {
+  animation: heroProgressBar 5s linear forwards;
+  will-change: width;
+}
+
+.animation-paused {
+  animation-play-state: paused !important;
+}
+
+
