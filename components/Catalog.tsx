@@ -57,18 +57,18 @@ function LogoTioWilly({ className = '' }: { className?: string }) {
       </div>
       
       {/* HOME */}
-      <h1 className="text-4xl md:text-5xl font-black tracking-[0.2em] text-white leading-none select-none flex items-center font-sans drop-shadow-sm">
+      <h1 className="text-4xl md:text-5xl font-black tracking-[0.2em] text-zinc-950 leading-none select-none flex items-center font-sans drop-shadow-sm">
         H
         <span className="relative inline-flex items-center justify-center">
           O
           <span className="absolute w-2.5 h-2.5 rounded-full bg-red-500 animate-ping opacity-75"></span>
-          <span className="absolute w-2 h-2 rounded-full bg-white animate-pulse"></span>
+          <span className="absolute w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>
         </span>
         ME
       </h1>
       
       {/* AND TOYS */}
-      <h2 className="text-2xl md:text-3xl font-extrabold tracking-[0.25em] text-[#FF2D2D] leading-none select-none mt-1 font-sans drop-shadow-[0_0_8px_rgba(255,45,45,0.4)]">
+      <h2 className="text-2xl md:text-3xl font-extrabold tracking-[0.25em] text-[#FF2D2D] leading-none select-none mt-1 font-sans drop-shadow-[0_0_8px_rgba(255,45,45,0.25)]">
         AND TOYS
       </h2>
       
@@ -76,7 +76,7 @@ function LogoTioWilly({ className = '' }: { className?: string }) {
       <div className="w-52 h-[1.5px] bg-gradient-to-r from-transparent via-red-500 to-transparent my-3 opacity-90"></div>
       
       {/* TÍO WILLY */}
-      <h3 className="text-lg md:text-xl font-bold tracking-[0.35em] text-white leading-none select-none font-sans uppercase">
+      <h3 className="text-lg md:text-xl font-bold tracking-[0.35em] text-zinc-800 leading-none select-none font-sans uppercase">
         Tío Willy
       </h3>
     </div>
@@ -145,11 +145,11 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
   return (
     <div 
       onClick={() => setIsModalOpen(true)}
-      className="group relative flex flex-col rounded-3xl bg-zinc-900/90 border border-zinc-800 hover:border-red-500/50 transition-all duration-500 overflow-hidden shadow-xl hover:shadow-2xl hover:shadow-red-950/20 shadow-black/40 cursor-pointer backdrop-blur-sm"
+      className="group relative flex flex-col rounded-3xl bg-white border border-zinc-200 hover:border-red-500/50 transition-all duration-500 overflow-hidden shadow-sm hover:shadow-xl hover:shadow-red-950/10 cursor-pointer"
     >
       {/* Carrusel de Imágenes con soporte híbrido de gestos swipe */}
       <div 
-        className="relative aspect-square w-full bg-zinc-850 overflow-hidden cursor-grab active:cursor-grabbing select-none"
+        className="relative aspect-square w-full bg-zinc-100 overflow-hidden cursor-grab active:cursor-grabbing select-none"
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
@@ -163,14 +163,14 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
         />
         
         {/* Sombreado de degradado */}
-        <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent opacity-70"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-40"></div>
 
         {/* Flechas de navegación (visibles en hover o móviles siempre) */}
         {product.images.length > 1 && (
           <>
             <button 
               onClick={handlePrev}
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-zinc-900/90 hover:bg-red-600 active:scale-95 text-white flex items-center justify-center transition-all duration-200 backdrop-blur-md opacity-0 group-hover:opacity-100 focus:opacity-100 focus:outline-none shadow-md shadow-black/50 border border-zinc-700/60"
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 hover:bg-red-600 active:scale-95 text-zinc-800 hover:text-white flex items-center justify-center transition-all duration-200 backdrop-blur-md opacity-0 group-hover:opacity-100 focus:opacity-100 focus:outline-none shadow-md border border-zinc-200"
               aria-label="Imagen anterior"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -179,7 +179,7 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
             </button>
             <button 
               onClick={handleNext}
-              className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-zinc-900/90 hover:bg-red-600 active:scale-95 text-white flex items-center justify-center transition-all duration-200 backdrop-blur-md opacity-0 group-hover:opacity-100 focus:opacity-100 focus:outline-none shadow-md shadow-black/50 border border-zinc-700/60"
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 hover:bg-red-600 active:scale-95 text-zinc-800 hover:text-white flex items-center justify-center transition-all duration-200 backdrop-blur-md opacity-0 group-hover:opacity-100 focus:opacity-100 focus:outline-none shadow-md border border-zinc-200"
               aria-label="Siguiente imagen"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -199,7 +199,7 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
                 setActiveIdx(idx);
               }}
               className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                idx === activeIdx ? 'bg-red-500 w-4' : 'bg-white/50 hover:bg-white/80'
+                idx === activeIdx ? 'bg-red-500 w-4' : 'bg-white/70 hover:bg-white'
               }`}
               aria-label={`Ver variedad ${idx + 1}`}
             />
@@ -208,14 +208,14 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
 
         {/* Categoría Badge */}
         <div className="absolute top-4 left-4">
-          <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider text-red-400 bg-zinc-900/90 border border-red-500/30 rounded-full backdrop-blur-md shadow-sm">
+          <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider text-red-600 bg-white/95 border border-red-200 rounded-full backdrop-blur-md shadow-sm">
             {categoryName || product.category}
           </span>
         </div>
 
         {/* Badge de Oferta Especial */}
         {isOfferActive && (
-          <div className="absolute top-4 right-4 z-10 bg-red-600 border border-red-400 text-white font-black text-xs tracking-wider px-3 py-1 rounded-full uppercase shadow-lg shadow-black/60 flex items-center gap-1.5 backdrop-blur-sm">
+          <div className="absolute top-4 right-4 z-10 bg-red-600 border border-red-400 text-white font-black text-xs tracking-wider px-3 py-1 rounded-full uppercase shadow-lg shadow-black/20 flex items-center gap-1.5 backdrop-blur-sm">
             <span>🔥 OFERTA</span>
             {product.priceDetal > (product.offerPrice || 0) && (
               <span className="bg-zinc-900/80 text-white px-1.5 py-0.5 rounded text-[10px] font-mono font-bold">
@@ -228,18 +228,18 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
 
       {/* Cuerpo de la Tarjeta */}
       <div className="flex flex-col flex-1 p-6">
-        <h3 className="text-lg font-bold text-white tracking-wide group-hover:text-red-400 transition-colors duration-300 min-h-[56px] line-clamp-2">
+        <h3 className="text-lg font-bold text-zinc-900 tracking-wide group-hover:text-red-600 transition-colors duration-300 min-h-[56px] line-clamp-2">
           {product.name}
         </h3>
         
-        <p className="text-zinc-400 text-sm mt-2 line-clamp-2 min-h-[40px]">
+        <p className="text-zinc-600 text-sm mt-2 line-clamp-2 min-h-[40px]">
           {product.description}
         </p>
 
         {/* Selección Rápida de Variedades por Texto/Color */}
         {product.varieties.length > 1 && (
           <div className="mt-4">
-            <span className="text-xs text-zinc-400 block mb-1.5 uppercase font-bold tracking-wider">Variedad:</span>
+            <span className="text-xs text-zinc-500 block mb-1.5 uppercase font-bold tracking-wider">Variedad:</span>
             <div className="flex flex-wrap gap-1.5">
               {product.varieties.map((varName: string, idx: number) => (
                 <button
@@ -250,8 +250,8 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
                   }}
                   className={`text-xs px-2.5 py-1 rounded-lg border transition-all duration-300 ${
                     idx === activeIdx
-                      ? 'bg-red-950/50 text-red-400 border-red-500/60 font-semibold'
-                      : 'bg-zinc-800 text-zinc-300 border-zinc-700/80 hover:border-zinc-500 hover:text-white'
+                      ? 'bg-red-50 text-red-600 border-red-400 font-semibold'
+                      : 'bg-zinc-100 text-zinc-700 border-zinc-200 hover:border-zinc-400 hover:text-zinc-900'
                   }`}
                 >
                   {varName}
@@ -265,35 +265,35 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
         <div className="flex-1 min-h-[20px]"></div>
 
         {/* Precios */}
-        <div className="mt-4 p-4 rounded-2xl bg-zinc-800/70 border border-zinc-700/60 flex flex-col gap-2.5">
+        <div className="mt-4 p-4 rounded-2xl bg-zinc-50 border border-zinc-200 flex flex-col gap-2.5">
           {isOfferActive ? (
             <div className="flex justify-between items-baseline">
               <div className="flex flex-col">
-                <span className="text-[10px] text-zinc-500 line-through font-mono">
+                <span className="text-[10px] text-zinc-400 line-through font-mono">
                   Antes: {symbol}{product.priceDetal.toFixed(2)}
                 </span>
-                <span className="text-xs text-red-500 font-bold uppercase tracking-wide flex items-center gap-1">
+                <span className="text-xs text-red-600 font-bold uppercase tracking-wide flex items-center gap-1">
                   <span>🔥 Oferta:</span>
                 </span>
               </div>
-              <span className="text-2xl font-black text-red-500 font-mono">
+              <span className="text-2xl font-black text-red-600 font-mono">
                 {symbol}{product.offerPrice!.toFixed(2)}
               </span>
             </div>
           ) : (
             <div className="flex justify-between items-baseline">
-              <span className="text-xs text-zinc-400 font-medium uppercase tracking-wide">Precio Detal:</span>
-              <span className="text-2xl font-black text-white font-mono">{symbol}{product.priceDetal.toFixed(2)}</span>
+              <span className="text-xs text-zinc-500 font-medium uppercase tracking-wide">Precio Detal:</span>
+              <span className="text-2xl font-black text-zinc-900 font-mono">{symbol}{product.priceDetal.toFixed(2)}</span>
             </div>
           )}
           
-          <div className="h-[1px] bg-zinc-800/60"></div>
+          <div className="h-[1px] bg-zinc-200"></div>
           <div className="flex justify-between items-baseline">
             <div className="flex flex-col">
-              <span className="text-xs text-red-500 font-bold uppercase tracking-wide">Precio Mayor:</span>
+              <span className="text-xs text-red-600 font-bold uppercase tracking-wide">Precio Mayor:</span>
               <span className="text-[10px] text-zinc-500 italic">Mínimo {product.minMayor} unidades</span>
             </div>
-            <span className="text-xl font-black text-red-400 font-mono">{symbol}{product.priceMayor.toFixed(2)}</span>
+            <span className="text-xl font-black text-red-600 font-mono">{symbol}{product.priceMayor.toFixed(2)}</span>
           </div>
         </div>
 
@@ -305,7 +305,7 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
             e.stopPropagation();
             trackEventAction('whatsapp_click', product._id).catch(err => console.error("Error tracking click:", err));
           }}
-          className="mt-5 w-full py-3.5 px-4 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-xl font-bold flex items-center justify-center gap-2.5 transition-all duration-300 shadow-lg shadow-red-900/20 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-red-500/50"
+          className="mt-5 w-full py-3.5 px-4 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-xl font-bold flex items-center justify-center gap-2.5 transition-all duration-300 shadow-md shadow-red-600/20 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-red-500/50"
         >
           {/* WhatsApp Icon */}
           <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
@@ -396,17 +396,17 @@ export function ProductDetailModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 md:p-6 bg-black/85 backdrop-blur-md transition-all duration-300 animate-fadeIn"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 md:p-6 bg-black/60 backdrop-blur-md transition-all duration-300 animate-fadeIn"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-lg md:max-w-4xl bg-zinc-950 border border-zinc-800 rounded-3xl overflow-hidden shadow-2xl shadow-black relative flex flex-col max-h-[92vh] animate-scaleUp"
+        className="w-full max-w-lg md:max-w-4xl bg-white border border-zinc-200 rounded-3xl overflow-hidden shadow-2xl relative flex flex-col max-h-[92vh] animate-scaleUp"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Cabecera Superior del Modal con Botón de Cerrar Seguro */}
-        <div className="flex items-center justify-between px-5 sm:px-7 py-4 border-b border-zinc-850/80 bg-zinc-900/60 backdrop-blur-md shrink-0">
+        <div className="flex items-center justify-between px-5 sm:px-7 py-4 border-b border-zinc-200 bg-zinc-50/95 backdrop-blur-md shrink-0">
           <div className="flex items-center gap-2.5 min-w-0 pr-4">
-            <span className="px-3 py-1 text-[10px] font-extrabold uppercase tracking-widest text-red-400 bg-red-950/40 border border-red-500/30 rounded-full shrink-0">
+            <span className="px-3 py-1 text-[10px] font-extrabold uppercase tracking-widest text-red-600 bg-red-50 border border-red-200 rounded-full shrink-0">
               {categoryName || product.category}
             </span>
             {isOfferActive && (
@@ -414,14 +414,14 @@ export function ProductDetailModal({
                 🔥 Oferta
               </span>
             )}
-            <span className="text-xs text-zinc-400 font-medium truncate hidden sm:inline">
+            <span className="text-xs text-zinc-700 font-medium truncate hidden sm:inline">
               {product.name}
             </span>
           </div>
 
           <button
             onClick={onClose}
-            className="w-9 h-9 rounded-full bg-zinc-800 hover:bg-red-600 active:scale-95 text-zinc-300 hover:text-white flex items-center justify-center transition-all duration-200 cursor-pointer focus:outline-none border border-zinc-700/60 shadow-md shrink-0 ml-auto"
+            className="w-9 h-9 rounded-full bg-zinc-100 hover:bg-red-600 active:scale-95 text-zinc-600 hover:text-white flex items-center justify-center transition-all duration-200 cursor-pointer focus:outline-none border border-zinc-200 shadow-sm shrink-0 ml-auto"
             aria-label="Cerrar modal"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -431,13 +431,13 @@ export function ProductDetailModal({
         </div>
 
         {/* Contenedor Interior con Scroll Suave */}
-        <div className="overflow-y-auto p-5 sm:p-7 flex flex-col md:flex-row gap-6 md:gap-8 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent">
+        <div className="overflow-y-auto p-5 sm:p-7 flex flex-col md:flex-row gap-6 md:gap-8 scrollbar-thin scrollbar-thumb-zinc-300 scrollbar-track-transparent">
           
           {/* Columna Izquierda: Galería Principal y Miniaturas */}
           <div className="w-full md:w-1/2 flex flex-col gap-3.5">
             {/* Foto Principal */}
             <div
-              className="relative aspect-square w-full bg-zinc-900 rounded-2xl overflow-hidden cursor-grab active:cursor-grabbing select-none border border-zinc-850 shadow-inner group/heroimg"
+              className="relative aspect-square w-full bg-zinc-100 rounded-2xl overflow-hidden cursor-grab active:cursor-grabbing select-none border border-zinc-200 shadow-inner group/heroimg"
               onTouchStart={onTouchStart}
               onTouchMove={onTouchMove}
               onTouchEnd={onTouchEnd}
@@ -447,14 +447,14 @@ export function ProductDetailModal({
                 alt={`${product.name} - ${currentVariety}`}
                 className="w-full h-full object-cover transition-transform duration-300 group-hover/heroimg:scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/70 via-transparent to-transparent opacity-60 pointer-events-none"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-40 pointer-events-none"></div>
 
               {/* Botones de navegación si hay más de 1 imagen */}
               {product.images.length > 1 && (
                 <>
                   <button
                     onClick={handlePrev}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-zinc-950/80 hover:bg-red-600 active:scale-95 text-white flex items-center justify-center transition-all duration-200 backdrop-blur-md focus:outline-none shadow-lg border border-zinc-700/70"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 hover:bg-red-600 active:scale-95 text-zinc-800 hover:text-white flex items-center justify-center transition-all duration-200 backdrop-blur-md focus:outline-none shadow-lg border border-zinc-200"
                     aria-label="Imagen anterior"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -463,7 +463,7 @@ export function ProductDetailModal({
                   </button>
                   <button
                     onClick={handleNext}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-zinc-950/80 hover:bg-red-600 active:scale-95 text-white flex items-center justify-center transition-all duration-200 backdrop-blur-md focus:outline-none shadow-lg border border-zinc-700/70"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 hover:bg-red-600 active:scale-95 text-zinc-800 hover:text-white flex items-center justify-center transition-all duration-200 backdrop-blur-md focus:outline-none shadow-lg border border-zinc-200"
                     aria-label="Siguiente imagen"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -475,7 +475,7 @@ export function ProductDetailModal({
 
               {/* Contador de fotos en badge flotante */}
               {product.images.length > 1 && (
-                <div className="absolute bottom-3 right-3 z-10 px-2.5 py-1 rounded-full bg-zinc-950/80 border border-zinc-800 text-[11px] font-mono text-zinc-300 backdrop-blur-sm shadow-md font-bold">
+                <div className="absolute bottom-3 right-3 z-10 px-2.5 py-1 rounded-full bg-white/90 border border-zinc-200 text-[11px] font-mono text-zinc-800 backdrop-blur-sm shadow-md font-bold">
                   {modalActiveIdx + 1} / {product.images.length}
                 </div>
               )}
@@ -484,19 +484,19 @@ export function ProductDetailModal({
             {/* Fila de Miniaturas Clicables (Thumbnails) para ver todas las fotos */}
             {product.images.length > 1 && (
               <div className="flex flex-col gap-1.5">
-                <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-wider flex items-center gap-1.5">
                   <span>📷 Todas las fotos ({product.images.length})</span>
-                  <span className="text-zinc-500 font-normal">Toca para ampliar:</span>
+                  <span className="text-zinc-400 font-normal">Toca para ampliar:</span>
                 </span>
-                <div className="flex gap-2.5 overflow-x-auto pb-1.5 pt-0.5 scrollbar-thin scrollbar-thumb-zinc-800">
+                <div className="flex gap-2.5 overflow-x-auto pb-1.5 pt-0.5 scrollbar-thin scrollbar-thumb-zinc-300">
                   {product.images.map((imgSrc, idx) => (
                     <button
                       key={`thumb-${idx}`}
                       onClick={() => setModalActiveIdx(idx)}
                       className={`relative w-16 h-16 sm:w-18 sm:h-18 flex-shrink-0 rounded-xl overflow-hidden border-2 transition-all duration-200 cursor-pointer ${
                         idx === modalActiveIdx
-                          ? 'border-red-500 ring-2 ring-red-500/30 scale-105 shadow-md shadow-red-950/50'
-                          : 'border-zinc-800 hover:border-zinc-600 opacity-70 hover:opacity-100'
+                          ? 'border-red-500 ring-2 ring-red-500/30 scale-105 shadow-md shadow-red-950/20'
+                          : 'border-zinc-200 hover:border-zinc-400 opacity-70 hover:opacity-100'
                       }`}
                       aria-label={`Ver foto ${idx + 1}`}
                     >
@@ -519,7 +519,7 @@ export function ProductDetailModal({
           <div className="w-full md:w-1/2 flex flex-col justify-between gap-5 text-left">
             <div>
               {/* Título Principal Grande */}
-              <h2 className="text-xl sm:text-2xl font-black text-white tracking-wide leading-tight">
+              <h2 className="text-xl sm:text-2xl font-black text-zinc-950 tracking-wide leading-tight">
                 {product.name}
               </h2>
 
@@ -527,10 +527,10 @@ export function ProductDetailModal({
               {product.varieties.length > 1 && (
                 <div className="mt-4">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] text-zinc-400 uppercase font-extrabold tracking-wider">
+                    <span className="text-[10px] text-zinc-500 uppercase font-extrabold tracking-wider">
                       Variedades / Modelos:
                     </span>
-                    <span className="text-xs text-red-400 font-bold">
+                    <span className="text-xs text-red-600 font-bold">
                       {currentVariety}
                     </span>
                   </div>
@@ -541,8 +541,8 @@ export function ProductDetailModal({
                         onClick={() => setModalActiveIdx(idx)}
                         className={`text-xs px-3 py-1.5 rounded-xl border transition-all duration-200 font-semibold cursor-pointer ${
                           idx === modalActiveIdx
-                            ? 'bg-red-950/60 text-red-300 border-red-500 shadow-md shadow-red-950/40'
-                            : 'bg-zinc-900 text-zinc-300 border-zinc-800 hover:border-zinc-700 hover:text-white'
+                            ? 'bg-red-50 text-red-600 border-red-500 shadow-sm'
+                            : 'bg-zinc-100 text-zinc-700 border-zinc-200 hover:border-zinc-400 hover:text-zinc-900'
                         }`}
                       >
                         {varName}
@@ -552,14 +552,14 @@ export function ProductDetailModal({
                 </div>
               )}
 
-              <div className="h-[1px] bg-zinc-850 my-4"></div>
+              <div className="h-[1px] bg-zinc-200 my-4"></div>
 
               {/* Descripción con scroll independiente si es muy larga */}
               <div>
-                <span className="text-[10px] text-zinc-400 block mb-1.5 uppercase font-extrabold tracking-wider">
+                <span className="text-[10px] text-zinc-500 block mb-1.5 uppercase font-extrabold tracking-wider">
                   Descripción y Detalles:
                 </span>
-                <p className="text-zinc-300 text-sm leading-relaxed whitespace-pre-line font-normal overflow-y-auto max-h-[140px] md:max-h-[200px] pr-2 scrollbar-thin scrollbar-thumb-zinc-800">
+                <p className="text-zinc-700 text-sm leading-relaxed whitespace-pre-line font-normal overflow-y-auto max-h-[140px] md:max-h-[200px] pr-2 scrollbar-thin scrollbar-thumb-zinc-300">
                   {product.description || 'Sin descripción detallada disponible.'}
                 </p>
               </div>
@@ -567,7 +567,7 @@ export function ProductDetailModal({
 
             {/* Caja de Precios Estructurada en Filas Claras (Sin Solapamientos) */}
             <div className="pt-2">
-              <div className="p-4 sm:p-5 rounded-2xl bg-zinc-900/90 border border-zinc-800 flex flex-col gap-3 shadow-lg shadow-black/40">
+              <div className="p-4 sm:p-5 rounded-2xl bg-zinc-50 border border-zinc-200 flex flex-col gap-3 shadow-sm">
                 {isOfferActive ? (
                   <div className="flex flex-col gap-2">
                     {/* Fila Antes + Badge de Descuento */}
@@ -583,32 +583,32 @@ export function ProductDetailModal({
                     </div>
 
                     {/* Fila Precio de Oferta */}
-                    <div className="flex items-baseline justify-between gap-2 pt-1 border-t border-zinc-800/80">
-                      <span className="text-xs text-red-400 font-extrabold uppercase tracking-wide flex items-center gap-1">
+                    <div className="flex items-baseline justify-between gap-2 pt-1 border-t border-zinc-200">
+                      <span className="text-xs text-red-600 font-extrabold uppercase tracking-wide flex items-center gap-1">
                         <span>🔥 Precio Oferta:</span>
                       </span>
-                      <span className="text-2xl sm:text-3xl font-black text-red-500 font-mono">
+                      <span className="text-2xl sm:text-3xl font-black text-red-600 font-mono">
                         {symbol}{product.offerPrice!.toFixed(2)}
                       </span>
                     </div>
                   </div>
                 ) : (
                   <div className="flex items-baseline justify-between gap-2">
-                    <span className="text-xs text-zinc-400 font-bold uppercase tracking-wider">Precio Detal:</span>
-                    <span className="text-2xl sm:text-3xl font-black text-white font-mono">{symbol}{product.priceDetal.toFixed(2)}</span>
+                    <span className="text-xs text-zinc-500 font-bold uppercase tracking-wider">Precio Detal:</span>
+                    <span className="text-2xl sm:text-3xl font-black text-zinc-950 font-mono">{symbol}{product.priceDetal.toFixed(2)}</span>
                   </div>
                 )}
 
                 {/* Línea Divisoria */}
-                <div className="h-[1px] bg-zinc-800"></div>
+                <div className="h-[1px] bg-zinc-200"></div>
 
                 {/* Fila Precio al Mayor */}
                 <div className="flex items-baseline justify-between gap-2">
                   <div className="flex flex-col">
-                    <span className="text-xs text-red-400 font-bold uppercase tracking-wider">Precio al Mayor:</span>
-                    <span className="text-[10px] text-zinc-400">A partir de {product.minMayor} unidades</span>
+                    <span className="text-xs text-red-600 font-bold uppercase tracking-wider">Precio al Mayor:</span>
+                    <span className="text-[10px] text-zinc-500">A partir de {product.minMayor} unidades</span>
                   </div>
-                  <span className="text-xl sm:text-2xl font-black text-red-400 font-mono">
+                  <span className="text-xl sm:text-2xl font-black text-red-600 font-mono">
                     {symbol}{product.priceMayor.toFixed(2)}
                   </span>
                 </div>
@@ -622,7 +622,7 @@ export function ProductDetailModal({
                 onClick={() => {
                   trackEventAction('whatsapp_click', product._id).catch((err) => console.error("Error tracking click:", err));
                 }}
-                className="mt-4 w-full min-h-[48px] py-3.5 px-5 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-xl font-black text-sm flex items-center justify-center gap-2.5 transition-all duration-300 shadow-xl shadow-red-950/60 hover:shadow-red-600/30 active:scale-[0.98] cursor-pointer uppercase tracking-wider"
+                className="mt-4 w-full min-h-[48px] py-3.5 px-5 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-xl font-black text-sm flex items-center justify-center gap-2.5 transition-all duration-300 shadow-md shadow-red-600/20 active:scale-[0.98] cursor-pointer uppercase tracking-wider"
               >
                 <svg className="w-5 h-5 fill-current shrink-0" viewBox="0 0 24 24">
                   <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.835-9.977c.311.089.822.112 1.134.112.31 0 .82-.112 1.131-.492.311-.38.82-1.993.899-2.15.079-.156.13-.339.028-.553-.102-.213-.822-1.994-.822-1.994-.127-.278-.261-.318-.466-.318-.17 0-.368-.012-.566-.012-.397 0-.907.146-1.22.492-.311.38-1.189 1.163-1.189 2.833 0 1.67 1.218 3.282 1.388 3.507.17.225 2.4 3.665 5.811 5.138.81.35 1.442.56 1.933.717.813.259 1.554.223 2.14.136.652-.097 1.993-.815 2.276-1.602.283-.787.283-1.46.198-1.602-.085-.142-.311-.225-.652-.393-.34-.168-1.993-.984-2.276-1.085-.283-.101-.49-.152-.697.152-.207.304-.803 1.085-.984 1.288-.18.203-.362.228-.703.06-.34-.168-1.436-.53-2.735-1.688-1.01-.902-1.693-2.016-1.892-2.355-.198-.339-.021-.523.149-.692.153-.152.34-.393.51-.59.17-.197.226-.338.339-.564.113-.225.056-.422-.028-.59-.084-.168-.703-1.692-1.01-2.434-.298-.718-.604-.621-.822-.631-.212-.01-.453-.012-.694-.012-.24 0-.631.09-.962.45-.33.36-1.26 1.23-1.26 3.003 0 1.77 1.29 3.48 1.47 3.73.18.25 2.54 3.88 6.16 5.45.86.37 1.53.59 2.06.76.87.28 1.66.24 2.28.15.69-.1 2.12-.87 2.42-1.71.3-.84.3-1.56.21-1.71-.09-.15-.33-.24-.72-.43z"/>
@@ -1461,18 +1461,18 @@ export default function Catalog({
   }, [selectedCategory, searchQuery]);
 
   return (
-    <div className="min-h-screen bg-[#121216] text-white font-sans selection:bg-red-600 selection:text-white relative bg-brand-lines">
+    <div className="min-h-screen bg-[#F8F9FA] text-zinc-900 font-sans selection:bg-red-600 selection:text-white relative bg-brand-lines">
       {/* Aviso de cierre de sesión por inactividad */}
       {showInactivityAlert && (
         <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 animate-pulse duration-700">
-          <div className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-zinc-900/95 border border-red-500/40 text-red-500 shadow-2xl shadow-black/60 backdrop-blur-md text-xs sm:text-sm font-bold tracking-wide">
-            <svg className="w-5 h-5 text-red-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-white/95 border border-red-500/40 text-red-600 shadow-xl shadow-zinc-300/50 backdrop-blur-md text-xs sm:text-sm font-bold tracking-wide">
+            <svg className="w-5 h-5 text-red-600 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
             <span>Sesión cerrada por inactividad</span>
             <button
               onClick={() => setShowInactivityAlert(false)}
-              className="text-zinc-500 hover:text-white transition-colors focus:outline-none ml-2 cursor-pointer"
+              className="text-zinc-400 hover:text-zinc-700 transition-colors focus:outline-none ml-2 cursor-pointer"
               aria-label="Cerrar aviso"
             >
               <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1483,7 +1483,7 @@ export default function Catalog({
         </div>
       )}
       {/* Sticky Top Navbar de Alta Gama */}
-      <nav className="sticky top-0 z-30 w-full bg-zinc-900/95 border-b border-zinc-800/90 backdrop-blur-xl transition-all shadow-lg shadow-black/30">
+      <nav className="sticky top-0 z-30 w-full bg-white/95 border-b border-zinc-200 backdrop-blur-xl transition-all shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-4">
           
           {/* 1. Logo Compacto de Alta Jerarquía */}
@@ -1497,10 +1497,10 @@ export default function Catalog({
               </svg>
             </div>
             <div className="flex flex-col">
-              <span className="font-black tracking-wider text-xs uppercase leading-none text-white font-sans flex items-center gap-1.5">
+              <span className="font-black tracking-wider text-xs uppercase leading-none text-zinc-950 font-sans flex items-center gap-1.5">
                 HOME & TOYS
               </span>
-              <span className="text-red-500 font-bold text-[9px] tracking-[0.25em] uppercase leading-none mt-1">
+              <span className="text-red-600 font-bold text-[9px] tracking-[0.25em] uppercase leading-none mt-1">
                 Tío Willy
               </span>
             </div>
@@ -1512,8 +1512,8 @@ export default function Catalog({
               onClick={() => { setSelectedCategory('todos'); document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' }); }} 
               className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
                 selectedCategory === 'todos' 
-                  ? 'bg-red-600 text-white shadow-md shadow-red-950/30' 
-                  : 'text-zinc-300 hover:text-white hover:bg-zinc-800/80'
+                  ? 'bg-red-600 text-white shadow-md shadow-red-600/30' 
+                  : 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100'
               }`}
             >
               Catálogo
@@ -1522,9 +1522,9 @@ export default function Catalog({
             {offerProducts.length > 0 && (
               <button 
                 onClick={() => document.getElementById('seccion-ofertas')?.scrollIntoView({ behavior: 'smooth' })} 
-                className="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider text-amber-400 hover:text-amber-300 hover:bg-amber-950/30 transition-all flex items-center gap-1.5 cursor-pointer"
+                className="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider text-amber-600 hover:text-amber-700 hover:bg-amber-50 transition-all flex items-center gap-1.5 cursor-pointer"
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
                 <span>Ofertas</span>
               </button>
             )}
@@ -1532,17 +1532,17 @@ export default function Catalog({
             <button 
               onClick={handleGenerateCatalogPDF}
               disabled={pdfLoading}
-              className="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider text-zinc-300 hover:text-white hover:bg-zinc-800/80 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+              className="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
               title="Descargar Catálogo B2B para Mayoristas"
             >
               {pdfLoading ? (
                 <>
                   <span className="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
-                  <span className="text-red-400">Generando...</span>
+                  <span className="text-red-600">Generando...</span>
                 </>
               ) : (
                 <>
-                  <svg className="w-3.5 h-3.5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3.5 h-3.5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                   <span>Mayoristas (PDF)</span>
@@ -1552,7 +1552,7 @@ export default function Catalog({
 
             <button 
               onClick={() => document.getElementById('ubicacion')?.scrollIntoView({ behavior: 'smooth' })} 
-              className="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider text-zinc-300 hover:text-white hover:bg-zinc-800/80 transition-all cursor-pointer"
+              className="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 transition-all cursor-pointer"
             >
               Ubicación
             </button>
@@ -1562,12 +1562,12 @@ export default function Catalog({
           <div className="flex items-center gap-2.5">
             
             {/* Redes Sociales Oficiales con Badges Circulares */}
-            <div className="hidden sm:flex items-center gap-1.5 pr-1 border-r border-zinc-700/60">
+            <div className="hidden sm:flex items-center gap-1.5 pr-1 border-r border-zinc-200">
               <a
                 href="https://www.tiktok.com/@hogaryjuguetestiowilly"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-9 h-9 rounded-full bg-zinc-800/90 border border-zinc-700 hover:border-zinc-500 hover:bg-zinc-700 text-zinc-300 hover:text-white flex items-center justify-center transition-all active:scale-95 shadow-sm group"
+                className="w-9 h-9 rounded-full bg-zinc-100 border border-zinc-200 hover:border-zinc-300 hover:bg-zinc-200 text-zinc-700 hover:text-zinc-950 flex items-center justify-center transition-all active:scale-95 shadow-sm group"
                 title="TikTok Oficial @hogaryjuguetestiowilly"
                 aria-label="TikTok Oficial"
               >
@@ -1580,7 +1580,7 @@ export default function Catalog({
                 href="https://www.instagram.com/hogaryjuguetestiowilly"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-9 h-9 rounded-full bg-zinc-800/90 border border-zinc-700 hover:border-pink-500/50 hover:bg-zinc-700 text-zinc-300 hover:text-pink-400 flex items-center justify-center transition-all active:scale-95 shadow-sm group"
+                className="w-9 h-9 rounded-full bg-zinc-100 border border-zinc-200 hover:border-pink-300 hover:bg-zinc-200 text-zinc-700 hover:text-pink-600 flex items-center justify-center transition-all active:scale-95 shadow-sm group"
                 title="Instagram Oficial @hogaryjuguetestiowilly"
                 aria-label="Instagram Oficial"
               >
@@ -1595,7 +1595,7 @@ export default function Catalog({
               href="https://wa.me/584244576086"
               target="_blank"
               rel="noopener noreferrer"
-              className="h-10 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white text-xs font-black transition-all uppercase tracking-wider shadow-md shadow-emerald-950/40 flex items-center gap-2 active:scale-95"
+              className="h-10 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white text-xs font-black transition-all uppercase tracking-wider shadow-md shadow-emerald-600/30 flex items-center gap-2 active:scale-95"
             >
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-300 opacity-75"></span>
@@ -1610,7 +1610,7 @@ export default function Catalog({
             {/* Botón Menú Móvil Hamburger */}
             <button
               onClick={() => setIsDrawerOpen(true)}
-              className="lg:hidden w-10 h-10 flex items-center justify-center text-zinc-300 hover:text-white bg-zinc-800/80 hover:bg-zinc-700 active:scale-95 rounded-xl border border-zinc-700 transition-all focus:outline-none cursor-pointer"
+              className="lg:hidden w-10 h-10 flex items-center justify-center text-zinc-700 hover:text-zinc-950 bg-zinc-100 hover:bg-zinc-200 active:scale-95 rounded-xl border border-zinc-200 transition-all focus:outline-none cursor-pointer"
               aria-label="Abrir menú de navegación y categorías"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1626,17 +1626,17 @@ export default function Catalog({
         {/* Backdrop (fondo oscuro semitransparente) */}
         <div 
           onClick={() => setIsDrawerOpen(false)}
-          className={`absolute inset-0 bg-zinc-950/80 backdrop-blur-md transition-opacity duration-300 ${isDrawerOpen ? 'opacity-100' : 'opacity-0'}`}
+          className={`absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${isDrawerOpen ? 'opacity-100' : 'opacity-0'}`}
         ></div>
 
         {/* Panel lateral */}
-        <div className={`absolute inset-y-0 right-0 w-80 max-w-[85%] bg-zinc-900 border-l border-zinc-800 p-6 flex flex-col gap-6 shadow-2xl transition-transform duration-300 transform ${isDrawerOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+        <div className={`absolute inset-y-0 right-0 w-80 max-w-[85%] bg-white border-l border-zinc-200 p-6 flex flex-col gap-6 shadow-2xl transition-transform duration-300 transform ${isDrawerOpen ? 'translate-x-0' : 'translate-x-full'}`}>
           {/* Cabecera del menú */}
           <div className="flex items-center justify-between">
-            <span className="font-extrabold tracking-widest text-[10px] uppercase text-zinc-400">Navegación / Filtros</span>
+            <span className="font-extrabold tracking-widest text-[10px] uppercase text-zinc-500">Navegación / Filtros</span>
             <button
               onClick={() => setIsDrawerOpen(false)}
-              className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-xl transition-colors cursor-pointer"
+              className="p-2 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 rounded-xl transition-colors cursor-pointer"
               aria-label="Cerrar menú móvil"
             >
               <svg className="w-5.5 h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1652,7 +1652,7 @@ export default function Catalog({
               setIsDrawerOpen(false);
             }}
             disabled={pdfLoading}
-            className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 text-xs font-bold transition-all uppercase tracking-wider cursor-pointer disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-800 border border-zinc-200 text-xs font-bold transition-all uppercase tracking-wider cursor-pointer disabled:opacity-50"
           >
             {pdfLoading ? (
               <>
@@ -1661,7 +1661,7 @@ export default function Catalog({
               </>
             ) : (
               <>
-                <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
                 <span>Descargar Catálogo (PDF)</span>
@@ -1678,9 +1678,9 @@ export default function Catalog({
                 placeholder="Buscar productos..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl focus:border-red-500/80 text-white placeholder-zinc-500 focus:outline-none transition-all text-xs"
+                className="w-full pl-10 pr-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl focus:border-red-500 text-zinc-900 placeholder-zinc-400 focus:outline-none transition-all text-xs"
               />
-              <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
@@ -1688,18 +1688,18 @@ export default function Catalog({
 
           {/* Categorías dentro del menú móvil */}
           <div className="flex flex-col gap-2">
-            <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Categorías</span>
+            <span className="text-xs font-bold text-zinc-600 uppercase tracking-wider">Categorías</span>
             <div className="flex flex-col gap-1 overflow-y-auto max-h-[45vh] pr-1">
               <button
                 onClick={() => { setSelectedCategory('todos'); setIsDrawerOpen(false); document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' }); }}
                 className={`w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold transition-all text-xs ${
                   selectedCategory === 'todos'
-                    ? 'bg-red-600 text-white shadow-lg shadow-red-950/20'
-                    : 'bg-zinc-800/80 text-zinc-300 hover:text-white'
+                    ? 'bg-red-600 text-white shadow-lg shadow-red-600/20'
+                    : 'bg-zinc-50 text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900 border border-zinc-200/60'
                 }`}
               >
                 <span>Todos los productos</span>
-                <span className={`text-[10px] px-2 py-0.5 rounded-full ${selectedCategory === 'todos' ? 'bg-red-700 text-white' : 'bg-zinc-700 text-zinc-300 font-bold'}`}>
+                <span className={`text-[10px] px-2 py-0.5 rounded-full ${selectedCategory === 'todos' ? 'bg-red-700 text-white' : 'bg-zinc-200 text-zinc-700 font-bold'}`}>
                   {categoryCounts.todos}
                 </span>
               </button>
@@ -1713,12 +1713,12 @@ export default function Catalog({
                     onClick={() => { setSelectedCategory(cat._id); setIsDrawerOpen(false); document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' }); }}
                     className={`w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold transition-all text-xs ${
                       isActive
-                        ? 'bg-red-600 text-white shadow-lg shadow-red-950/20'
-                        : 'bg-zinc-800/80 text-zinc-300 hover:text-white'
+                        ? 'bg-red-600 text-white shadow-lg shadow-red-600/20'
+                        : 'bg-zinc-50 text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900 border border-zinc-200/60'
                     }`}
                   >
                     <span>{cat.name}</span>
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full ${isActive ? 'bg-red-700 text-white' : 'bg-zinc-700 text-zinc-300 font-bold'}`}>
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full ${isActive ? 'bg-red-700 text-white' : 'bg-zinc-200 text-zinc-700 font-bold'}`}>
                       {count}
                     </span>
                   </button>
@@ -1727,29 +1727,29 @@ export default function Catalog({
             </div>
           </div>
 
-          <div className="h-[1px] bg-zinc-800"></div>
+          <div className="h-[1px] bg-zinc-200"></div>
 
           {/* Información de contacto y Redes Sociales */}
           <div className="mt-auto flex flex-col gap-3">
-            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block text-center">Atención al Cliente</span>
+            <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest block text-center">Atención al Cliente</span>
             <a
               href="https://wa.me/584244576086"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full min-h-[44px] py-3 bg-red-600 hover:bg-red-500 border border-red-500/30 text-white rounded-xl font-bold text-center text-xs transition-colors flex items-center justify-center gap-2 shadow-md shadow-red-950/40"
+              className="w-full min-h-[44px] py-3 bg-red-600 hover:bg-red-500 border border-red-500/30 text-white rounded-xl font-bold text-center text-xs transition-colors flex items-center justify-center gap-2 shadow-md shadow-red-600/30"
             >
               <span>📞 +58 424 457 6086</span>
             </a>
 
             {/* Redes Sociales Drawer */}
-            <div className="pt-2 border-t border-zinc-800/80 flex flex-col gap-2">
-              <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block text-center">Síguenos Oficial</span>
+            <div className="pt-2 border-t border-zinc-200 flex flex-col gap-2">
+              <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest block text-center">Síguenos Oficial</span>
               <div className="grid grid-cols-2 gap-2">
                 <a
                   href="https://www.tiktok.com/@hogaryjuguetestiowilly"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="min-h-[44px] px-3 py-2.5 rounded-xl bg-zinc-800/90 border border-zinc-700 hover:border-zinc-500 text-zinc-200 hover:text-white flex items-center justify-center gap-2 text-xs font-bold transition-all active:scale-95"
+                  className="min-h-[44px] px-3 py-2.5 rounded-xl bg-zinc-100 border border-zinc-200 hover:border-zinc-300 text-zinc-800 hover:text-black flex items-center justify-center gap-2 text-xs font-bold transition-all active:scale-95"
                 >
                   <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
                     <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.24 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/>
@@ -1760,7 +1760,7 @@ export default function Catalog({
                   href="https://www.instagram.com/hogaryjuguetestiowilly"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="min-h-[44px] px-3 py-2.5 rounded-xl bg-zinc-800/90 border border-zinc-700 hover:border-pink-500/50 text-zinc-200 hover:text-pink-400 flex items-center justify-center gap-2 text-xs font-bold transition-all active:scale-95"
+                  className="min-h-[44px] px-3 py-2.5 rounded-xl bg-zinc-100 border border-zinc-200 hover:border-pink-300 text-zinc-800 hover:text-pink-600 flex items-center justify-center gap-2 text-xs font-bold transition-all active:scale-95"
                 >
                   <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
                     <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
@@ -1780,48 +1780,48 @@ export default function Catalog({
         onTouchStart={onHeroTouchStart}
         onTouchMove={onHeroTouchMove}
         onTouchEnd={onHeroTouchEnd}
-        className="relative w-full min-h-[500px] md:min-h-[560px] overflow-hidden flex flex-col items-center justify-center border-b border-zinc-800/80 bg-gradient-to-b from-zinc-900 via-[#15151a] to-zinc-900 cursor-grab active:cursor-grabbing select-none"
+        className="relative w-full min-h-[500px] md:min-h-[560px] overflow-hidden flex flex-col items-center justify-center border-b border-zinc-200 bg-gradient-to-b from-white via-zinc-50 to-zinc-100 cursor-grab active:cursor-grabbing select-none"
       >
         {/* Malla Geométrica y Figuras Decorativas de Fondo con Aura Radial */}
-        <div className="absolute inset-0 bg-brand-grid opacity-75 pointer-events-none"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_15%,_rgba(255,45,45,0.22)_0%,_transparent_65%)] pointer-events-none"></div>
+        <div className="absolute inset-0 bg-brand-grid opacity-80 pointer-events-none"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_15%,_rgba(255,45,45,0.08)_0%,_transparent_65%)] pointer-events-none"></div>
         
         {/* Figuras geométricas y luces volumétricas */}
-        <div className="absolute top-8 left-10 w-80 h-80 bg-red-600/15 rounded-full blur-[110px] pointer-events-none animate-pulse"></div>
-        <div className="absolute bottom-8 right-10 w-96 h-96 bg-red-500/10 rounded-full blur-[120px] pointer-events-none"></div>
-        <div className="absolute top-1/4 right-[9%] w-36 h-36 border border-red-500/20 rounded-3xl rotate-12 pointer-events-none hidden lg:block backdrop-blur-[1px]"></div>
-        <div className="absolute bottom-1/4 left-[7%] w-28 h-28 border border-zinc-700/40 rounded-2xl -rotate-6 pointer-events-none hidden lg:block backdrop-blur-[1px]"></div>
+        <div className="absolute top-8 left-10 w-80 h-80 bg-red-600/10 rounded-full blur-[110px] pointer-events-none animate-pulse"></div>
+        <div className="absolute bottom-8 right-10 w-96 h-96 bg-red-500/5 rounded-full blur-[120px] pointer-events-none"></div>
+        <div className="absolute top-1/4 right-[9%] w-36 h-36 border border-red-500/15 rounded-3xl rotate-12 pointer-events-none hidden lg:block backdrop-blur-[1px]"></div>
+        <div className="absolute bottom-1/4 left-[7%] w-28 h-28 border border-zinc-300/60 rounded-2xl -rotate-6 pointer-events-none hidden lg:block backdrop-blur-[1px]"></div>
 
         {/* Cápsulas Flotantes de Colección (Floating Feature Pills en Desktop) */}
-        <div className="hidden xl:flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-zinc-900/85 border border-zinc-700/80 backdrop-blur-md shadow-2xl shadow-black/50 text-xs font-bold text-zinc-200 absolute top-28 left-8 xl:left-14 animate-float-slow z-20 pointer-events-none">
-          <span className="w-8 h-8 rounded-xl bg-red-600/20 border border-red-500/40 flex items-center justify-center text-base shrink-0">🚴‍♂️</span>
+        <div className="hidden xl:flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-white/95 border border-zinc-200 backdrop-blur-md shadow-lg shadow-zinc-200/60 text-xs font-bold text-zinc-800 absolute top-28 left-8 xl:left-14 animate-float-slow z-20 pointer-events-none">
+          <span className="w-8 h-8 rounded-xl bg-red-50 border border-red-200 flex items-center justify-center text-base shrink-0">🚴‍♂️</span>
           <div className="flex flex-col text-left">
-            <span className="text-[10px] text-zinc-400 uppercase tracking-widest font-semibold">Bicicletas</span>
-            <span className="text-white text-xs font-black">Rin 12 a Rin 29</span>
+            <span className="text-[10px] text-zinc-500 uppercase tracking-widest font-semibold">Bicicletas</span>
+            <span className="text-zinc-950 text-xs font-black">Rin 12 a Rin 29</span>
           </div>
         </div>
 
-        <div className="hidden xl:flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-zinc-900/85 border border-zinc-700/80 backdrop-blur-md shadow-2xl shadow-black/50 text-xs font-bold text-zinc-200 absolute top-24 right-8 xl:right-14 animate-float-reverse z-20 pointer-events-none">
-          <span className="w-8 h-8 rounded-xl bg-red-600/20 border border-red-500/40 flex items-center justify-center text-base shrink-0">🎧</span>
+        <div className="hidden xl:flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-white/95 border border-zinc-200 backdrop-blur-md shadow-lg shadow-zinc-200/60 text-xs font-bold text-zinc-800 absolute top-24 right-8 xl:right-14 animate-float-reverse z-20 pointer-events-none">
+          <span className="w-8 h-8 rounded-xl bg-red-50 border border-red-200 flex items-center justify-center text-base shrink-0">🎧</span>
           <div className="flex flex-col text-left">
-            <span className="text-[10px] text-zinc-400 uppercase tracking-widest font-semibold">Tecnología</span>
-            <span className="text-white text-xs font-black">Audio & Gaming</span>
+            <span className="text-[10px] text-zinc-500 uppercase tracking-widest font-semibold">Tecnología</span>
+            <span className="text-zinc-950 text-xs font-black">Audio & Gaming</span>
           </div>
         </div>
 
-        <div className="hidden xl:flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-zinc-900/85 border border-zinc-700/80 backdrop-blur-md shadow-2xl shadow-black/50 text-xs font-bold text-zinc-200 absolute bottom-24 left-10 xl:left-16 animate-float-reverse z-20 pointer-events-none">
-          <span className="w-8 h-8 rounded-xl bg-red-600/20 border border-red-500/40 flex items-center justify-center text-base shrink-0">📦</span>
+        <div className="hidden xl:flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-white/95 border border-zinc-200 backdrop-blur-md shadow-lg shadow-zinc-200/60 text-xs font-bold text-zinc-800 absolute bottom-24 left-10 xl:left-16 animate-float-reverse z-20 pointer-events-none">
+          <span className="w-8 h-8 rounded-xl bg-red-50 border border-red-200 flex items-center justify-center text-base shrink-0">📦</span>
           <div className="flex flex-col text-left">
-            <span className="text-[10px] text-zinc-400 uppercase tracking-widest font-semibold">Mayoristas</span>
-            <span className="text-white text-xs font-black">Tarifas de Fábrica</span>
+            <span className="text-[10px] text-zinc-500 uppercase tracking-widest font-semibold">Mayoristas</span>
+            <span className="text-zinc-950 text-xs font-black">Tarifas de Fábrica</span>
           </div>
         </div>
 
-        <div className="hidden xl:flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-zinc-900/85 border border-zinc-700/80 backdrop-blur-md shadow-2xl shadow-black/50 text-xs font-bold text-zinc-200 absolute bottom-20 right-10 xl:right-16 animate-float-slow z-20 pointer-events-none">
-          <span className="w-8 h-8 rounded-xl bg-red-600/20 border border-red-500/40 flex items-center justify-center text-base shrink-0">⚡</span>
+        <div className="hidden xl:flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-white/95 border border-zinc-200 backdrop-blur-md shadow-lg shadow-zinc-200/60 text-xs font-bold text-zinc-800 absolute bottom-20 right-10 xl:right-16 animate-float-slow z-20 pointer-events-none">
+          <span className="w-8 h-8 rounded-xl bg-red-50 border border-red-200 flex items-center justify-center text-base shrink-0">⚡</span>
           <div className="flex flex-col text-left">
-            <span className="text-[10px] text-zinc-400 uppercase tracking-widest font-semibold">Envíos Rápidos</span>
-            <span className="text-white text-xs font-black">Caracas & Nacional</span>
+            <span className="text-[10px] text-zinc-500 uppercase tracking-widest font-semibold">Envíos Rápidos</span>
+            <span className="text-zinc-950 text-xs font-black">Caracas & Nacional</span>
           </div>
         </div>
 
@@ -1832,16 +1832,16 @@ export default function Catalog({
 
         {/* Micro-Badges de Especialidad para Móvil (Scrollable horizontal muy suave) */}
         <div className="flex xl:hidden items-center gap-2 z-10 px-4 py-1.5 mb-2 max-w-full overflow-x-auto scrollbar-none">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-850/80 border border-zinc-700/70 text-[11px] font-bold text-zinc-300 whitespace-nowrap backdrop-blur-xs">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/90 border border-zinc-200 text-[11px] font-bold text-zinc-700 whitespace-nowrap shadow-sm backdrop-blur-xs">
             <span>🚴‍♂️</span> Bicicletas
           </span>
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-850/80 border border-zinc-700/70 text-[11px] font-bold text-zinc-300 whitespace-nowrap backdrop-blur-xs">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/90 border border-zinc-200 text-[11px] font-bold text-zinc-700 whitespace-nowrap shadow-sm backdrop-blur-xs">
             <span>🎧</span> Audio & Tech
           </span>
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-850/80 border border-zinc-700/70 text-[11px] font-bold text-zinc-300 whitespace-nowrap backdrop-blur-xs">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/90 border border-zinc-200 text-[11px] font-bold text-zinc-700 whitespace-nowrap shadow-sm backdrop-blur-xs">
             <span>📦</span> Mayor & Detal
           </span>
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-850/80 border border-zinc-700/70 text-[11px] font-bold text-zinc-300 whitespace-nowrap backdrop-blur-xs">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/90 border border-zinc-200 text-[11px] font-bold text-zinc-700 whitespace-nowrap shadow-sm backdrop-blur-xs">
             <span>⚡</span> Envíos 24h
           </span>
         </div>
@@ -1861,23 +1861,23 @@ export default function Catalog({
               >
                 {/* Badge con borde animado de acento */}
                 <div className={`transition-all duration-700 delay-100 transform ${isActive ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'}`}>
-                  <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-950/70 border border-red-500/50 text-red-200 text-xs font-black uppercase tracking-widest mb-3 shadow-xl shadow-red-950/50 animate-pulse">
+                  <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-50 border border-red-200 text-red-700 text-xs font-black uppercase tracking-widest mb-3 shadow-sm animate-pulse">
                     <span>{slide.badge}</span>
                   </div>
                 </div>
 
                 {/* Título Principal */}
-                <h2 className={`text-2xl sm:text-4xl md:text-5xl font-black text-white tracking-tight max-w-2xl leading-tight transition-all duration-700 delay-200 transform drop-shadow-md ${isActive ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0'}`}>
+                <h2 className={`text-2xl sm:text-4xl md:text-5xl font-black text-zinc-950 tracking-tight max-w-2xl leading-tight transition-all duration-700 delay-200 transform drop-shadow-sm ${isActive ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0'}`}>
                   {slide.title}
                 </h2>
 
                 {/* Highlight / Subtítulo Corporativo */}
-                <p className={`text-red-400 font-black text-sm sm:text-base tracking-wider uppercase mt-2.5 transition-all duration-700 delay-300 transform drop-shadow-sm ${isActive ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'}`}>
+                <p className={`text-red-600 font-black text-sm sm:text-base tracking-wider uppercase mt-2.5 transition-all duration-700 delay-300 transform drop-shadow-sm ${isActive ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'}`}>
                   {slide.highlight}
                 </p>
 
                 {/* Descripción */}
-                <p className={`mt-3 text-zinc-300 text-xs sm:text-sm md:text-base max-w-xl leading-relaxed transition-all duration-700 delay-400 transform ${isActive ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'}`}>
+                <p className={`mt-3 text-zinc-600 text-xs sm:text-sm md:text-base max-w-xl leading-relaxed transition-all duration-700 delay-400 transform ${isActive ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'}`}>
                   {slide.description}
                 </p>
 
@@ -1887,7 +1887,7 @@ export default function Catalog({
                     <button
                       onClick={handleGenerateCatalogPDF}
                       disabled={pdfLoading}
-                      className="min-h-[46px] px-6 py-3 rounded-xl bg-red-600 hover:bg-red-500 active:bg-red-700 text-white text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-300 shadow-xl shadow-red-950/60 flex items-center gap-2 cursor-pointer disabled:opacity-50 active:scale-95"
+                      className="min-h-[46px] px-6 py-3 rounded-xl bg-red-600 hover:bg-red-500 active:bg-red-700 text-white text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-300 shadow-md shadow-red-600/30 flex items-center gap-2 cursor-pointer disabled:opacity-50 active:scale-95"
                     >
                       {pdfLoading ? (
                         <>
@@ -1906,7 +1906,7 @@ export default function Catalog({
                   ) : (
                     <a
                       href={slide.ctaLink}
-                      className="min-h-[46px] px-6 py-3 rounded-xl bg-red-600 hover:bg-red-500 active:bg-red-700 text-white text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-300 shadow-xl shadow-red-950/60 flex items-center gap-2 active:scale-95"
+                      className="min-h-[46px] px-6 py-3 rounded-xl bg-red-600 hover:bg-red-500 active:bg-red-700 text-white text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-300 shadow-md shadow-red-600/30 flex items-center gap-2 active:scale-95"
                     >
                       <span>{slide.ctaText}</span>
                       <svg className="w-4 h-4 fill-none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1919,10 +1919,10 @@ export default function Catalog({
                     href={slide.secondaryLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="min-h-[46px] px-6 py-3 rounded-xl bg-zinc-800/95 hover:bg-zinc-750 border border-zinc-700 hover:border-zinc-600 text-zinc-200 hover:text-white text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-300 flex items-center gap-2 active:scale-95 shadow-lg shadow-black/30"
+                    className="min-h-[46px] px-6 py-3 rounded-xl bg-white hover:bg-zinc-50 border border-zinc-200 hover:border-zinc-300 text-zinc-800 hover:text-zinc-950 text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-300 flex items-center gap-2 active:scale-95 shadow-sm"
                   >
                     <span>{slide.secondaryText}</span>
-                    <svg className="w-4 h-4 fill-current text-red-500" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 fill-current text-red-600" viewBox="0 0 24 24">
                       <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.835-9.977c.311.089.822.112 1.134.112.31 0 .82-.112 1.131-.492.311-.38.82-1.993.899-2.15.079-.156.13-.339.028-.553-.102-.213-.822-1.994-.822-1.994-.127-.278-.261-.318-.466-.318-.17 0-.368-.012-.566-.012-.397 0-.907.146-1.22.492-.311.38-1.189 1.163-1.189 2.833 0 1.67 1.218 3.282 1.388 3.507.17.225 2.4 3.665 5.811 5.138.81.35 1.442.56 1.933.717.813.259 1.554.223 2.14.136.652-.097 1.993-.815 2.276-1.602.283-.787.283-1.46.198-1.602-.085-.142-.311-.225-.652-.393-.34-.168-1.993-.984-2.276-1.085-.283-.101-.49-.152-.697.152-.207.304-.803 1.085-.984 1.288-.18.203-.362.228-.703.06-.34-.168-1.436-.53-2.735-1.688-1.01-.902-1.693-2.016-1.892-2.355-.198-.339-.021-.523.149-.692.153-.152.34-.393.51-.59.17-.197.226-.338.339-.564.113-.225.056-.422-.028-.59-.084-.168-.703-1.692-1.01-2.434-.298-.718-.604-.621-.822-.631-.212-.01-.453-.012-.694-.012-.24 0-.631.09-.962.45-.33.36-1.26 1.23-1.26 3.003 0 1.77 1.29 3.48 1.47 3.73.18.25 2.54 3.88 6.16 5.45.86.37 1.53.59 2.06.76.87.28 1.66.24 2.28.15.69-.1 2.12-.87 2.42-1.71.3-.84.3-1.56.21-1.71-.09-.15-.33-.24-.72-.43z"/>
                     </svg>
                   </a>
@@ -1935,7 +1935,7 @@ export default function Catalog({
         {/* Flechas de navegación del Slider (>= 44px) */}
         <button
           onClick={() => setCurrentHeroSlide((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length)}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-zinc-800/90 hover:bg-red-600 border border-zinc-700 hover:border-red-500 text-white flex items-center justify-center transition-all cursor-pointer shadow-xl hidden sm:flex active:scale-95"
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/90 hover:bg-red-600 border border-zinc-200 hover:border-red-500 text-zinc-700 hover:text-white flex items-center justify-center transition-all cursor-pointer shadow-md hidden sm:flex active:scale-95"
           aria-label="Slide anterior"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1944,7 +1944,7 @@ export default function Catalog({
         </button>
         <button
           onClick={() => setCurrentHeroSlide((prev) => (prev + 1) % HERO_SLIDES.length)}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-zinc-800/90 hover:bg-red-600 border border-zinc-700 hover:border-red-500 text-white flex items-center justify-center transition-all cursor-pointer shadow-xl hidden sm:flex active:scale-95"
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/90 hover:bg-red-600 border border-zinc-200 hover:border-red-500 text-zinc-700 hover:text-white flex items-center justify-center transition-all cursor-pointer shadow-md hidden sm:flex active:scale-95"
           aria-label="Siguiente slide"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1952,7 +1952,7 @@ export default function Catalog({
           </svg>
         </button>
 
-        {/* Indicadores Cinemáticos con Barra de Progreso en Vivo (Estilo Apple / Tesla Store) */}
+        {/* Indicadores Cinemáticos con Barra de Progreso en Vivo */}
         <div className="relative z-10 flex items-center gap-3 mt-4 pb-8">
           {HERO_SLIDES.map((_, dotIdx) => {
             const isCurrent = dotIdx === currentHeroSlide;
@@ -1964,7 +1964,7 @@ export default function Catalog({
                 aria-label={`Ir a la diapositiva ${dotIdx + 1}`}
               >
                 {isCurrent ? (
-                  <div className="w-16 sm:w-20 h-2 bg-zinc-800/90 border border-zinc-700/80 rounded-full overflow-hidden relative shadow-inner">
+                  <div className="w-16 sm:w-20 h-2 bg-zinc-200 border border-zinc-300 rounded-full overflow-hidden relative shadow-inner">
                     <div
                       key={`progress-${currentHeroSlide}`}
                       className={`h-full bg-gradient-to-r from-red-600 via-red-500 to-red-400 rounded-full animate-hero-progress ${
@@ -1973,7 +1973,7 @@ export default function Catalog({
                     />
                   </div>
                 ) : (
-                  <span className="w-3 h-2 rounded-full bg-zinc-700 group-hover:bg-zinc-500 transition-all block" />
+                  <span className="w-3 h-2 rounded-full bg-zinc-300 group-hover:bg-zinc-400 transition-all block" />
                 )}
               </button>
             );
@@ -1982,7 +1982,7 @@ export default function Catalog({
       </header>
 
       {/* Franja de Ritmo Claro / Neutro: Pilares y Confianza de Marca */}
-      <section className="relative z-20 w-full bg-gradient-to-r from-zinc-100 via-white to-zinc-100 border-y border-zinc-300 py-6 sm:py-7 text-zinc-900 shadow-xl overflow-hidden">
+      <section className="relative z-20 w-full bg-white border-y border-zinc-200 py-6 sm:py-7 text-zinc-900 shadow-sm overflow-hidden">
         {/* Micro-textura y figura geométrica de fondo en la franja clara */}
         <div className="absolute inset-0 bg-brand-lines opacity-10 pointer-events-none"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -2039,22 +2039,22 @@ export default function Catalog({
         
         {/* Franja de Super Ofertas Destacadas (Si existen productos con isOffer) */}
         {offerProducts.length > 0 && (
-          <section id="seccion-ofertas" className="mb-12 sm:mb-16 p-6 sm:p-8 rounded-3xl bg-gradient-to-b from-red-950/20 via-zinc-900/90 to-zinc-900/90 border border-red-500/30 shadow-2xl shadow-red-950/20 relative overflow-hidden bg-brand-lines">
+          <section id="seccion-ofertas" className="mb-12 sm:mb-16 p-6 sm:p-8 rounded-3xl bg-gradient-to-b from-red-50/60 via-white to-red-50/30 border border-red-200 shadow-xl relative overflow-hidden bg-brand-lines">
             {/* Luces decorativas */}
-            <div className="absolute top-0 right-0 w-96 h-96 bg-red-600/10 rounded-full blur-[100px] pointer-events-none"></div>
+            <div className="absolute top-0 right-0 w-96 h-96 bg-red-600/5 rounded-full blur-[100px] pointer-events-none"></div>
             
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 relative z-10">
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-2xl animate-pulse">🔥</span>
-                  <h3 className="text-xl sm:text-2xl font-black text-white tracking-wide uppercase">
+                  <h3 className="text-xl sm:text-2xl font-black text-zinc-950 tracking-wide uppercase">
                     Super Ofertas Destacadas
                   </h3>
                   <span className="bg-red-600 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider font-mono">
                     {offerProducts.length} {offerProducts.length === 1 ? 'Producto' : 'Productos'}
                   </span>
                 </div>
-                <p className="text-zinc-400 text-xs sm:text-sm mt-1">
+                <p className="text-zinc-600 text-xs sm:text-sm mt-1">
                   Precios especiales por tiempo limitado en artículos seleccionados. ¡Aprovecha estas promociones!
                 </p>
               </div>
@@ -2062,7 +2062,7 @@ export default function Catalog({
                 href="https://wa.me/584244576086?text=¡Hola!%20Quisiera%20consultar%20por%20las%20super%20ofertas%20destacadas%20de%20la%20tienda"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="self-start sm:self-auto min-h-[44px] flex items-center gap-2 px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 active:bg-red-700 text-white text-xs font-extrabold transition-all uppercase tracking-wider shadow-lg shadow-red-950/60 active:scale-95"
+                className="self-start sm:self-auto min-h-[44px] flex items-center gap-2 px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 active:bg-red-700 text-white text-xs font-extrabold transition-all uppercase tracking-wider shadow-md shadow-red-600/30 active:scale-95"
               >
                 <span>Consultar en WhatsApp</span>
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2072,7 +2072,7 @@ export default function Catalog({
             </div>
 
             {/* Carrusel Deslizable de Tarjetas de Oferta */}
-            <div className="flex gap-4 sm:gap-6 overflow-x-auto pb-4 pt-1 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent scroll-smooth snap-x snap-mandatory">
+            <div className="flex gap-4 sm:gap-6 overflow-x-auto pb-4 pt-1 scrollbar-thin scrollbar-thumb-zinc-300 scrollbar-track-transparent scroll-smooth snap-x snap-mandatory">
               {offerProducts.map((offerProd) => {
                 const catName = initialCategorias.find((c) => c._id === offerProd.category)?.name || offerProd.category;
                 const discountPct = offerProd.priceDetal > (offerProd.offerPrice || 0) 
@@ -2086,10 +2086,10 @@ export default function Catalog({
                   <div 
                     key={`offer-${offerProd._id}`}
                     onClick={() => setSelectedOfferProduct(offerProd)}
-                    className="w-72 sm:w-80 flex-shrink-0 bg-zinc-900/95 border border-red-500/40 hover:border-red-500 rounded-2xl overflow-hidden flex flex-col group transition-all duration-300 hover:shadow-2xl hover:shadow-red-950/50 snap-start cursor-pointer"
+                    className="w-72 sm:w-80 flex-shrink-0 bg-white border border-red-200 hover:border-red-500 rounded-2xl overflow-hidden flex flex-col group transition-all duration-300 hover:shadow-xl hover:shadow-red-950/10 snap-start cursor-pointer"
                   >
                     {/* Imagen con Badges */}
-                    <div className="relative aspect-video w-full bg-zinc-950 overflow-hidden">
+                    <div className="relative aspect-video w-full bg-zinc-100 overflow-hidden">
                       <img 
                         src={offerProd.images[0] || '/images/chair_red.jpg'} 
                         alt={offerProd.name} 
@@ -2097,26 +2097,26 @@ export default function Catalog({
                         decoding="async"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent opacity-60"></div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-40"></div>
                       
                       {/* Badge Oferta / Descuento */}
-                      <div className="absolute top-3 left-3 z-10 bg-red-600 border border-red-400 text-white font-black text-xs tracking-wider px-3 py-1 rounded-full uppercase shadow-lg shadow-black/80 flex items-center gap-1.5 backdrop-blur-sm">
+                      <div className="absolute top-3 left-3 z-10 bg-red-600 border border-red-400 text-white font-black text-xs tracking-wider px-3 py-1 rounded-full uppercase shadow-md flex items-center gap-1.5 backdrop-blur-sm">
                         <span>🔥 OFERTA</span>
                         {discountPct && (
-                          <span className="bg-zinc-950/60 text-white px-1.5 py-0.5 rounded text-[10px] font-mono font-bold">
+                          <span className="bg-zinc-900/80 text-white px-1.5 py-0.5 rounded text-[10px] font-mono font-bold">
                             -{discountPct}%
                           </span>
                         )}
                       </div>
 
-                      <div className="absolute top-3 right-3 z-10 bg-zinc-900/90 border border-zinc-800 text-zinc-300 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase backdrop-blur-sm">
+                      <div className="absolute top-3 right-3 z-10 bg-white/90 border border-zinc-200 text-zinc-700 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase backdrop-blur-sm shadow-sm">
                         {catName}
                       </div>
 
                       {/* Badge de Fotos Disponibles */}
                       {offerProd.images.length > 1 && (
-                        <div className="absolute bottom-2.5 right-3 z-10 bg-black/80 border border-zinc-700/80 text-zinc-200 text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1 backdrop-blur-sm shadow-md">
-                          <svg className="w-3 h-3 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="absolute bottom-2.5 right-3 z-10 bg-white/90 border border-zinc-200 text-zinc-800 text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1 backdrop-blur-sm shadow-sm">
+                          <svg className="w-3 h-3 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                           </svg>
                           <span>{offerProd.images.length} fotos</span>
@@ -2126,19 +2126,19 @@ export default function Catalog({
 
                     {/* Información y CTA */}
                     <div className="p-4 sm:p-5 flex flex-col flex-1">
-                      <h4 className="text-white font-bold text-sm line-clamp-1 group-hover:text-red-400 transition-colors">
+                      <h4 className="text-zinc-900 font-bold text-sm line-clamp-1 group-hover:text-red-600 transition-colors">
                         {offerProd.name}
                       </h4>
-                      <p className="text-zinc-400 text-xs mt-1 line-clamp-2">
+                      <p className="text-zinc-600 text-xs mt-1 line-clamp-2">
                         {offerProd.description}
                       </p>
 
-                      <div className="mt-auto pt-4 flex items-end justify-between border-t border-zinc-800/80">
+                      <div className="mt-auto pt-4 flex items-end justify-between border-t border-zinc-200">
                         <div>
-                          <span className="text-[11px] text-zinc-500 line-through font-mono block">
+                          <span className="text-[11px] text-zinc-400 line-through font-mono block">
                             Antes: {currencySymbol}{offerProd.priceDetal.toFixed(2)}
                           </span>
-                          <span className="text-xl font-black text-red-500 font-mono">
+                          <span className="text-xl font-black text-red-600 font-mono">
                             {currencySymbol}{offerProd.offerPrice?.toFixed(2)}
                           </span>
                         </div>
@@ -2150,7 +2150,7 @@ export default function Catalog({
                             e.stopPropagation();
                             trackEventAction('whatsapp_click', offerProd._id).catch(err => console.error("Error tracking click:", err));
                           }}
-                          className="min-h-[44px] px-4 py-2.5 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-xl font-extrabold text-xs flex items-center gap-2 transition-all shadow-lg shadow-red-950/60 hover:shadow-red-600/30 active:scale-95 cursor-pointer uppercase tracking-wider"
+                          className="min-h-[44px] px-4 py-2.5 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-xl font-extrabold text-xs flex items-center gap-2 transition-all shadow-md shadow-red-600/30 hover:shadow-red-600/40 active:scale-95 cursor-pointer uppercase tracking-wider"
                         >
                           <span>Pedir</span>
                           <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
@@ -2171,15 +2171,15 @@ export default function Catalog({
           {/* Columna Izquierda: Filtros de Categoría y Buscador */}
           <aside className="w-full lg:w-80 flex flex-col gap-6 lg:sticky lg:top-8 z-20 hidden lg:flex">
             {/* Buscador */}
-            <div className="p-6 rounded-3xl bg-zinc-900/90 border border-zinc-800 flex flex-col gap-3 shadow-xl shadow-black/30 backdrop-blur-md">
-              <h4 className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Búsqueda</h4>
+            <div className="p-6 rounded-3xl bg-white border border-zinc-200 flex flex-col gap-3 shadow-sm backdrop-blur-md">
+              <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Búsqueda</h4>
               <div className="relative">
                 <input
                   type="text"
                   placeholder="Buscar productos..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3 bg-zinc-800/90 border border-zinc-700/80 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/30 text-white placeholder-zinc-400 focus:outline-none transition-all duration-300 font-medium text-sm"
+                  className="w-full pl-11 pr-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl focus:border-red-500 focus:bg-white focus:ring-1 focus:ring-red-500/20 text-zinc-900 placeholder-zinc-400 focus:outline-none transition-all duration-300 font-medium text-sm"
                 />
                 <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -2188,23 +2188,23 @@ export default function Catalog({
             </div>
 
             {/* Selector de Categorías */}
-            <div className="p-6 rounded-3xl bg-zinc-900/90 border border-zinc-800 flex flex-col gap-3 shadow-xl shadow-black/30 backdrop-blur-md">
-              <h4 className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Categorías</h4>
+            <div className="p-6 rounded-3xl bg-white border border-zinc-200 flex flex-col gap-3 shadow-sm backdrop-blur-md">
+              <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Categorías</h4>
               <nav className="flex flex-col gap-1.5">
                 {/* Categoría Todos */}
                 <button
                   onClick={() => setSelectedCategory('todos')}
                   className={`w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold transition-all duration-300 group ${
                     selectedCategory === 'todos'
-                      ? 'bg-red-600 text-white shadow-lg shadow-red-950/40 translate-x-1'
-                      : 'bg-zinc-800/60 text-zinc-300 border border-zinc-750 hover:bg-zinc-800 hover:text-white'
+                      ? 'bg-red-600 text-white shadow-md shadow-red-600/30 translate-x-1'
+                      : 'bg-zinc-50 text-zinc-700 border border-zinc-200/80 hover:bg-zinc-100 hover:text-zinc-900'
                   }`}
                 >
                   <span className="flex items-center gap-2.5">
-                    <span className={`w-1.5 h-1.5 rounded-full ${selectedCategory === 'todos' ? 'bg-white' : 'bg-zinc-500 group-hover:bg-red-500 transition-colors'}`}></span>
+                    <span className={`w-1.5 h-1.5 rounded-full ${selectedCategory === 'todos' ? 'bg-white' : 'bg-zinc-400 group-hover:bg-red-500 transition-colors'}`}></span>
                     Todos los productos
                   </span>
-                  <span className={`text-xs px-2.5 py-0.5 rounded-full ${selectedCategory === 'todos' ? 'bg-red-700/80 text-white' : 'bg-zinc-700 text-zinc-300 font-semibold'}`}>
+                  <span className={`text-xs px-2.5 py-0.5 rounded-full ${selectedCategory === 'todos' ? 'bg-red-700/80 text-white' : 'bg-zinc-200 text-zinc-700 font-semibold'}`}>
                     {categoryCounts.todos}
                   </span>
                 </button>
@@ -2219,15 +2219,15 @@ export default function Catalog({
                       onClick={() => setSelectedCategory(cat._id)}
                       className={`w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold transition-all duration-300 group ${
                         isActive
-                          ? 'bg-red-600 text-white shadow-lg shadow-red-950/40 translate-x-1'
-                          : 'bg-zinc-900/60 text-zinc-400 border border-zinc-900 hover:bg-zinc-900 hover:text-white'
+                          ? 'bg-red-600 text-white shadow-md shadow-red-600/30 translate-x-1'
+                          : 'bg-zinc-50 text-zinc-700 border border-zinc-200/80 hover:bg-zinc-100 hover:text-zinc-900'
                       }`}
                     >
                       <span className="flex items-center gap-2.5">
-                        <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-white' : 'bg-zinc-600 group-hover:bg-red-500 transition-colors'}`}></span>
+                        <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-white' : 'bg-zinc-400 group-hover:bg-red-500 transition-colors'}`}></span>
                         {cat.name}
                       </span>
-                      <span className={`text-xs px-2.5 py-0.5 rounded-full ${isActive ? 'bg-red-700/80 text-white' : 'bg-zinc-800 text-zinc-500 font-semibold'}`}>
+                      <span className={`text-xs px-2.5 py-0.5 rounded-full ${isActive ? 'bg-red-700/80 text-white' : 'bg-zinc-200 text-zinc-700 font-semibold'}`}>
                         {count}
                       </span>
                     </button>
@@ -2240,15 +2240,15 @@ export default function Catalog({
           {/* Columna Derecha: Catálogo de Productos y Paginación */}
           <div className="flex-1 flex flex-col gap-6 lg:gap-10">
             {/* Mobile Filter & Search Button Trigger + Buscador Rápido */}
-            <div className="lg:hidden flex flex-col gap-3 bg-zinc-950 border border-zinc-900 rounded-3xl p-4 shadow-lg shadow-black/40">
+            <div className="lg:hidden flex flex-col gap-3 bg-white border border-zinc-200 rounded-3xl p-4 shadow-sm">
               <div className="flex items-center justify-between">
                 <div className="flex flex-col gap-0.5">
                   <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Catálogo de Productos</span>
-                  <span className="text-xs font-black text-white">{filteredProducts.length} Productos Disponibles</span>
+                  <span className="text-xs font-black text-zinc-900">{filteredProducts.length} Productos Disponibles</span>
                 </div>
                 <button
                   onClick={() => setIsDrawerOpen(true)}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-xl font-bold text-xs transition-colors cursor-pointer shadow-lg shadow-red-950/20"
+                  className="flex items-center gap-2 px-4 py-2.5 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-xl font-bold text-xs transition-colors cursor-pointer shadow-md shadow-red-600/20"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
@@ -2264,9 +2264,9 @@ export default function Catalog({
                   placeholder="Buscar en el catálogo..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl focus:border-red-500 text-white placeholder-zinc-500 focus:outline-none text-xs font-medium"
+                  className="w-full pl-10 pr-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl focus:border-red-500 focus:bg-white text-zinc-900 placeholder-zinc-400 focus:outline-none text-xs font-medium"
                 />
-                <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
@@ -2290,13 +2290,13 @@ export default function Catalog({
                   }}
                   className={`flex-shrink-0 min-h-[44px] flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer snap-start active:scale-95 ${
                     selectedCategory === 'todos'
-                      ? 'bg-red-600 text-white shadow-lg shadow-red-950/60 scale-[1.02]'
-                      : 'bg-zinc-900/90 text-zinc-400 border border-zinc-800 hover:text-white hover:bg-zinc-800'
+                      ? 'bg-red-600 text-white shadow-md shadow-red-600/30 scale-[1.02]'
+                      : 'bg-white text-zinc-700 border border-zinc-200 hover:text-zinc-950 hover:bg-zinc-100'
                   }`}
                 >
                   <span>Todos</span>
                   <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono ${
-                    selectedCategory === 'todos' ? 'bg-red-800/90 text-white font-bold' : 'bg-zinc-800 text-zinc-400'
+                    selectedCategory === 'todos' ? 'bg-red-700 text-white font-bold' : 'bg-zinc-100 text-zinc-600'
                   }`}>
                     {categoryCounts.todos}
                   </span>
@@ -2314,13 +2314,13 @@ export default function Catalog({
                       }}
                       className={`flex-shrink-0 min-h-[44px] flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer snap-start active:scale-95 ${
                         isActive
-                          ? 'bg-red-600 text-white shadow-lg shadow-red-950/60 scale-[1.02]'
-                          : 'bg-zinc-900/90 text-zinc-400 border border-zinc-800 hover:text-white hover:bg-zinc-800'
+                          ? 'bg-red-600 text-white shadow-md shadow-red-600/30 scale-[1.02]'
+                          : 'bg-white text-zinc-700 border border-zinc-200 hover:text-zinc-950 hover:bg-zinc-100'
                       }`}
                     >
                       <span>{cat.name}</span>
                       <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono ${
-                        isActive ? 'bg-red-800/90 text-white font-bold' : 'bg-zinc-800 text-zinc-400'
+                        isActive ? 'bg-red-700 text-white font-bold' : 'bg-zinc-100 text-zinc-600'
                       }`}>
                         {count}
                       </span>
@@ -2332,7 +2332,7 @@ export default function Catalog({
 
             {/* Filtro de Subcategorías / Variantes por Categoría */}
             {selectedCategory !== 'todos' && subcategories.length > 0 && (
-              <div className="w-full bg-zinc-950/45 border border-zinc-900 rounded-3xl p-5 shadow-lg shadow-black/30 flex flex-col gap-3">
+              <div className="w-full bg-white border border-zinc-200 rounded-3xl p-5 shadow-sm flex flex-col gap-3">
                 <div className="flex justify-between items-center">
                   <span className="text-[10px] text-zinc-500 font-extrabold uppercase tracking-wider">
                     Filtros de tamaño / tipo
@@ -2340,7 +2340,7 @@ export default function Catalog({
                   {selectedSubcategory !== 'todos' && (
                     <button
                       onClick={() => setSelectedSubcategory('todos')}
-                      className="text-[10px] text-red-500 hover:text-red-400 font-bold uppercase tracking-wider transition-colors cursor-pointer"
+                      className="text-[10px] text-red-600 hover:text-red-500 font-bold uppercase tracking-wider transition-colors cursor-pointer"
                     >
                       Limpiar Filtro
                     </button>
@@ -2348,14 +2348,14 @@ export default function Catalog({
                 </div>
                 
                 {/* Contenedor con Scroll Lateral Suave */}
-                <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent">
+                <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-zinc-300 scrollbar-track-transparent">
                   {/* Botón Ver Todo */}
                   <button
                     onClick={() => setSelectedSubcategory('todos')}
                     className={`flex-shrink-0 text-xs px-3.5 py-2 rounded-xl font-bold transition-all duration-300 cursor-pointer ${
                       selectedSubcategory === 'todos'
-                        ? 'bg-red-600 text-white shadow-md shadow-red-950/20'
-                        : 'bg-zinc-900/60 hover:bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-850'
+                        ? 'bg-red-600 text-white shadow-sm'
+                        : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-700 hover:text-zinc-950 border border-zinc-200'
                     }`}
                   >
                     Ver Todo
@@ -2368,8 +2368,8 @@ export default function Catalog({
                       onClick={() => setSelectedSubcategory(subcat)}
                       className={`flex-shrink-0 text-xs px-3.5 py-2 rounded-xl font-bold transition-all duration-300 cursor-pointer ${
                         selectedSubcategory === subcat
-                          ? 'bg-red-600 text-white shadow-md shadow-red-950/20'
-                          : 'bg-zinc-900/60 hover:bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-850'
+                          ? 'bg-red-600 text-white shadow-sm'
+                          : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-700 hover:text-zinc-950 border border-zinc-200'
                       }`}
                     >
                       {subcat}
@@ -2396,12 +2396,12 @@ export default function Catalog({
                 })}
               </div>
             ) : (
-              <div className="w-full py-20 flex flex-col items-center justify-center text-center rounded-3xl bg-zinc-950/40 border border-zinc-900">
-                <svg className="w-16 h-16 text-zinc-700 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-full py-20 flex flex-col items-center justify-center text-center rounded-3xl bg-white border border-zinc-200 shadow-sm">
+                <svg className="w-16 h-16 text-zinc-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <h3 className="text-xl font-bold text-zinc-400">No encontramos productos</h3>
-                <p className="text-zinc-600 text-sm mt-1">Prueba cambiando la búsqueda o el filtro de categoría.</p>
+                <h3 className="text-xl font-bold text-zinc-800">No encontramos productos</h3>
+                <p className="text-zinc-500 text-sm mt-1">Prueba cambiando la búsqueda o el filtro de categoría.</p>
               </div>
             )}
 
@@ -2414,7 +2414,7 @@ export default function Catalog({
                     document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' });
                   }}
                   disabled={currentPage === 1}
-                  className="w-11 h-11 rounded-xl bg-zinc-850 border border-zinc-700/80 flex items-center justify-center hover:border-red-500/50 active:bg-zinc-800 disabled:opacity-30 disabled:pointer-events-none transition-all duration-300 shadow-sm"
+                  className="w-11 h-11 rounded-xl bg-white border border-zinc-200 flex items-center justify-center hover:border-red-500/50 hover:bg-zinc-50 active:bg-zinc-100 disabled:opacity-30 disabled:pointer-events-none transition-all duration-300 shadow-sm text-zinc-700"
                   aria-label="Página anterior"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2433,8 +2433,8 @@ export default function Catalog({
                       }}
                       className={`w-11 h-11 rounded-xl font-bold transition-all duration-300 shadow-sm ${
                         currentPage === pageNum
-                          ? 'bg-red-600 text-white shadow-lg shadow-red-950/40'
-                          : 'bg-zinc-850 border border-zinc-700/80 text-zinc-300 hover:text-white hover:border-zinc-500'
+                          ? 'bg-red-600 text-white shadow-md shadow-red-600/30'
+                          : 'bg-white border border-zinc-200 text-zinc-700 hover:text-zinc-950 hover:bg-zinc-50 hover:border-zinc-300'
                       }`}
                     >
                       {pageNum}
@@ -2448,7 +2448,7 @@ export default function Catalog({
                     document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' });
                   }}
                   disabled={currentPage === totalPages}
-                  className="w-11 h-11 rounded-xl bg-zinc-850 border border-zinc-700/80 flex items-center justify-center hover:border-red-500/50 active:bg-zinc-800 disabled:opacity-30 disabled:pointer-events-none transition-all duration-300 shadow-sm"
+                  className="w-11 h-11 rounded-xl bg-white border border-zinc-200 flex items-center justify-center hover:border-red-500/50 hover:bg-zinc-50 active:bg-zinc-100 disabled:opacity-30 disabled:pointer-events-none transition-all duration-300 shadow-sm text-zinc-700"
                   aria-label="Siguiente página"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2461,26 +2461,26 @@ export default function Catalog({
         </div>
       </main>
 
-      {/* Sección de Ubicación y Contacto con diseño dark premium y halos de marca */}
-      <section id="ubicacion" className="w-full py-20 bg-gradient-to-b from-transparent via-zinc-900/60 to-zinc-900/90 border-t border-zinc-800 scroll-mt-20 relative overflow-hidden">
+      {/* Sección de Ubicación y Contacto con diseño luminoso premium y halos de marca */}
+      <section id="ubicacion" className="w-full py-20 bg-zinc-50 border-t border-zinc-200 scroll-mt-20 relative overflow-hidden">
         {/* Halos decorativos de fondo */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-red-600/5 rounded-full blur-[140px] pointer-events-none"></div>
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center relative z-10">
           
           <div className="text-center max-w-2xl mb-12">
-            <span className="text-xs text-red-400 font-bold uppercase tracking-[0.2em] block mb-2">Contacto & Visitas</span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white mb-3">Ubicación y Contacto</h2>
-            <p className="text-zinc-400 text-xs sm:text-sm">
+            <span className="text-xs text-red-600 font-bold uppercase tracking-[0.2em] block mb-2">Contacto & Visitas</span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-zinc-950 mb-3">Ubicación y Contacto</h2>
+            <p className="text-zinc-600 text-xs sm:text-sm">
               Visítanos en nuestra tienda física o contáctanos a través de nuestras líneas de atención directa.
             </p>
           </div>
 
           {/* Mapa Responsivo */}
-          <div className="w-full aspect-[16/9] sm:aspect-[21/9] min-h-[320px] rounded-3xl overflow-hidden border border-zinc-700/80 shadow-2xl shadow-black/60">
+          <div className="w-full aspect-[16/9] sm:aspect-[21/9] min-h-[320px] rounded-3xl overflow-hidden border border-zinc-200 shadow-xl">
             <iframe
               src={mapUrl || 'https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d3923.3670984803977!2d-66.91327300000002!3d10.506195699999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1ses-419!2sve!4v1710000000000!5m2!1ses-419!2sve'}
-              className="w-full h-full border-0 grayscale invert contrast-[1.2]"
+              className="w-full h-full border-0"
               allowFullScreen={false}
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
@@ -2493,7 +2493,7 @@ export default function Catalog({
             href="https://www.google.com/maps/place/Edificio+Arvelo/@10.5062937,-66.9130259,20.46z/data=!4m6!3m5!1s0x8c2a5f0019dc6fb7:0x261466dc19753595!8m2!3d10.5063117!4d-66.9132688!16s%2Fg%2F11xkw4cns7?entry=ttu&g_ep=EgoyMDI2MDgxOS4wIKXMDSoASAFQAw%3D%3D"
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-6 w-full max-w-md py-4 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-2xl font-bold flex items-center justify-center gap-2.5 transition-all duration-300 shadow-xl shadow-red-950/40 active:scale-[0.98] text-xs sm:text-sm cursor-pointer select-none"
+            className="mt-6 w-full max-w-md py-4 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-2xl font-bold flex items-center justify-center gap-2.5 transition-all duration-300 shadow-md shadow-red-600/30 active:scale-[0.98] text-xs sm:text-sm cursor-pointer select-none"
             title="Cómo llegar con Google Maps"
           >
             <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2504,14 +2504,14 @@ export default function Catalog({
           </a>
 
           {/* Información de Ubicación y Contacto justo debajo del mapa */}
-          <div className="mt-8 w-full max-w-2xl bg-zinc-900/90 p-6 sm:p-8 rounded-3xl border border-zinc-800 text-left flex flex-col gap-4 shadow-xl backdrop-blur-md">
+          <div className="mt-8 w-full max-w-2xl bg-white p-6 sm:p-8 rounded-3xl border border-zinc-200 text-left flex flex-col gap-4 shadow-sm backdrop-blur-md">
             
             {/* Dirección */}
             <div className="flex items-start gap-3">
               <span className="text-xl shrink-0 mt-0.5" aria-hidden="true">📍</span>
               <div className="flex flex-col gap-0.5">
-                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Ubicación Física</span>
-                <p className="text-white text-sm sm:text-base font-bold leading-relaxed">
+                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Ubicación Física</span>
+                <p className="text-zinc-900 text-sm sm:text-base font-bold leading-relaxed">
                   Centro de Caracas, Esquina de Torres a Madrices, Edificio Arvelo, PB, Locales 1-2 y 3.
                 </p>
               </div>
@@ -2520,29 +2520,29 @@ export default function Catalog({
             {/* Referencia */}
             <div className="flex items-start gap-3 pl-8">
               <div className="flex flex-col gap-0.5">
-                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Punto de Referencia</span>
-                <p className="text-zinc-300 text-sm font-medium leading-relaxed">
+                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Punto de Referencia</span>
+                <p className="text-zinc-700 text-sm font-medium leading-relaxed">
                   Frente a la Panadería Picadelli (Catedral / Plaza Bolívar).
                 </p>
               </div>
             </div>
 
-            <div className="h-[1px] bg-zinc-800 my-1"></div>
+            <div className="h-[1px] bg-zinc-200 my-1"></div>
 
             {/* Contactos */}
             <div className="flex items-start gap-3">
               <span className="text-xl shrink-0 mt-0.5" aria-hidden="true">📞</span>
               <div className="flex flex-col gap-2 w-full">
-                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Líneas de Atención Directa</span>
+                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Líneas de Atención Directa</span>
                 
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2.5 text-sm sm:text-base font-bold">
                   {/* Numero 1 */}
-                  <div className="flex items-center gap-2 bg-zinc-800/80 px-3.5 py-2 rounded-xl border border-zinc-700">
-                    <span className="text-white font-mono">0424-4576086</span>
+                  <div className="flex items-center gap-2 bg-zinc-50 px-3.5 py-2 rounded-xl border border-zinc-200">
+                    <span className="text-zinc-900 font-mono">0424-4576086</span>
                     <div className="flex items-center gap-1.5 shrink-0 ml-1.5">
                       <a
                         href="tel:+584244576086"
-                        className="w-8 h-8 rounded-lg bg-zinc-700 hover:bg-zinc-600 text-zinc-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer active:scale-95"
+                        className="w-8 h-8 rounded-lg bg-zinc-200 hover:bg-zinc-300 text-zinc-700 hover:text-zinc-950 flex items-center justify-center transition-colors cursor-pointer active:scale-95"
                         title="Llamar por teléfono"
                       >
                         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2553,7 +2553,7 @@ export default function Catalog({
                         href="https://wa.me/584244576086"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="w-8 h-8 rounded-lg bg-emerald-950/40 hover:bg-emerald-800/50 text-emerald-400 hover:text-white flex items-center justify-center transition-colors cursor-pointer active:scale-95"
+                        className="w-8 h-8 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 hover:text-emerald-900 flex items-center justify-center transition-colors cursor-pointer active:scale-95 border border-emerald-200"
                         title="Enviar WhatsApp"
                       >
                         <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -2563,15 +2563,15 @@ export default function Catalog({
                     </div>
                   </div>
 
-                  <span className="text-zinc-600 font-mono hidden sm:inline">/</span>
+                  <span className="text-zinc-400 font-mono hidden sm:inline">/</span>
 
                   {/* Numero 2 */}
-                  <div className="flex items-center gap-2 bg-zinc-800/80 px-3.5 py-2 rounded-xl border border-zinc-700">
-                    <span className="text-white font-mono">0424-1439324</span>
+                  <div className="flex items-center gap-2 bg-zinc-50 px-3.5 py-2 rounded-xl border border-zinc-200">
+                    <span className="text-zinc-900 font-mono">0424-1439324</span>
                     <div className="flex items-center gap-1.5 shrink-0 ml-1.5">
                       <a
                         href="tel:+584241439324"
-                        className="w-8 h-8 rounded-lg bg-zinc-700 hover:bg-zinc-600 text-zinc-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer active:scale-95"
+                        className="w-8 h-8 rounded-lg bg-zinc-200 hover:bg-zinc-300 text-zinc-700 hover:text-zinc-950 flex items-center justify-center transition-colors cursor-pointer active:scale-95"
                         title="Llamar por teléfono"
                       >
                         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2582,7 +2582,7 @@ export default function Catalog({
                         href="https://wa.me/584241439324"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="w-8 h-8 rounded-lg bg-emerald-950/40 hover:bg-emerald-800/50 text-emerald-400 hover:text-white flex items-center justify-center transition-colors cursor-pointer active:scale-95"
+                        className="w-8 h-8 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 hover:text-emerald-900 flex items-center justify-center transition-colors cursor-pointer active:scale-95 border border-emerald-200"
                         title="Enviar WhatsApp"
                       >
                         <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -2594,19 +2594,19 @@ export default function Catalog({
                 </div>
 
                 {/* Redes Sociales Oficiales */}
-                <div className="h-[1px] bg-zinc-800 my-1"></div>
+                <div className="h-[1px] bg-zinc-200 my-1"></div>
                 <div className="flex items-start gap-3">
                   <span className="text-xl shrink-0 mt-0.5" aria-hidden="true">🌐</span>
                   <div className="flex flex-col gap-2 w-full">
-                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Redes Sociales Oficiales</span>
-                    <p className="text-xs text-zinc-400">Síguenos para enterarte de nuevos ingresos, promociones y videos en vivo:</p>
+                    <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Redes Sociales Oficiales</span>
+                    <p className="text-xs text-zinc-600">Síguenos para enterarte de nuevos ingresos, promociones y videos en vivo:</p>
                     
                     <div className="flex flex-wrap items-center gap-3 pt-1">
                       <a
                         href="https://www.tiktok.com/@hogaryjuguetestiowilly"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="group flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-zinc-800/90 border border-zinc-700 hover:border-zinc-500 hover:bg-zinc-800 transition-all active:scale-95 shadow-sm"
+                        className="group flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-zinc-50 border border-zinc-200 hover:border-zinc-300 hover:bg-zinc-100 transition-all active:scale-95 shadow-sm"
                       >
                         <span className="w-8 h-8 rounded-lg bg-black flex items-center justify-center text-white shrink-0 group-hover:scale-105 transition-transform">
                           <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -2614,8 +2614,8 @@ export default function Catalog({
                           </svg>
                         </span>
                         <div className="flex flex-col text-left">
-                          <span className="text-xs font-bold text-white group-hover:text-red-400 transition-colors">TikTok</span>
-                          <span className="text-[10px] text-zinc-400 font-mono">@hogaryjuguetestiowilly</span>
+                          <span className="text-xs font-bold text-zinc-900 group-hover:text-red-600 transition-colors">TikTok</span>
+                          <span className="text-[10px] text-zinc-500 font-mono">@hogaryjuguetestiowilly</span>
                         </div>
                       </a>
 
@@ -2623,7 +2623,7 @@ export default function Catalog({
                         href="https://www.instagram.com/hogaryjuguetestiowilly"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="group flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-zinc-800/90 border border-zinc-700 hover:border-pink-500/50 hover:bg-zinc-800 transition-all active:scale-95 shadow-sm"
+                        className="group flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-zinc-50 border border-zinc-200 hover:border-pink-300 hover:bg-zinc-100 transition-all active:scale-95 shadow-sm"
                       >
                         <span className="w-8 h-8 rounded-lg bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 flex items-center justify-center text-white shrink-0 group-hover:scale-105 transition-transform">
                           <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -2631,8 +2631,8 @@ export default function Catalog({
                           </svg>
                         </span>
                         <div className="flex flex-col text-left">
-                          <span className="text-xs font-bold text-white group-hover:text-pink-400 transition-colors">Instagram</span>
-                          <span className="text-[10px] text-zinc-400 font-mono">@hogaryjuguetestiowilly</span>
+                          <span className="text-xs font-bold text-zinc-900 group-hover:text-pink-600 transition-colors">Instagram</span>
+                          <span className="text-[10px] text-zinc-500 font-mono">@hogaryjuguetestiowilly</span>
                         </div>
                       </a>
                     </div>
@@ -2646,7 +2646,7 @@ export default function Catalog({
       </section>
 
       {/* Footer */}
-      <footer className="w-full py-12 border-t border-zinc-800 bg-zinc-900/90 text-center text-zinc-400 text-sm flex flex-col items-center gap-3">
+      <footer className="w-full py-12 border-t border-zinc-200 bg-white text-center text-zinc-600 text-sm flex flex-col items-center gap-3">
         <LogoTioWilly className="scale-75 opacity-90 mb-1" />
 
         {/* Social Icons Bar in Footer */}
@@ -2655,7 +2655,7 @@ export default function Catalog({
             href="https://www.tiktok.com/@hogaryjuguetestiowilly"
             target="_blank"
             rel="noopener noreferrer"
-            className="w-9 h-9 rounded-full bg-zinc-800 border border-zinc-700 hover:border-zinc-500 hover:bg-zinc-700 text-zinc-300 hover:text-white flex items-center justify-center transition-all active:scale-95 shadow-sm"
+            className="w-9 h-9 rounded-full bg-zinc-100 border border-zinc-200 hover:border-zinc-300 hover:bg-zinc-200 text-zinc-700 hover:text-zinc-950 flex items-center justify-center transition-all active:scale-95 shadow-sm"
             title="TikTok Oficial"
             aria-label="TikTok Oficial"
           >
@@ -2667,7 +2667,7 @@ export default function Catalog({
             href="https://www.instagram.com/hogaryjuguetestiowilly"
             target="_blank"
             rel="noopener noreferrer"
-            className="w-9 h-9 rounded-full bg-zinc-800 border border-zinc-700 hover:border-pink-500/50 hover:bg-zinc-700 text-zinc-300 hover:text-pink-400 flex items-center justify-center transition-all active:scale-95 shadow-sm"
+            className="w-9 h-9 rounded-full bg-zinc-100 border border-zinc-200 hover:border-pink-300 hover:bg-zinc-200 text-zinc-700 hover:text-pink-600 flex items-center justify-center transition-all active:scale-95 shadow-sm"
             title="Instagram Oficial"
             aria-label="Instagram Oficial"
           >
@@ -2679,7 +2679,7 @@ export default function Catalog({
             href="https://wa.me/584244576086"
             target="_blank"
             rel="noopener noreferrer"
-            className="w-9 h-9 rounded-full bg-zinc-800 border border-zinc-700 hover:border-emerald-500/50 hover:bg-zinc-700 text-zinc-300 hover:text-emerald-400 flex items-center justify-center transition-all active:scale-95 shadow-sm"
+            className="w-9 h-9 rounded-full bg-zinc-100 border border-zinc-200 hover:border-emerald-500/50 hover:bg-zinc-200 text-zinc-700 hover:text-emerald-600 flex items-center justify-center transition-all active:scale-95 shadow-sm"
             title="WhatsApp Directo"
             aria-label="WhatsApp Directo"
           >
@@ -2689,11 +2689,11 @@ export default function Catalog({
           </a>
         </div>
 
-        <p className="mt-2 text-zinc-300">© 2026 Home and Toys Tío Willy. Todos los derechos reservados.</p>
+        <p className="mt-2 text-zinc-600">© 2026 Home and Toys Tío Willy. Todos los derechos reservados.</p>
         <p className="text-xs text-zinc-400 italic">Desarrollado con pasión para una experiencia de compra premium.</p>
         <a 
           href="/admin" 
-          className="text-xs text-red-500 hover:text-red-400 transition-colors duration-300 uppercase tracking-widest font-bold mt-2 hover:underline"
+          className="text-xs text-red-600 hover:text-red-500 transition-colors duration-300 uppercase tracking-widest font-bold mt-2 hover:underline"
         >
           Acceso Administrador
         </a>
