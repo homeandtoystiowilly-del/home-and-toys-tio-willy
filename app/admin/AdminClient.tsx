@@ -737,7 +737,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
   if (!isAuthorized) {
     return (
       <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4 selection:bg-red-500 selection:text-white">
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-80 h-80 bg-red-650/5 rounded-full blur-[80px] pointer-events-none"></div>
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-80 h-80 bg-red-600/10 rounded-full blur-[80px] pointer-events-none"></div>
 
         <div className="w-full max-w-md p-8 rounded-3xl bg-zinc-950/80 border border-zinc-900/60 shadow-2xl shadow-black/90 backdrop-blur-md relative z-10 text-center">
           <div className="flex flex-col items-center mb-6">
@@ -778,7 +778,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
               <button
                 type="submit"
                 disabled={loginLoading}
-                className="mt-2 py-3 bg-red-650 hover:bg-red-550 active:bg-red-750 text-white font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                className="mt-2 py-3 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
               >
                 {loginLoading ? 'Verificando...' : 'Ingresar al Panel'}
               </button>
@@ -817,7 +817,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                       placeholder="Escribe tu respuesta..."
                       value={securityAnswerInput}
                       onChange={(e) => setSecurityAnswerInput(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/30 text-white placeholder-zinc-650 focus:outline-none transition-all text-xs"
+                      className="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/30 text-white placeholder-zinc-500 focus:outline-none transition-all text-xs"
                       disabled={recoverLoading}
                       required
                     />
@@ -830,7 +830,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                       placeholder="Mínimo 4 caracteres"
                       value={newPasswordInput}
                       onChange={(e) => setNewPasswordInput(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/30 text-white placeholder-zinc-650 focus:outline-none transition-all text-xs"
+                      className="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/30 text-white placeholder-zinc-500 focus:outline-none transition-all text-xs"
                       disabled={recoverLoading}
                       required
                     />
@@ -843,7 +843,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                       placeholder="Repite la contraseña"
                       value={confirmPasswordInput}
                       onChange={(e) => setConfirmPasswordInput(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/30 text-white placeholder-zinc-650 focus:outline-none transition-all text-xs"
+                      className="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/30 text-white placeholder-zinc-500 focus:outline-none transition-all text-xs"
                       disabled={recoverLoading}
                       required
                     />
@@ -858,7 +858,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                   <button
                     type="submit"
                     disabled={recoverLoading}
-                    className="mt-1 py-3 bg-red-650 hover:bg-red-550 active:bg-red-750 text-white font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 text-xs uppercase tracking-wider"
+                    className="mt-1 py-3 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 text-xs uppercase tracking-wider"
                   >
                     {recoverLoading ? 'Restableciendo...' : 'Restablecer y Entrar'}
                   </button>
@@ -941,7 +941,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
         
         {/* Panel de Métricas de Tráfico */}
         <section className="bg-zinc-950/40 border border-zinc-900 rounded-3xl p-6 relative overflow-hidden backdrop-blur-sm">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-red-650/3 rounded-full blur-[80px] pointer-events-none"></div>
+          <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/10 rounded-full blur-[80px] pointer-events-none"></div>
           
           <div className="flex flex-col gap-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-900/60 pb-4">
@@ -1018,7 +1018,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
               </h3>
               
               {topProducts.length === 0 ? (
-                <p className="text-xs text-zinc-650 italic pl-1">
+                <p className="text-xs text-zinc-500 italic pl-1">
                   Aún no se registran clics de clientes en los productos del catálogo.
                 </p>
               ) : (
@@ -1135,7 +1135,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                           <button
                             type="button"
                             onClick={() => handleRemoveExistingImage(idx)}
-                            className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-red-650 hover:bg-red-500 text-white flex items-center justify-center transition-all duration-200 cursor-pointer shadow-md focus:outline-none"
+                            className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-red-600 hover:bg-red-500 text-white flex items-center justify-center transition-all duration-200 cursor-pointer shadow-md focus:outline-none"
                             title="Quitar imagen actual"
                           >
                             <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1155,7 +1155,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                           <button
                             type="button"
                             onClick={() => handleRemoveFile(idx)}
-                            className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-red-650 hover:bg-red-500 text-white flex items-center justify-center transition-all duration-200 cursor-pointer shadow-md focus:outline-none"
+                            className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-red-600 hover:bg-red-500 text-white flex items-center justify-center transition-all duration-200 cursor-pointer shadow-md focus:outline-none"
                             title="Quitar imagen nueva"
                           >
                             <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1176,7 +1176,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                     placeholder="Ej: Bicicleta rin 20"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white placeholder-zinc-650 focus:outline-none transition-all text-sm font-medium"
+                    className="w-full px-3.5 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white placeholder-zinc-500 focus:outline-none transition-all text-sm font-medium"
                     required
                   />
                 </div>
@@ -1191,7 +1191,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                       placeholder="150.00"
                       value={priceDetal}
                       onChange={(e) => setPriceDetal(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white placeholder-zinc-650 focus:outline-none transition-all text-sm font-mono"
+                      className="w-full px-3.5 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white placeholder-zinc-500 focus:outline-none transition-all text-sm font-mono"
                       required
                     />
                   </div>
@@ -1204,7 +1204,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                       placeholder="120.00"
                       value={priceMayor}
                       onChange={(e) => setPriceMayor(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white placeholder-zinc-650 focus:outline-none transition-all text-sm font-mono"
+                      className="w-full px-3.5 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white placeholder-zinc-500 focus:outline-none transition-all text-sm font-mono"
                       required
                     />
                   </div>
@@ -1264,7 +1264,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                       placeholder="3"
                       value={minMayor}
                       onChange={(e) => setMinMayor(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white placeholder-zinc-650 focus:outline-none transition-all text-sm font-mono"
+                      className="w-full px-3.5 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white placeholder-zinc-500 focus:outline-none transition-all text-sm font-mono"
                       required
                     />
                   </div>
@@ -1276,7 +1276,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                       placeholder="Ej: Rojo, Azul, Negro"
                       value={varieties}
                       onChange={(e) => setVarieties(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white placeholder-zinc-650 focus:outline-none transition-all text-sm font-medium"
+                      className="w-full px-3.5 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white placeholder-zinc-500 focus:outline-none transition-all text-sm font-medium"
                       required
                     />
                   </div>
@@ -1304,14 +1304,14 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                 <div className="flex flex-col gap-1">
                   <div className="flex justify-between items-baseline">
                     <label className="text-xs font-bold text-zinc-500 uppercase tracking-wide">Subcategoría (Opcional)</label>
-                    <span className="text-[10px] text-zinc-650 italic">Ej: Rin 12, Rin 16, Audio, Muebles</span>
+                    <span className="text-[10px] text-zinc-500 italic">Ej: Rin 12, Rin 16, Audio, Muebles</span>
                   </div>
                   <input
                     type="text"
                     placeholder="Dejar en blanco para autodetectar"
                     value={subcategory}
                     onChange={(e) => setSubcategory(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white placeholder-zinc-650 focus:outline-none transition-all text-sm font-medium"
+                    className="w-full px-3.5 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white placeholder-zinc-500 focus:outline-none transition-all text-sm font-medium"
                   />
                 </div>
 
@@ -1323,13 +1323,13 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     rows={2}
-                    className="w-full px-3.5 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white placeholder-zinc-650 focus:outline-none transition-all text-sm resize-none"
+                    className="w-full px-3.5 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white placeholder-zinc-500 focus:outline-none transition-all text-sm resize-none"
                     required
                   />
                    <button
                     type="submit"
                     disabled={submitLoading || compressing}
-                    className="w-full py-3 px-4 bg-red-600 hover:bg-red-550 active:bg-red-700 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                    className="w-full py-3 px-4 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                   >
                     {submitLoading ? (
                       editingProductId ? 'Actualizando...' : 'Agregando...'
@@ -1381,7 +1381,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                   placeholder="Ej. Electrodomésticos"
                   value={categoryInput}
                   onChange={(e) => setCategoryInput(e.target.value)}
-                  className="flex-1 px-3.5 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white placeholder-zinc-650 focus:outline-none transition-all text-sm font-medium"
+                  className="flex-1 px-3.5 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white placeholder-zinc-500 focus:outline-none transition-all text-sm font-medium"
                   required
                 />
                 
@@ -1450,7 +1450,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                     placeholder="https://www.google.com/maps/embed?pb=..."
                     value={mapUrlInput}
                     onChange={(e) => setMapUrlInput(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white placeholder-zinc-650 focus:outline-none transition-all text-xs font-mono"
+                    className="w-full px-3.5 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white placeholder-zinc-500 focus:outline-none transition-all text-xs font-mono"
                     required
                   />
                 </div>
@@ -1540,7 +1540,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                     placeholder="Escribe tu clave actual"
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white placeholder-zinc-650 focus:outline-none transition-all text-xs font-mono"
+                    className="w-full px-3.5 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white placeholder-zinc-500 focus:outline-none transition-all text-xs font-mono"
                     required
                   />
                 </div>
@@ -1553,7 +1553,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                       placeholder="Mínimo 4 caracteres"
                       value={newAdminPassword}
                       onChange={(e) => setNewAdminPassword(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white placeholder-zinc-650 focus:outline-none transition-all text-xs font-mono"
+                      className="w-full px-3.5 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white placeholder-zinc-500 focus:outline-none transition-all text-xs font-mono"
                     />
                   </div>
 
@@ -1564,7 +1564,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                       placeholder="Repite la nueva clave"
                       value={confirmAdminPassword}
                       onChange={(e) => setConfirmAdminPassword(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white placeholder-zinc-650 focus:outline-none transition-all text-xs font-mono"
+                      className="w-full px-3.5 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white placeholder-zinc-500 focus:outline-none transition-all text-xs font-mono"
                     />
                   </div>
                 </div>
@@ -1593,7 +1593,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                         placeholder="Ej. ¿Cuál es el nombre de mi abuela?"
                         value={customSecurityQuestion}
                         onChange={(e) => setCustomSecurityQuestion(e.target.value)}
-                        className="w-full px-3.5 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white placeholder-zinc-650 focus:outline-none transition-all text-xs"
+                        className="w-full px-3.5 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white placeholder-zinc-500 focus:outline-none transition-all text-xs"
                       />
                     </div>
                   )}
@@ -1605,7 +1605,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                       placeholder="Escribe tu respuesta de seguridad"
                       value={adminSecurityAnswer}
                       onChange={(e) => setAdminSecurityAnswer(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white placeholder-zinc-650 focus:outline-none transition-all text-xs"
+                      className="w-full px-3.5 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white placeholder-zinc-500 focus:outline-none transition-all text-xs"
                     />
                     <span className="text-[10px] text-zinc-600">Esta respuesta te permitirá recuperar la clave en la pantalla de inicio si la olvidas.</span>
                   </div>
@@ -1614,7 +1614,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                 <button
                   type="submit"
                   disabled={securityLoading}
-                  className="w-full py-2.5 bg-red-650 hover:bg-red-550 active:bg-red-750 text-white rounded-xl font-bold transition-all text-xs cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 mt-1"
+                  className="w-full py-2.5 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-xl font-bold transition-all text-xs cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 mt-1"
                 >
                   {securityLoading ? (
                     'Guardando...'
@@ -1658,7 +1658,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                   setAdminSearchQuery(e.target.value);
                   setAdminPage(1); // Resetear a la primera página al escribir
                 }}
-                className="w-full pl-9 pr-4 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white placeholder-zinc-550 focus:outline-none transition-all text-xs font-medium"
+                className="w-full pl-9 pr-4 py-2.5 bg-zinc-900/50 border border-zinc-900 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/25 text-white placeholder-zinc-500 focus:outline-none transition-all text-xs font-medium"
               />
             </div>
 
@@ -1879,7 +1879,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                     setProductToDelete(null);
                   }
                 }}
-                className="py-2.5 bg-red-600 hover:bg-red-550 active:bg-red-700 text-white rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center"
+                className="py-2.5 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center"
               >
                 Eliminar
               </button>

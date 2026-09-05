@@ -296,7 +296,7 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
             e.stopPropagation();
             trackEventAction('whatsapp_click', product._id).catch(err => console.error("Error tracking click:", err));
           }}
-          className="mt-5 w-full py-3.5 px-4 bg-red-600 hover:bg-red-550 active:bg-red-750 text-white rounded-xl font-bold flex items-center justify-center gap-2.5 transition-all duration-300 shadow-lg shadow-red-900/20 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-red-500/50"
+          className="mt-5 w-full py-3.5 px-4 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-xl font-bold flex items-center justify-center gap-2.5 transition-all duration-300 shadow-lg shadow-red-900/20 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-red-500/50"
         >
           {/* WhatsApp Icon */}
           <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
@@ -326,7 +326,7 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
                 e.stopPropagation();
                 setIsModalOpen(false);
               }}
-              className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-black/70 hover:bg-red-650 text-white flex items-center justify-center transition-colors duration-300 backdrop-blur-md cursor-pointer focus:outline-none"
+              className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-black/70 hover:bg-red-600 text-white flex items-center justify-center transition-colors duration-300 backdrop-blur-md cursor-pointer focus:outline-none"
               aria-label="Cerrar modal"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1389,7 +1389,7 @@ export default function Catalog({
             <button
               onClick={handleGenerateCatalogPDF}
               disabled={pdfLoading}
-              className="hidden md:flex items-center gap-1.5 px-4 py-2 rounded-full bg-zinc-900 border border-zinc-800 hover:border-red-500/50 hover:bg-zinc-850 text-zinc-400 hover:text-white text-xs font-bold transition-all uppercase tracking-wider cursor-pointer disabled:opacity-50"
+              className="hidden md:flex items-center gap-1.5 px-4 py-2 rounded-full bg-zinc-900 border border-zinc-800 hover:border-red-500/50 hover:bg-zinc-800 text-zinc-400 hover:text-white text-xs font-bold transition-all uppercase tracking-wider cursor-pointer disabled:opacity-50"
             >
               {pdfLoading ? (
                 <>
@@ -1409,7 +1409,7 @@ export default function Catalog({
               href="https://wa.me/584244576086"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-4 py-2 rounded-full bg-red-950/40 border border-red-500/30 hover:bg-red-650 hover:text-white text-red-500 text-xs font-bold transition-all uppercase tracking-wider"
+              className="px-4 py-2 rounded-full bg-red-950/40 border border-red-500/30 hover:bg-red-600 hover:text-white text-red-500 text-xs font-bold transition-all uppercase tracking-wider"
             >
               WhatsApp
             </a>
@@ -1501,7 +1501,7 @@ export default function Catalog({
                 onClick={() => { setSelectedCategory('todos'); setIsDrawerOpen(false); document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' }); }}
                 className={`w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold transition-all text-xs ${
                   selectedCategory === 'todos'
-                    ? 'bg-red-650 text-white shadow-lg shadow-red-950/20'
+                    ? 'bg-red-600 text-white shadow-lg shadow-red-950/20'
                     : 'bg-zinc-900 text-zinc-400 hover:text-white'
                 }`}
               >
@@ -1520,7 +1520,7 @@ export default function Catalog({
                     onClick={() => { setSelectedCategory(cat._id); setIsDrawerOpen(false); document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' }); }}
                     className={`w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold transition-all text-xs ${
                       isActive
-                        ? 'bg-red-650 text-white shadow-lg shadow-red-950/20'
+                        ? 'bg-red-600 text-white shadow-lg shadow-red-950/20'
                         : 'bg-zinc-900 text-zinc-400 hover:text-white'
                     }`}
                   >
@@ -1543,9 +1543,9 @@ export default function Catalog({
               href="https://wa.me/584244576086"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full py-3 bg-red-650 hover:bg-red-650 border border-red-550/20 text-white rounded-xl font-bold text-center text-xs transition-colors"
+              className="w-full min-h-[44px] py-3 bg-red-600 hover:bg-red-500 border border-red-500/30 text-white rounded-xl font-bold text-center text-xs transition-colors flex items-center justify-center gap-2 shadow-md shadow-red-950/40"
             >
-              📞 +58 424 457 6086
+              <span>📞 +58 424 457 6086</span>
             </a>
           </div>
         </div>
@@ -1597,32 +1597,32 @@ export default function Catalog({
                   {slide.description}
                 </p>
 
-                {/* Botones de acción del slide */}
+                {/* Botones de acción del slide (Touch targets >= 44px) */}
                 <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
                   {slide.isPdfAction ? (
                     <button
                       onClick={handleGenerateCatalogPDF}
                       disabled={pdfLoading}
-                      className="px-6 py-3 rounded-xl bg-red-600 hover:bg-red-550 active:bg-red-750 text-white text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-300 shadow-xl shadow-red-950/50 flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                      className="min-h-[44px] px-6 py-3 rounded-xl bg-red-600 hover:bg-red-500 active:bg-red-700 text-white text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-300 shadow-xl shadow-red-950/50 flex items-center gap-2 cursor-pointer disabled:opacity-50 active:scale-95"
                     >
                       {pdfLoading ? (
                         <>
                           <span className="w-2 h-2 rounded-full bg-white animate-ping"></span>
-                          Generando PDF...
+                          <span>Generando PDF...</span>
                         </>
                       ) : (
                         <>
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                           </svg>
-                          {slide.ctaText}
+                          <span>{slide.ctaText}</span>
                         </>
                       )}
                     </button>
                   ) : (
                     <a
                       href={slide.ctaLink}
-                      className="px-6 py-3 rounded-xl bg-red-600 hover:bg-red-550 active:bg-red-750 text-white text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-300 shadow-xl shadow-red-950/50 flex items-center gap-2"
+                      className="min-h-[44px] px-6 py-3 rounded-xl bg-red-600 hover:bg-red-500 active:bg-red-700 text-white text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-300 shadow-xl shadow-red-950/50 flex items-center gap-2 active:scale-95"
                     >
                       <span>{slide.ctaText}</span>
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1635,7 +1635,7 @@ export default function Catalog({
                     href={slide.secondaryLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-6 py-3 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-300 flex items-center gap-2"
+                    className="min-h-[44px] px-6 py-3 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-300 flex items-center gap-2 active:scale-95"
                   >
                     <span>{slide.secondaryText}</span>
                     <svg className="w-4 h-4 fill-current text-red-500" viewBox="0 0 24 24">
@@ -1648,10 +1648,10 @@ export default function Catalog({
           })}
         </div>
 
-        {/* Flechas de navegación del Slider */}
+        {/* Flechas de navegación del Slider (>= 44px) */}
         <button
           onClick={() => setCurrentHeroSlide((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length)}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-zinc-900/80 hover:bg-red-650 border border-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center transition-all cursor-pointer shadow-lg hidden sm:flex"
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-zinc-900/80 hover:bg-red-600 border border-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center transition-all cursor-pointer shadow-lg hidden sm:flex active:scale-95"
           aria-label="Slide anterior"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1660,7 +1660,7 @@ export default function Catalog({
         </button>
         <button
           onClick={() => setCurrentHeroSlide((prev) => (prev + 1) % HERO_SLIDES.length)}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-zinc-900/80 hover:bg-red-650 border border-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center transition-all cursor-pointer shadow-lg hidden sm:flex"
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-zinc-900/80 hover:bg-red-600 border border-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center transition-all cursor-pointer shadow-lg hidden sm:flex active:scale-95"
           aria-label="Siguiente slide"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1668,17 +1668,19 @@ export default function Catalog({
           </svg>
         </button>
 
-        {/* Dots / Puntos de Navegación del Hero */}
-        <div className="relative z-10 flex items-center gap-2 mt-4 pb-8">
+        {/* Dots / Puntos de Navegación del Hero (Touch Target optimizado) */}
+        <div className="relative z-10 flex items-center gap-3 mt-4 pb-8">
           {HERO_SLIDES.map((_, dotIdx) => (
             <button
               key={dotIdx}
               onClick={() => setCurrentHeroSlide(dotIdx)}
-              className={`h-2 rounded-full transition-all duration-500 cursor-pointer ${
-                dotIdx === currentHeroSlide ? 'w-8 bg-red-600' : 'w-2 bg-zinc-800 hover:bg-zinc-600'
-              }`}
+              className="p-2 cursor-pointer flex items-center justify-center"
               aria-label={`Ir a la diapositiva ${dotIdx + 1}`}
-            />
+            >
+              <span className={`h-2 rounded-full transition-all duration-500 block ${
+                dotIdx === currentHeroSlide ? 'w-8 bg-red-600 shadow-md shadow-red-600/50' : 'w-2.5 bg-zinc-800 hover:bg-zinc-600'
+              }`} />
+            </button>
           ))}
         </div>
       </header>
@@ -1711,7 +1713,7 @@ export default function Catalog({
                 href="https://wa.me/584244576086?text=¡Hola!%20Quisiera%20consultar%20por%20las%20super%20ofertas%20destacadas%20de%20la%20tienda"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="self-start sm:self-auto flex items-center gap-2 px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 active:bg-red-700 text-white text-xs font-extrabold transition-all uppercase tracking-wider shadow-lg shadow-red-950/60"
+                className="self-start sm:self-auto min-h-[44px] flex items-center gap-2 px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 active:bg-red-700 text-white text-xs font-extrabold transition-all uppercase tracking-wider shadow-lg shadow-red-950/60 active:scale-95"
               >
                 <span>Consultar en WhatsApp</span>
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1786,7 +1788,7 @@ export default function Catalog({
                             e.stopPropagation();
                             trackEventAction('whatsapp_click', offerProd._id).catch(err => console.error("Error tracking click:", err));
                           }}
-                          className="px-4 py-2.5 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-xl font-extrabold text-xs flex items-center gap-2 transition-all shadow-lg shadow-red-950/60 hover:shadow-red-600/30 active:scale-95 cursor-pointer uppercase tracking-wider"
+                          className="min-h-[44px] px-4 py-2.5 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-xl font-extrabold text-xs flex items-center gap-2 transition-all shadow-lg shadow-red-950/60 hover:shadow-red-600/30 active:scale-95 cursor-pointer uppercase tracking-wider"
                         >
                           <span>Pedir</span>
                           <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
@@ -1924,15 +1926,15 @@ export default function Catalog({
                     setSelectedCategory('todos');
                     setSelectedSubcategory('todos');
                   }}
-                  className={`flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer snap-start ${
+                  className={`flex-shrink-0 min-h-[44px] flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer snap-start active:scale-95 ${
                     selectedCategory === 'todos'
-                      ? 'bg-red-600 text-white shadow-lg shadow-red-950/50 scale-[1.02]'
-                      : 'bg-zinc-900/90 text-zinc-400 border border-zinc-800 hover:text-white hover:bg-zinc-850'
+                      ? 'bg-red-600 text-white shadow-lg shadow-red-950/60 scale-[1.02]'
+                      : 'bg-zinc-900/90 text-zinc-400 border border-zinc-800 hover:text-white hover:bg-zinc-800'
                   }`}
                 >
                   <span>Todos</span>
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full ${
-                    selectedCategory === 'todos' ? 'bg-red-800/90 text-white' : 'bg-zinc-800 text-zinc-500'
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono ${
+                    selectedCategory === 'todos' ? 'bg-red-800/90 text-white font-bold' : 'bg-zinc-800 text-zinc-400'
                   }`}>
                     {categoryCounts.todos}
                   </span>
@@ -1948,15 +1950,15 @@ export default function Catalog({
                         setSelectedCategory(cat._id);
                         setSelectedSubcategory('todos');
                       }}
-                      className={`flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer snap-start ${
+                      className={`flex-shrink-0 min-h-[44px] flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer snap-start active:scale-95 ${
                         isActive
-                          ? 'bg-red-600 text-white shadow-lg shadow-red-950/50 scale-[1.02]'
-                          : 'bg-zinc-900/90 text-zinc-400 border border-zinc-800 hover:text-white hover:bg-zinc-850'
+                          ? 'bg-red-600 text-white shadow-lg shadow-red-950/60 scale-[1.02]'
+                          : 'bg-zinc-900/90 text-zinc-400 border border-zinc-800 hover:text-white hover:bg-zinc-800'
                       }`}
                     >
                       <span>{cat.name}</span>
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full ${
-                        isActive ? 'bg-red-800/90 text-white' : 'bg-zinc-800 text-zinc-500'
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono ${
+                        isActive ? 'bg-red-800/90 text-white font-bold' : 'bg-zinc-800 text-zinc-400'
                       }`}>
                         {count}
                       </span>
@@ -1990,7 +1992,7 @@ export default function Catalog({
                     onClick={() => setSelectedSubcategory('todos')}
                     className={`flex-shrink-0 text-xs px-3.5 py-2 rounded-xl font-bold transition-all duration-300 cursor-pointer ${
                       selectedSubcategory === 'todos'
-                        ? 'bg-red-650 text-white shadow-md shadow-red-950/20'
+                        ? 'bg-red-600 text-white shadow-md shadow-red-950/20'
                         : 'bg-zinc-900/60 hover:bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-850'
                     }`}
                   >
@@ -2004,7 +2006,7 @@ export default function Catalog({
                       onClick={() => setSelectedSubcategory(subcat)}
                       className={`flex-shrink-0 text-xs px-3.5 py-2 rounded-xl font-bold transition-all duration-300 cursor-pointer ${
                         selectedSubcategory === subcat
-                          ? 'bg-red-650 text-white shadow-md shadow-red-950/20'
+                          ? 'bg-red-600 text-white shadow-md shadow-red-950/20'
                           : 'bg-zinc-900/60 hover:bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-850'
                       }`}
                     >
