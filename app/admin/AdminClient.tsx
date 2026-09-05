@@ -736,20 +736,20 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
   // VISTA 1: LOGIN CARD
   if (!isAuthorized) {
     return (
-      <div className="min-h-screen bg-[#121216] bg-brand-lines flex flex-col items-center justify-center p-4 selection:bg-red-600 selection:text-white relative">
+      <div className="min-h-screen bg-gradient-to-b from-[#09090b] via-[#18181b]/5 via-white to-zinc-100 bg-brand-lines flex flex-col items-center justify-center p-4 selection:bg-red-600 selection:text-white relative">
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-red-600/10 rounded-full blur-[100px] pointer-events-none"></div>
 
-        <div className="w-full max-w-md p-8 rounded-3xl bg-zinc-900/90 border border-zinc-800 shadow-2xl shadow-black/60 backdrop-blur-md relative z-10 text-center">
+        <div className="w-full max-w-md p-8 rounded-3xl bg-white border border-zinc-200 shadow-2xl shadow-zinc-300/60 relative z-10 text-center">
           <div className="flex flex-col items-center mb-6">
             <svg className="w-14 h-14 mb-2 drop-shadow-[0_0_8px_rgba(255,45,45,0.4)]" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M50 85C42 77 15 54 15 37C15 17 31 5 50 5C69 5 85 17 85 37C85 54 58 77 50 85Z" stroke="#FF2D2D" strokeWidth="6"/>
               <path d="M38 48V62H62V48M32 48L50 32L68 48" stroke="#FF2D2D" strokeWidth="5"/>
               <rect x="46" y="52" width="8" height="10" fill="#FF2D2D" />
             </svg>
-            <h2 className="text-xl font-bold tracking-[0.25em] text-white uppercase leading-none font-sans">
+            <h2 className="text-xl font-bold tracking-[0.25em] text-zinc-950 uppercase leading-none font-sans">
               {isRecovering ? 'Recuperar Acceso' : 'Acceso Admin'}
             </h2>
-            <h3 className="text-xs tracking-wider text-red-500 font-semibold uppercase mt-1">
+            <h3 className="text-xs tracking-wider text-red-600 font-semibold uppercase mt-1">
               Tío Willy
             </h3>
           </div>
@@ -757,20 +757,20 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
           {!isRecovering ? (
             <form onSubmit={handleLogin} className="flex flex-col gap-4">
               <div className="flex flex-col gap-2 text-left">
-                <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Contraseña del Sistema</label>
+                <label className="text-xs font-bold text-zinc-600 uppercase tracking-wider">Contraseña del Sistema</label>
                 <input
                   type="password"
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-xl focus:border-red-500/85 focus:ring-1 focus:ring-red-500/30 text-white placeholder-zinc-700 focus:outline-none transition-all duration-300 font-mono text-center"
+                  className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl focus:border-red-500 focus:bg-white focus:ring-1 focus:ring-red-500/20 text-zinc-900 placeholder-zinc-400 focus:outline-none transition-all duration-300 font-mono text-center"
                   disabled={loginLoading}
                   required
                 />
               </div>
 
               {loginError && (
-                <p className="text-xs text-red-500 font-bold bg-red-950/20 border border-red-950/40 p-3 rounded-lg text-center">
+                <p className="text-xs text-red-600 font-bold bg-red-50 border border-red-200 p-3 rounded-xl text-center">
                   {loginError}
                 </p>
               )}
@@ -778,16 +778,16 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
               <button
                 type="submit"
                 disabled={loginLoading}
-                className="mt-2 py-3 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                className="mt-2 py-3 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 shadow-md shadow-red-600/30"
               >
                 {loginLoading ? 'Verificando...' : 'Ingresar al Panel'}
               </button>
 
-              <div className="mt-2 pt-4 border-t border-zinc-900 flex flex-col items-center">
+              <div className="mt-2 pt-4 border-t border-zinc-200 flex flex-col items-center">
                 <button
                   type="button"
                   onClick={handleStartRecovery}
-                  className="text-xs text-zinc-500 hover:text-red-400 transition-colors font-medium cursor-pointer"
+                  className="text-xs text-zinc-500 hover:text-red-600 transition-colors font-medium cursor-pointer"
                 >
                   ¿Olvidaste tu contraseña?
                 </button>
@@ -801,56 +801,56 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                 </div>
               ) : (
                 <>
-                  <div className="p-3.5 bg-red-950/20 border border-red-500/30 rounded-2xl">
-                    <span className="text-[10px] text-red-400 font-bold uppercase tracking-wider block">
+                  <div className="p-3.5 bg-red-50 border border-red-200 rounded-2xl">
+                    <span className="text-[10px] text-red-600 font-bold uppercase tracking-wider block">
                       Pregunta de Seguridad
                     </span>
-                    <p className="text-white text-xs font-semibold mt-1 leading-snug">
+                    <p className="text-zinc-900 text-xs font-semibold mt-1 leading-snug">
                       {recoveryQuestion}
                     </p>
                   </div>
 
                   <div className="flex flex-col gap-1">
-                    <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Tu Respuesta</label>
+                    <label className="text-[10px] font-bold text-zinc-600 uppercase tracking-wider">Tu Respuesta</label>
                     <input
                       type="text"
                       placeholder="Escribe tu respuesta..."
                       value={securityAnswerInput}
                       onChange={(e) => setSecurityAnswerInput(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/30 text-white placeholder-zinc-500 focus:outline-none transition-all text-xs"
+                      className="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl focus:border-red-500 focus:bg-white text-zinc-900 placeholder-zinc-400 focus:outline-none transition-all text-xs"
                       disabled={recoverLoading}
                       required
                     />
                   </div>
 
                   <div className="flex flex-col gap-1">
-                    <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Nueva Contraseña</label>
+                    <label className="text-[10px] font-bold text-zinc-600 uppercase tracking-wider">Nueva Contraseña</label>
                     <input
                       type="password"
                       placeholder="Mínimo 4 caracteres"
                       value={newPasswordInput}
                       onChange={(e) => setNewPasswordInput(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/30 text-white placeholder-zinc-500 focus:outline-none transition-all text-xs"
+                      className="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl focus:border-red-500 focus:bg-white text-zinc-900 placeholder-zinc-400 focus:outline-none transition-all text-xs"
                       disabled={recoverLoading}
                       required
                     />
                   </div>
 
                   <div className="flex flex-col gap-1">
-                    <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Confirmar Nueva Contraseña</label>
+                    <label className="text-[10px] font-bold text-zinc-600 uppercase tracking-wider">Confirmar Nueva Contraseña</label>
                     <input
                       type="password"
                       placeholder="Repite la contraseña"
                       value={confirmPasswordInput}
                       onChange={(e) => setConfirmPasswordInput(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl focus:border-red-500/80 focus:ring-1 focus:ring-red-500/30 text-white placeholder-zinc-500 focus:outline-none transition-all text-xs"
+                      className="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl focus:border-red-500 focus:bg-white text-zinc-900 placeholder-zinc-400 focus:outline-none transition-all text-xs"
                       disabled={recoverLoading}
                       required
                     />
                   </div>
 
                   {recoverError && (
-                    <p className="text-xs text-red-500 font-bold bg-red-950/20 border border-red-950/40 p-3 rounded-lg text-center">
+                    <p className="text-xs text-red-600 font-bold bg-red-50 border border-red-200 p-3 rounded-xl text-center">
                       {recoverError}
                     </p>
                   )}
@@ -858,7 +858,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                   <button
                     type="submit"
                     disabled={recoverLoading}
-                    className="mt-1 py-3 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 text-xs uppercase tracking-wider"
+                    className="mt-1 py-3 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 text-xs uppercase tracking-wider shadow-md shadow-red-600/30"
                   >
                     {recoverLoading ? 'Restableciendo...' : 'Restablecer y Entrar'}
                   </button>
@@ -870,7 +870,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                         setIsRecovering(false);
                         setRecoverError('');
                       }}
-                      className="text-xs text-zinc-500 hover:text-white transition-colors cursor-pointer"
+                      className="text-xs text-zinc-500 hover:text-zinc-900 transition-colors cursor-pointer"
                     >
                       ← Volver a Iniciar Sesión
                     </button>
@@ -908,25 +908,25 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
 
   // VISTA 2: PANEL DE CONTROL
   return (
-    <div className="min-h-screen bg-[#121216] bg-brand-lines text-white font-sans selection:bg-red-600 selection:text-white">
-      {/* Navbar de control */}
-      <nav className="w-full py-4 border-b border-zinc-800 bg-zinc-900/90 sticky top-0 z-50 backdrop-blur-xl shadow-md shadow-black/20">
+    <div className="min-h-screen bg-gradient-to-b from-[#09090b] via-[#18181b]/5 via-white to-zinc-100 bg-brand-lines text-zinc-900 font-sans selection:bg-red-600 selection:text-white">
+      {/* Navbar de control en cristal ahumado oscuro */}
+      <nav className="w-full py-4 border-b border-zinc-800/80 bg-zinc-950/90 sticky top-0 z-50 backdrop-blur-xl shadow-2xl text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <svg className="w-8 h-8 drop-shadow-[0_0_4px_rgba(255,45,45,0.4)]" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg className="w-8 h-8 drop-shadow-[0_0_8px_rgba(255,45,45,0.4)]" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M50 85C42 77 15 54 15 37C15 17 31 5 50 5C69 5 85 17 85 37C85 54 58 77 50 85Z" stroke="#FF2D2D" strokeWidth="6"/>
               <path d="M38 48V62H62V48M32 48L50 32L68 48" stroke="#FF2D2D" strokeWidth="5"/>
               <rect x="46" y="52" width="8" height="10" fill="#FF2D2D" />
             </svg>
             <div>
-              <span className="font-black tracking-widest text-sm leading-none block">PANEL ADMIN</span>
+              <span className="font-black tracking-widest text-sm leading-none block text-white font-sans">PANEL ADMIN</span>
               <span className="text-[10px] text-red-500 uppercase tracking-widest font-bold leading-none">Tío Willy</span>
             </div>
           </div>
           
           <button
             onClick={() => handleLogout(false)}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white font-bold text-xs transition-all duration-200 border border-zinc-800 active:scale-95 cursor-pointer"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white font-bold text-xs transition-all duration-200 border border-zinc-800 active:scale-95 cursor-pointer shadow-sm"
           >
             <span>Cerrar Sesión</span>
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -940,67 +940,67 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col gap-8">
         
         {/* Panel de Métricas de Tráfico */}
-        <section className="bg-zinc-900/90 border border-zinc-800 rounded-3xl p-5 sm:p-6 relative overflow-hidden backdrop-blur-md shadow-xl shadow-black/30">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/10 rounded-full blur-[80px] pointer-events-none"></div>
+        <section className="bg-white border border-zinc-200 rounded-3xl p-5 sm:p-6 relative overflow-hidden backdrop-blur-md shadow-lg shadow-zinc-200/50">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/5 rounded-full blur-[80px] pointer-events-none"></div>
           
           <div className="flex flex-col gap-5">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-800/80 pb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-200 pb-4">
               <div>
-                <h2 className="text-base sm:text-lg font-bold text-white tracking-wide flex items-center gap-2">
+                <h2 className="text-base sm:text-lg font-bold text-zinc-950 tracking-wide flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
                   Métricas de Actividad Comercial
                 </h2>
-                <p className="text-xs text-zinc-400 mt-0.5">Estadísticas en tiempo real de visitas e interacciones en la tienda.</p>
+                <p className="text-xs text-zinc-500 mt-0.5">Estadísticas en tiempo real de visitas e interacciones en la tienda.</p>
               </div>
-              <span className="text-[10px] bg-red-950/50 text-red-300 border border-red-500/30 rounded-full px-3 py-1 font-bold uppercase tracking-wider self-start sm:self-center shadow-sm">
+              <span className="text-[10px] bg-red-50 text-red-600 border border-red-200 rounded-full px-3 py-1 font-bold uppercase tracking-wider self-start sm:self-center shadow-sm">
                 Moneda actual: {globalCurrency}
               </span>
             </div>
 
-            {/* Fila de Tarjetas Métricas (2 columnas compactas en móvil para evitar scroll vertical excesivo) */}
+            {/* Fila de Tarjetas Métricas */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
               
               {/* Tarjeta: Visitas */}
-              <div className="p-3.5 sm:p-4 rounded-2xl bg-zinc-800/80 border border-zinc-700/80 flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-4 hover:border-zinc-500 transition-all duration-300 shadow-sm">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-zinc-700/60 border border-zinc-600/60 flex items-center justify-center text-zinc-300 flex-shrink-0">
+              <div className="p-3.5 sm:p-4 rounded-2xl bg-zinc-50 border border-zinc-200 flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-4 hover:border-zinc-300 transition-all duration-300 shadow-sm">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-zinc-200/70 border border-zinc-300/70 flex items-center justify-center text-zinc-700 flex-shrink-0">
                   <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                   </svg>
                 </div>
                 <div>
-                  <span className="text-[10px] sm:text-[11px] text-zinc-400 font-bold uppercase tracking-wider block">Visitas</span>
-                  <span className="text-xl sm:text-2xl font-black text-white font-mono leading-tight mt-0.5 block">
+                  <span className="text-[10px] sm:text-[11px] text-zinc-500 font-bold uppercase tracking-wider block">Visitas</span>
+                  <span className="text-xl sm:text-2xl font-black text-zinc-950 font-mono leading-tight mt-0.5 block">
                     {stats.visitas.toLocaleString()}
                   </span>
                 </div>
               </div>
 
               {/* Tarjeta: Clics Whatsapp */}
-              <div className="p-3.5 sm:p-4 rounded-2xl bg-zinc-800/80 border border-zinc-700/80 flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-4 hover:border-zinc-500 transition-all duration-300 shadow-sm">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-red-950/40 border border-red-500/30 flex items-center justify-center text-red-400 flex-shrink-0">
+              <div className="p-3.5 sm:p-4 rounded-2xl bg-zinc-50 border border-zinc-200 flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-4 hover:border-zinc-300 transition-all duration-300 shadow-sm">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 flex-shrink-0">
                   <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                   </svg>
                 </div>
                 <div>
-                  <span className="text-[10px] sm:text-[11px] text-zinc-400 font-bold uppercase tracking-wider block">WhatsApp</span>
-                  <span className="text-xl sm:text-2xl font-black text-white font-mono leading-tight mt-0.5 block">
+                  <span className="text-[10px] sm:text-[11px] text-zinc-500 font-bold uppercase tracking-wider block">WhatsApp</span>
+                  <span className="text-xl sm:text-2xl font-black text-zinc-950 font-mono leading-tight mt-0.5 block">
                     {stats.whatsapp.toLocaleString()}
                   </span>
                 </div>
               </div>
 
               {/* Tarjeta: Conversion */}
-              <div className="col-span-2 sm:col-span-1 p-3.5 sm:p-4 rounded-2xl bg-zinc-800/80 border border-zinc-700/80 flex items-center gap-3 sm:gap-4 hover:border-zinc-500 transition-all duration-300 shadow-sm">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-zinc-700/60 border border-zinc-600/60 flex items-center justify-center text-zinc-300 flex-shrink-0">
+              <div className="col-span-2 sm:col-span-1 p-3.5 sm:p-4 rounded-2xl bg-zinc-50 border border-zinc-200 flex items-center gap-3 sm:gap-4 hover:border-zinc-300 transition-all duration-300 shadow-sm">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-zinc-200/70 border border-zinc-300/70 flex items-center justify-center text-zinc-700 flex-shrink-0">
                   <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                   </svg>
                 </div>
                 <div>
-                  <span className="text-[10px] sm:text-[11px] text-zinc-400 font-bold uppercase tracking-wider block">Conversión</span>
-                  <span className="text-xl sm:text-2xl font-black text-red-400 font-mono leading-tight mt-0.5 block">
+                  <span className="text-[10px] sm:text-[11px] text-zinc-500 font-bold uppercase tracking-wider block">Conversión</span>
+                  <span className="text-xl sm:text-2xl font-black text-red-600 font-mono leading-tight mt-0.5 block">
                     {stats.visitas > 0 ? ((stats.whatsapp / stats.visitas) * 100).toFixed(1) : '0.0'}%
                   </span>
                 </div>
@@ -1009,9 +1009,9 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
             </div>
 
             {/* Ranking de Productos */}
-            <div className="border-t border-zinc-800/80 pt-4 flex flex-col gap-3">
-              <h3 className="text-xs font-bold text-zinc-300 uppercase tracking-widest flex items-center gap-1.5">
-                <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="border-t border-zinc-200 pt-4 flex flex-col gap-3">
+              <h3 className="text-xs font-bold text-zinc-800 uppercase tracking-widest flex items-center gap-1.5">
+                <svg className="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
                 Top 5 - Productos más Consultados (Clics en WhatsApp)
@@ -1024,21 +1024,21 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-5 gap-2.5 sm:gap-3">
                   {topProducts.map((p: Product, idx: number) => (
-                    <div key={p._id} className="p-3.5 rounded-2xl bg-zinc-800/90 border border-zinc-700/80 flex flex-col justify-between hover:border-zinc-500 hover:shadow-md transition-all duration-200">
+                    <div key={p._id} className="p-3.5 rounded-2xl bg-zinc-50 border border-zinc-200 flex flex-col justify-between hover:border-zinc-300 hover:shadow-md transition-all duration-200">
                       <div>
                         <div className="flex justify-between items-center gap-2">
-                          <span className="text-[10px] font-black uppercase font-mono px-2 py-0.5 rounded-md bg-zinc-700/80 text-zinc-200">#{idx + 1}</span>
-                          <span className="text-[10px] bg-red-950/40 text-red-300 border border-red-500/30 px-2 py-0.5 rounded-full font-bold truncate max-w-[130px]">
+                          <span className="text-[10px] font-black uppercase font-mono px-2 py-0.5 rounded-md bg-zinc-200 text-zinc-700">#{idx + 1}</span>
+                          <span className="text-[10px] bg-red-50 text-red-600 border border-red-200 px-2 py-0.5 rounded-full font-bold truncate max-w-[130px]">
                             {categories.find(c => c._id === p.category)?.name || p.category}
                           </span>
                         </div>
-                        <h4 className="text-xs sm:text-sm font-bold text-white mt-2 line-clamp-1" title={p.name}>
+                        <h4 className="text-xs sm:text-sm font-bold text-zinc-900 mt-2 line-clamp-1" title={p.name}>
                           {p.name}
                         </h4>
                       </div>
-                      <div className="flex justify-between items-center mt-3 pt-2 border-t border-zinc-700/60">
-                        <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">Interacciones:</span>
-                        <span className="text-xs font-black text-red-400 font-mono bg-red-950/30 px-2 py-0.5 rounded-md border border-red-500/20">{p.clicks || 0} clics</span>
+                      <div className="flex justify-between items-center mt-3 pt-2 border-t border-zinc-200">
+                        <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Interacciones:</span>
+                        <span className="text-xs font-black text-red-600 font-mono bg-red-50 px-2 py-0.5 rounded-md border border-red-200">{p.clicks || 0} clics</span>
                       </div>
                     </div>
                   ))}
@@ -1055,12 +1055,12 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
           <div className="lg:col-span-5 flex flex-col gap-8">
             
             {/* 1. Nuevo Producto Form Card */}
-            <div className="p-5 sm:p-6 rounded-3xl bg-zinc-900/90 border border-zinc-800 shadow-xl shadow-black/30 flex flex-col gap-6 backdrop-blur-md">
+            <div className="p-5 sm:p-6 rounded-3xl bg-white border border-zinc-200/90 shadow-xl shadow-zinc-200/50 flex flex-col gap-6">
               <div>
-                <h2 className="text-lg sm:text-xl font-bold tracking-wide text-white">
+                <h2 className="text-lg sm:text-xl font-black tracking-wide text-zinc-950">
                   {editingProductId ? 'Editar producto' : 'Nuevo producto'}
                 </h2>
-                <p className="text-zinc-400 text-xs mt-1">
+                <p className="text-zinc-500 text-xs mt-1">
                   {editingProductId 
                     ? 'Modifica los campos del producto y guarda los cambios.' 
                     : 'Sube una o varias imágenes desde tu ordenador o teléfono y completa los datos.'}
@@ -1068,13 +1068,13 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
               </div>
 
               {successMsg && (
-                <div className="p-3.5 rounded-xl bg-emerald-950/30 border border-emerald-500/40 text-emerald-300 text-xs font-semibold">
+                <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold">
                   {successMsg}
                 </div>
               )}
 
               {errorMsg && (
-                <div className="p-3.5 rounded-xl bg-red-950/30 border border-red-500/40 text-red-300 text-xs font-semibold">
+                <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold">
                   {errorMsg}
                 </div>
               )}
@@ -1083,30 +1083,30 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                 
                 {/* imágenes */}
                 <div className="flex flex-col gap-1.5">
-                  <span className="text-xs font-bold text-zinc-300 uppercase tracking-wide">Imágenes del producto</span>
+                  <span className="text-xs font-bold text-zinc-700 uppercase tracking-wide">Imágenes del producto</span>
                   <div 
                     onClick={() => {
                       if (!compressing) fileInputRef.current?.click();
                     }}
-                    className={`w-full border border-dashed rounded-2xl py-7 px-4 text-center bg-zinc-800/50 hover:bg-zinc-800 transition-all duration-300 flex flex-col items-center gap-2.5 group ${
+                    className={`w-full border border-dashed rounded-2xl py-7 px-4 text-center bg-zinc-50/80 hover:bg-zinc-100/90 transition-all duration-300 flex flex-col items-center gap-2.5 group ${
                       compressing 
                         ? 'border-red-500/40 cursor-not-allowed opacity-75' 
-                        : 'border-zinc-700 hover:border-red-500/40 cursor-pointer'
+                        : 'border-zinc-300 hover:border-red-500/50 cursor-pointer'
                     }`}
                   >
                     {compressing ? (
                       <>
                         <div className="w-6 h-6 border-2 border-red-500 border-t-transparent rounded-full animate-spin"></div>
-                        <span className="text-xs font-bold text-red-400 animate-pulse">
+                        <span className="text-xs font-bold text-red-600 animate-pulse">
                           Procesando y optimizando imágenes... Por favor espera.
                         </span>
                       </>
                     ) : (
                       <>
-                        <svg className="w-7 h-7 text-zinc-500 group-hover:text-red-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-7 h-7 text-zinc-400 group-hover:text-red-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
-                        <span className="text-xs font-bold text-zinc-300 group-hover:text-white transition-colors">
+                        <span className="text-xs font-bold text-zinc-700 group-hover:text-zinc-950 transition-colors">
                           Haz clic para seleccionar imágenes (puedes elegir varias)
                         </span>
                       </>
@@ -1127,15 +1127,15 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                     <div className="mt-2.5 flex flex-wrap gap-2.5">
                       {/* Imágenes Activas Existentes */}
                       {existingImages.map((url, idx) => (
-                        <div key={`existing-${idx}`} className="relative w-14 h-14 rounded-xl border border-zinc-900 bg-zinc-900 group/thumb">
-                          <img src={url} alt="existing" className="w-full h-full object-cover rounded-xl opacity-80" />
-                          <span className="absolute bottom-0 right-0 bg-red-950/90 text-red-500 font-mono font-bold text-[8px] px-1 rounded-tl-lg uppercase">
+                        <div key={`existing-${idx}`} className="relative w-14 h-14 rounded-xl border border-zinc-200 bg-zinc-100 shadow-sm group/thumb">
+                          <img src={url} alt="existing" className="w-full h-full object-cover rounded-xl" />
+                          <span className="absolute bottom-0 right-0 bg-red-600 text-white font-mono font-bold text-[8px] px-1 rounded-tl-lg uppercase">
                             Activa
                           </span>
                           <button
                             type="button"
                             onClick={() => handleRemoveExistingImage(idx)}
-                            className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-red-600 hover:bg-red-500 text-white flex items-center justify-center transition-all duration-200 cursor-pointer shadow-md focus:outline-none"
+                            className="absolute -top-1.5 -right-1.5 w-4.5 h-4.5 rounded-full bg-red-600 hover:bg-red-500 text-white flex items-center justify-center transition-all duration-200 cursor-pointer shadow-md focus:outline-none"
                             title="Quitar imagen actual"
                           >
                             <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1147,15 +1147,15 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
 
                       {/* Imágenes Nuevas (Previsualización local) */}
                       {previewUrls.map((url, idx) => (
-                        <div key={`new-${idx}`} className="relative w-14 h-14 rounded-xl border border-zinc-900 bg-zinc-900 group/thumb">
+                        <div key={`new-${idx}`} className="relative w-14 h-14 rounded-xl border border-zinc-200 bg-zinc-100 shadow-sm group/thumb">
                           <img src={url} alt="mini" className="w-full h-full object-cover rounded-xl" />
-                          <span className="absolute bottom-0 right-0 bg-zinc-950/80 text-zinc-500 font-mono font-bold text-[8px] px-1 rounded-tl-lg uppercase">
+                          <span className="absolute bottom-0 right-0 bg-zinc-800 text-white font-mono font-bold text-[8px] px-1 rounded-tl-lg uppercase">
                             Nueva
                           </span>
                           <button
                             type="button"
                             onClick={() => handleRemoveFile(idx)}
-                            className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-red-600 hover:bg-red-500 text-white flex items-center justify-center transition-all duration-200 cursor-pointer shadow-md focus:outline-none"
+                            className="absolute -top-1.5 -right-1.5 w-4.5 h-4.5 rounded-full bg-red-600 hover:bg-red-500 text-white flex items-center justify-center transition-all duration-200 cursor-pointer shadow-md focus:outline-none"
                             title="Quitar imagen nueva"
                           >
                             <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1170,13 +1170,13 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
 
                 {/* Nombre */}
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-zinc-300 uppercase tracking-wide">Nombre del Producto</label>
+                  <label className="text-xs font-bold text-zinc-700 uppercase tracking-wide">Nombre del Producto</label>
                   <input
                     type="text"
                     placeholder="Ej: Bicicleta rin 20"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full min-h-[44px] px-3.5 py-2.5 bg-zinc-800/90 border border-zinc-700 hover:border-zinc-600 rounded-xl focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-white placeholder-zinc-400 focus:outline-none transition-all text-sm font-medium"
+                    className="w-full min-h-[44px] px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 hover:border-zinc-300 rounded-xl focus:bg-white focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-zinc-900 placeholder-zinc-400 focus:outline-none transition-all text-sm font-medium shadow-xs"
                     required
                   />
                 </div>
@@ -1184,40 +1184,40 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                 {/* Precios Detal/Mayor */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-zinc-300 uppercase tracking-wide">Precio al detal ({globalCurrency})</label>
+                    <label className="text-xs font-bold text-zinc-700 uppercase tracking-wide">Precio al detal ({globalCurrency})</label>
                     <input
                       type="number"
                       step="0.01"
                       placeholder="150.00"
                       value={priceDetal}
                       onChange={(e) => setPriceDetal(e.target.value)}
-                      className="w-full min-h-[44px] px-3.5 py-2.5 bg-zinc-800/90 border border-zinc-700 hover:border-zinc-600 rounded-xl focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-white placeholder-zinc-400 focus:outline-none transition-all text-sm font-mono font-semibold"
+                      className="w-full min-h-[44px] px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 hover:border-zinc-300 rounded-xl focus:bg-white focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-zinc-900 placeholder-zinc-400 focus:outline-none transition-all text-sm font-mono font-semibold shadow-xs"
                       required
                     />
                   </div>
 
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-zinc-300 uppercase tracking-wide">Precio al mayor ({globalCurrency})</label>
+                    <label className="text-xs font-bold text-zinc-700 uppercase tracking-wide">Precio al mayor ({globalCurrency})</label>
                     <input
                       type="number"
                       step="0.01"
                       placeholder="120.00"
                       value={priceMayor}
                       onChange={(e) => setPriceMayor(e.target.value)}
-                      className="w-full min-h-[44px] px-3.5 py-2.5 bg-zinc-800/90 border border-zinc-700 hover:border-zinc-600 rounded-xl focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-white placeholder-zinc-400 focus:outline-none transition-all text-sm font-mono font-semibold"
+                      className="w-full min-h-[44px] px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 hover:border-zinc-300 rounded-xl focus:bg-white focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-zinc-900 placeholder-zinc-400 focus:outline-none transition-all text-sm font-mono font-semibold shadow-xs"
                       required
                     />
                   </div>
                 </div>
 
                 {/* Sección de Ofertas y Descuentos */}
-                <div className="p-4 rounded-2xl bg-zinc-800/70 border border-zinc-700 flex flex-col gap-3">
+                <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200 flex flex-col gap-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className="text-base">🔥</span>
                       <div>
-                        <span className="text-xs font-bold text-white uppercase tracking-wider block">Destacar en Ofertas</span>
-                        <span className="text-[11px] text-zinc-400">Muestra el producto en la franja superior de rebajas</span>
+                        <span className="text-xs font-bold text-zinc-900 uppercase tracking-wider block">Destacar en Ofertas</span>
+                        <span className="text-[11px] text-zinc-500">Muestra el producto en la franja superior de rebajas</span>
                       </div>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
@@ -1227,16 +1227,16 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                         onChange={(e) => setIsOffer(e.target.checked)}
                         className="sr-only peer"
                       />
-                      <div className="w-11 h-6 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+                      <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
                     </label>
                   </div>
 
                   {isOffer && (
-                    <div className="flex flex-col gap-1.5 pt-3 border-t border-zinc-700/80">
+                    <div className="flex flex-col gap-1.5 pt-3 border-t border-zinc-200">
                       <div className="flex justify-between items-center">
-                        <label className="text-xs font-bold text-red-400 uppercase tracking-wide">Precio Promocional de Oferta ({globalCurrency})</label>
+                        <label className="text-xs font-bold text-red-600 uppercase tracking-wide">Precio Promocional de Oferta ({globalCurrency})</label>
                         {priceDetal && offerPrice && parseFloat(offerPrice) < parseFloat(priceDetal) && (
-                          <span className="text-[10px] bg-red-950/80 text-red-300 border border-red-500/40 px-2 py-0.5 rounded-full font-bold">
+                          <span className="text-[10px] bg-red-100 text-red-700 border border-red-300 px-2 py-0.5 rounded-full font-bold">
                             -{Math.round(((parseFloat(priceDetal) - parseFloat(offerPrice)) / parseFloat(priceDetal)) * 100)}% Dcto
                           </span>
                         )}
@@ -1247,36 +1247,36 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                         placeholder="Ej: 119.99"
                         value={offerPrice}
                         onChange={(e) => setOfferPrice(e.target.value)}
-                        className="w-full min-h-[44px] px-3.5 py-2.5 bg-zinc-900 border border-red-500/80 rounded-xl focus:border-red-500 focus:ring-1 focus:ring-red-500/40 text-white placeholder-zinc-500 focus:outline-none transition-all text-sm font-mono font-bold"
+                        className="w-full min-h-[44px] px-3.5 py-2.5 bg-white border border-red-400 rounded-xl focus:border-red-500 focus:ring-1 focus:ring-red-500/40 text-zinc-950 placeholder-zinc-400 focus:outline-none transition-all text-sm font-mono font-bold shadow-xs"
                         required={isOffer}
                       />
-                      <span className="text-[11px] text-zinc-400">Este valor se mostrará como el precio activo y el precio anterior ({globalCurrency} {priceDetal || '0.00'}) aparecerá tachado.</span>
+                      <span className="text-[11px] text-zinc-500">Este valor se mostrará como el precio activo y el precio anterior ({globalCurrency} {priceDetal || '0.00'}) aparecerá tachado.</span>
                     </div>
                   )}
                 </div>
 
-                {/* Mínimo unidades mayorista y descripción oculta/automatizada */}
+                {/* Mínimo unidades mayorista y variedades */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-zinc-300 uppercase tracking-wide">Mínimo al mayor (Uds)</label>
+                    <label className="text-xs font-bold text-zinc-700 uppercase tracking-wide">Mínimo al mayor (Uds)</label>
                     <input
                       type="number"
                       placeholder="3"
                       value={minMayor}
                       onChange={(e) => setMinMayor(e.target.value)}
-                      className="w-full min-h-[44px] px-3.5 py-2.5 bg-zinc-800/90 border border-zinc-700 hover:border-zinc-600 rounded-xl focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-white placeholder-zinc-400 focus:outline-none transition-all text-sm font-mono font-semibold"
+                      className="w-full min-h-[44px] px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 hover:border-zinc-300 rounded-xl focus:bg-white focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-zinc-900 placeholder-zinc-400 focus:outline-none transition-all text-sm font-mono font-semibold shadow-xs"
                       required
                     />
                   </div>
 
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-zinc-300 uppercase tracking-wide">Variedades (Separadas por comas)</label>
+                    <label className="text-xs font-bold text-zinc-700 uppercase tracking-wide">Variedades (Separadas por comas)</label>
                     <input
                       type="text"
                       placeholder="Ej: Rojo, Azul, Negro"
                       value={varieties}
                       onChange={(e) => setVarieties(e.target.value)}
-                      className="w-full min-h-[44px] px-3.5 py-2.5 bg-zinc-800/90 border border-zinc-700 hover:border-zinc-600 rounded-xl focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-white placeholder-zinc-400 focus:outline-none transition-all text-sm font-medium"
+                      className="w-full min-h-[44px] px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 hover:border-zinc-300 rounded-xl focus:bg-white focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-zinc-900 placeholder-zinc-400 focus:outline-none transition-all text-sm font-medium shadow-xs"
                       required
                     />
                   </div>
@@ -1284,16 +1284,16 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
 
                 {/* Categoría */}
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-zinc-300 uppercase tracking-wide">Categoría</label>
+                  <label className="text-xs font-bold text-zinc-700 uppercase tracking-wide">Categoría</label>
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    className="w-full min-h-[44px] px-3.5 py-2.5 bg-zinc-800/90 border border-zinc-700 hover:border-zinc-600 rounded-xl focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-white focus:outline-none transition-all text-sm font-medium cursor-pointer"
+                    className="w-full min-h-[44px] px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 hover:border-zinc-300 rounded-xl focus:bg-white focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-zinc-900 focus:outline-none transition-all text-sm font-medium cursor-pointer shadow-xs"
                     required
                   >
-                    <option value="" disabled className="bg-zinc-900 text-zinc-400">Selecciona una categoría</option>
+                    <option value="" disabled className="bg-white text-zinc-400">Selecciona una categoría</option>
                     {categories.map((cat) => (
-                      <option key={cat._id} value={cat._id} className="bg-zinc-900 text-white">
+                      <option key={cat._id} value={cat._id} className="bg-white text-zinc-900">
                         {cat.name}
                       </option>
                     ))}
@@ -1303,33 +1303,33 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                 {/* Subcategoría Manual */}
                 <div className="flex flex-col gap-1.5">
                   <div className="flex justify-between items-baseline">
-                    <label className="text-xs font-bold text-zinc-300 uppercase tracking-wide">Subcategoría (Opcional)</label>
-                    <span className="text-[11px] text-zinc-400 italic">Ej: Rin 12, Rin 16, Audio</span>
+                    <label className="text-xs font-bold text-zinc-700 uppercase tracking-wide">Subcategoría (Opcional)</label>
+                    <span className="text-[11px] text-zinc-500 italic">Ej: Rin 12, Rin 16, Audio</span>
                   </div>
                   <input
                     type="text"
                     placeholder="Dejar en blanco para autodetectar"
                     value={subcategory}
                     onChange={(e) => setSubcategory(e.target.value)}
-                    className="w-full min-h-[44px] px-3.5 py-2.5 bg-zinc-800/90 border border-zinc-700 hover:border-zinc-600 rounded-xl focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-white placeholder-zinc-400 focus:outline-none transition-all text-sm font-medium"
+                    className="w-full min-h-[44px] px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 hover:border-zinc-300 rounded-xl focus:bg-white focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-zinc-900 placeholder-zinc-400 focus:outline-none transition-all text-sm font-medium shadow-xs"
                   />
                 </div>
 
-                {/* Descripción (Rellenado básico o amplio) */}
+                {/* Descripción */}
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-zinc-300 uppercase tracking-wide">Descripción</label>
+                  <label className="text-xs font-bold text-zinc-700 uppercase tracking-wide">Descripción</label>
                   <textarea
                     placeholder="Escribe los detalles clave del producto..."
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     rows={3}
-                    className="w-full px-3.5 py-2.5 bg-zinc-800/90 border border-zinc-700 hover:border-zinc-600 rounded-xl focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-white placeholder-zinc-400 focus:outline-none transition-all text-sm resize-none"
+                    className="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 hover:border-zinc-300 rounded-xl focus:bg-white focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-zinc-900 placeholder-zinc-400 focus:outline-none transition-all text-sm resize-none shadow-xs font-normal"
                     required
                   />
                   <button
                     type="submit"
                     disabled={submitLoading || compressing}
-                    className="w-full min-h-[48px] py-3.5 px-4 bg-red-600 hover:bg-red-500 active:bg-red-700 active:scale-[0.98] text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-sm shadow-lg shadow-red-950/50 mt-1"
+                    className="w-full min-h-[48px] py-3.5 px-4 bg-red-600 hover:bg-red-500 active:bg-red-700 active:scale-[0.98] text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-sm shadow-lg shadow-red-500/25 mt-1"
                   >
                     {submitLoading ? (
                       editingProductId ? 'Actualizando...' : 'Agregando...'
@@ -1359,7 +1359,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                       type="button"
                       onClick={handleCancelEdit}
                       disabled={submitLoading || compressing}
-                      className="w-full min-h-[44px] py-2.5 px-4 bg-zinc-800 hover:bg-zinc-750 active:scale-[0.98] border border-zinc-700 text-zinc-200 hover:text-white rounded-xl font-bold transition-all cursor-pointer text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full min-h-[44px] py-2.5 px-4 bg-zinc-100 hover:bg-zinc-200 active:scale-[0.98] border border-zinc-200 text-zinc-700 hover:text-zinc-950 rounded-xl font-bold transition-all cursor-pointer text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Cancelar edición
                     </button>
@@ -1369,10 +1369,10 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
             </div>
 
             {/* 2. Categorías Management Card */}
-            <div className="p-6 rounded-3xl bg-zinc-900/90 border border-zinc-800 backdrop-blur-md shadow-xl flex flex-col gap-5">
+            <div className="p-6 rounded-3xl bg-white border border-zinc-200/90 shadow-xl shadow-zinc-200/50 flex flex-col gap-5">
               <div>
-                <h2 className="text-lg font-bold tracking-wide text-white">Categorías</h2>
-                <p className="text-zinc-400 text-xs mt-1">Crea y administra las categorías del catálogo.</p>
+                <h2 className="text-lg font-black tracking-wide text-zinc-950">Categorías</h2>
+                <p className="text-zinc-500 text-xs mt-1">Crea y administra las categorías del catálogo.</p>
               </div>
 
               <form onSubmit={handleCreateCategory} className="flex gap-2">
@@ -1381,18 +1381,17 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                   placeholder="Ej. Electrodomésticos"
                   value={categoryInput}
                   onChange={(e) => setCategoryInput(e.target.value)}
-                  className="flex-1 min-h-[44px] px-3.5 py-2.5 bg-zinc-800/90 border border-zinc-700 hover:border-zinc-600 rounded-xl focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-white placeholder-zinc-400 focus:outline-none transition-all text-sm font-medium"
+                  className="flex-1 min-h-[44px] px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 hover:border-zinc-300 rounded-xl focus:bg-white focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-zinc-900 placeholder-zinc-400 focus:outline-none transition-all text-sm font-medium shadow-xs"
                   required
                 />
                 
                 <button
                   type="submit"
                   disabled={categoryLoading}
-                  className="min-h-[44px] px-4 py-2.5 bg-red-600 hover:bg-red-500 active:bg-red-700 active:scale-95 text-white rounded-xl transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center shadow-md shadow-red-950/40"
+                  className="min-h-[44px] px-4 py-2.5 bg-red-600 hover:bg-red-500 active:bg-red-700 active:scale-95 text-white rounded-xl transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center shadow-md shadow-red-500/25"
                   aria-label="Agregar categoría"
                   title="Agregar categoría"
                 >
-                  {/* Tag icon */}
                   <svg className="w-4.5 h-4.5 fill-current" viewBox="0 0 24 24">
                     <path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58.55 0 1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41 0-.55-.23-1.06-.59-1.42zM5.5 8.25c-.97 0-1.75-.78-1.75-1.75s.78-1.75 1.75-1.75 1.75.78 1.75 1.75-.78 1.75-1.75 1.75z" />
                   </svg>
@@ -1404,16 +1403,15 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                 {categories.map((cat) => (
                   <div 
                     key={cat._id}
-                    className="flex items-center gap-1.5 pl-3.5 pr-2 py-1.5 rounded-full bg-zinc-800/90 border border-zinc-700 hover:border-zinc-600 text-zinc-200 hover:text-white text-xs font-bold transition-all"
+                    className="flex items-center gap-1.5 pl-3.5 pr-2 py-1.5 rounded-full bg-zinc-100 border border-zinc-200 text-zinc-800 hover:bg-zinc-200/80 text-xs font-bold transition-all shadow-xs"
                   >
                     <span>{cat.name}</span>
                     <button
                       type="button"
                       onClick={() => handleDeleteCategory(cat._id)}
-                      className="w-5 h-5 rounded-full bg-zinc-700 hover:bg-red-950/90 text-zinc-300 hover:text-red-400 flex items-center justify-center transition-colors focus:outline-none cursor-pointer"
+                      className="w-5 h-5 rounded-full bg-zinc-200 hover:bg-red-100 text-zinc-600 hover:text-red-600 flex items-center justify-center transition-colors focus:outline-none cursor-pointer"
                       title="Eliminar categoría"
                     >
-                      {/* Close or Trash icon */}
                       <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                       </svg>
@@ -1424,33 +1422,33 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
             </div>
 
             {/* 3. Configuración de Ubicación (Google Maps) Card */}
-            <div className="p-6 rounded-3xl bg-zinc-900/90 border border-zinc-800 backdrop-blur-md shadow-xl flex flex-col gap-5">
+            <div className="p-6 rounded-3xl bg-white border border-zinc-200/90 shadow-xl shadow-zinc-200/50 flex flex-col gap-5">
               <div>
-                <h2 className="text-lg font-bold tracking-wide text-white">Ubicación del Negocio</h2>
-                <p className="text-zinc-400 text-xs mt-1">Configura el mapa de Google Maps que se muestra en tu catálogo.</p>
+                <h2 className="text-lg font-black tracking-wide text-zinc-950">Ubicación del Negocio</h2>
+                <p className="text-zinc-500 text-xs mt-1">Configura el mapa de Google Maps que se muestra en tu catálogo.</p>
               </div>
 
               {mapSuccessMsg && (
-                <div className="p-3 rounded-xl bg-emerald-950/30 border border-emerald-500/40 text-emerald-300 text-xs font-semibold">
+                <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold">
                   {mapSuccessMsg}
                 </div>
               )}
 
               {mapErrorMsg && (
-                <div className="p-3 rounded-xl bg-red-950/30 border border-red-500/40 text-red-300 text-xs font-semibold">
+                <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold">
                   {mapErrorMsg}
                 </div>
               )}
 
               <form onSubmit={handleUpdateMapUrl} className="flex flex-col gap-3">
                 <div className="flex flex-col gap-1.5">
-                  <span className="text-xs font-bold text-zinc-300 uppercase tracking-wider">Enlace del iframe (src)</span>
+                  <span className="text-xs font-bold text-zinc-700 uppercase tracking-wider">Enlace del iframe (src)</span>
                   <input
                     type="url"
                     placeholder="https://www.google.com/maps/embed?pb=..."
                     value={mapUrlInput}
                     onChange={(e) => setMapUrlInput(e.target.value)}
-                    className="w-full min-h-[44px] px-3.5 py-2.5 bg-zinc-800/90 border border-zinc-700 hover:border-zinc-600 rounded-xl focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-white placeholder-zinc-400 focus:outline-none transition-all text-xs font-mono"
+                    className="w-full min-h-[44px] px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 hover:border-zinc-300 rounded-xl focus:bg-white focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-zinc-900 placeholder-zinc-400 focus:outline-none transition-all text-xs font-mono shadow-xs"
                     required
                   />
                 </div>
@@ -1458,7 +1456,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                 <button
                   type="submit"
                   disabled={mapLoading}
-                  className="w-full min-h-[44px] py-2.5 bg-zinc-800 hover:bg-zinc-750 active:scale-[0.98] border border-zinc-700 text-zinc-200 hover:text-white rounded-xl font-bold transition-all text-xs cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="w-full min-h-[44px] py-2.5 bg-zinc-900 hover:bg-zinc-800 active:scale-[0.98] border border-zinc-900 text-white rounded-xl font-bold transition-all text-xs cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 shadow-md shadow-zinc-900/20"
                 >
                   {mapLoading ? (
                     'Guardando...'
@@ -1476,145 +1474,145 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
             </div>
 
             {/* 4. Configuración de Moneda Global Card */}
-            <div className="p-6 rounded-3xl bg-zinc-900/90 border border-zinc-800 backdrop-blur-md shadow-xl flex flex-col gap-5">
+            <div className="p-6 rounded-3xl bg-white border border-zinc-200/90 shadow-xl shadow-zinc-200/50 flex flex-col gap-5">
               <div>
-                <h2 className="text-lg font-bold tracking-wide text-white">Moneda Global del Catálogo</h2>
-                <p className="text-zinc-400 text-xs mt-1">Configura la divisa de toda la tienda. Los cambios se guardan y aplican automáticamente.</p>
+                <h2 className="text-lg font-black tracking-wide text-zinc-950">Moneda Global del Catálogo</h2>
+                <p className="text-zinc-500 text-xs mt-1">Configura la divisa de toda la tienda. Los cambios se guardan y aplican automáticamente.</p>
               </div>
 
               {currencySuccessMsg && (
-                <div className="p-3 rounded-xl bg-emerald-950/30 border border-emerald-500/40 text-emerald-300 text-xs font-semibold">
+                <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold">
                   {currencySuccessMsg}
                 </div>
               )}
 
               {currencyErrorMsg && (
-                <div className="p-3 rounded-xl bg-red-950/30 border border-red-500/40 text-red-300 text-xs font-semibold">
+                <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold">
                   {currencyErrorMsg}
                 </div>
               )}
 
               <div className="flex flex-col gap-1.5">
-                <span className="text-xs font-bold text-zinc-300 uppercase tracking-wider">Divisa Seleccionada</span>
+                <span className="text-xs font-bold text-zinc-700 uppercase tracking-wider">Divisa Seleccionada</span>
                 <select
                   value={globalCurrency}
                   onChange={(e) => handleUpdateGlobalCurrency(e.target.value)}
                   disabled={currencyLoading}
-                  className="w-full min-h-[44px] px-3.5 py-2.5 bg-zinc-800/90 border border-zinc-700 hover:border-zinc-600 rounded-xl focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-white focus:outline-none transition-all text-xs font-semibold cursor-pointer disabled:opacity-50"
+                  className="w-full min-h-[44px] px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 hover:border-zinc-300 rounded-xl focus:bg-white focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-zinc-900 focus:outline-none transition-all text-xs font-bold cursor-pointer disabled:opacity-50 shadow-xs"
                 >
-                  <option value="USD" className="bg-zinc-900 text-white">Dólares (USD $)</option>
-                  <option value="EUR" className="bg-zinc-900 text-white">Euros (EUR €)</option>
+                  <option value="USD" className="bg-white text-zinc-900">Dólares (USD $)</option>
+                  <option value="EUR" className="bg-white text-zinc-900">Euros (EUR €)</option>
                 </select>
               </div>
             </div>
 
             {/* 5. Configuración de Seguridad y Contraseña Card */}
-            <div className="p-6 rounded-3xl bg-zinc-900/90 border border-zinc-800 backdrop-blur-md shadow-xl flex flex-col gap-5">
+            <div className="p-6 rounded-3xl bg-white border border-zinc-200/90 shadow-xl shadow-zinc-200/50 flex flex-col gap-5">
               <div>
                 <div className="flex items-center gap-2">
-                  <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                   </svg>
-                  <h2 className="text-lg font-bold tracking-wide text-white">Seguridad y Acceso</h2>
+                  <h2 className="text-lg font-black tracking-wide text-zinc-950">Seguridad y Acceso</h2>
                 </div>
-                <p className="text-zinc-400 text-xs mt-1">Cambia tu contraseña de administrador y configura tu pregunta de recuperación en caso de olvido.</p>
+                <p className="text-zinc-500 text-xs mt-1">Cambia tu contraseña de administrador y configura tu pregunta de recuperación en caso de olvido.</p>
               </div>
 
               {securitySuccessMsg && (
-                <div className="p-3 rounded-xl bg-emerald-950/30 border border-emerald-500/40 text-emerald-300 text-xs font-semibold">
+                <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold">
                   {securitySuccessMsg}
                 </div>
               )}
 
               {securityErrorMsg && (
-                <div className="p-3 rounded-xl bg-red-950/30 border border-red-500/40 text-red-300 text-xs font-semibold">
+                <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold">
                   {securityErrorMsg}
                 </div>
               )}
 
               <form onSubmit={handleUpdateSecurity} className="flex flex-col gap-4">
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-zinc-300 uppercase tracking-wider">Contraseña Actual (Requerida)</label>
+                  <label className="text-xs font-bold text-zinc-700 uppercase tracking-wider">Contraseña Actual (Requerida)</label>
                   <input
                     type="password"
                     placeholder="Escribe tu clave actual"
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
-                    className="w-full min-h-[44px] px-3.5 py-2.5 bg-zinc-800/90 border border-zinc-700 hover:border-zinc-600 rounded-xl focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-white placeholder-zinc-400 focus:outline-none transition-all text-xs font-mono"
+                    className="w-full min-h-[44px] px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 hover:border-zinc-300 rounded-xl focus:bg-white focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-zinc-900 placeholder-zinc-400 focus:outline-none transition-all text-xs font-mono shadow-xs"
                     required
                   />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-zinc-300 uppercase tracking-wider">Nueva Contraseña</label>
+                    <label className="text-xs font-bold text-zinc-700 uppercase tracking-wider">Nueva Contraseña</label>
                     <input
                       type="password"
                       placeholder="Mínimo 4 caracteres"
                       value={newAdminPassword}
                       onChange={(e) => setNewAdminPassword(e.target.value)}
-                      className="w-full min-h-[44px] px-3.5 py-2.5 bg-zinc-800/90 border border-zinc-700 hover:border-zinc-600 rounded-xl focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-white placeholder-zinc-400 focus:outline-none transition-all text-xs font-mono"
+                      className="w-full min-h-[44px] px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 hover:border-zinc-300 rounded-xl focus:bg-white focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-zinc-900 placeholder-zinc-400 focus:outline-none transition-all text-xs font-mono shadow-xs"
                     />
                   </div>
 
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-zinc-300 uppercase tracking-wider">Confirmar Contraseña</label>
+                    <label className="text-xs font-bold text-zinc-700 uppercase tracking-wider">Confirmar Contraseña</label>
                     <input
                       type="password"
                       placeholder="Repite la nueva clave"
                       value={confirmAdminPassword}
                       onChange={(e) => setConfirmAdminPassword(e.target.value)}
-                      className="w-full min-h-[44px] px-3.5 py-2.5 bg-zinc-800/90 border border-zinc-700 hover:border-zinc-600 rounded-xl focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-white placeholder-zinc-400 focus:outline-none transition-all text-xs font-mono"
+                      className="w-full min-h-[44px] px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 hover:border-zinc-300 rounded-xl focus:bg-white focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-zinc-900 placeholder-zinc-400 focus:outline-none transition-all text-xs font-mono shadow-xs"
                     />
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-zinc-800 flex flex-col gap-3">
+                <div className="pt-2 border-t border-zinc-200 flex flex-col gap-3">
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-zinc-300 uppercase tracking-wider">Pregunta de Seguridad</label>
+                    <label className="text-xs font-bold text-zinc-700 uppercase tracking-wider">Pregunta de Seguridad</label>
                     <select
                       value={selectedSecurityQuestion}
                       onChange={(e) => setSelectedSecurityQuestion(e.target.value)}
-                      className="w-full min-h-[44px] px-3.5 py-2.5 bg-zinc-800/90 border border-zinc-700 hover:border-zinc-600 rounded-xl focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-white focus:outline-none transition-all text-xs font-medium cursor-pointer"
+                      className="w-full min-h-[44px] px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 hover:border-zinc-300 rounded-xl focus:bg-white focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-zinc-900 focus:outline-none transition-all text-xs font-medium cursor-pointer shadow-xs"
                     >
-                      <option value="¿Cuál es el nombre de tu primera mascota?" className="bg-zinc-900 text-white">¿Cuál es el nombre de tu primera mascota?</option>
-                      <option value="¿En qué ciudad naciste?" className="bg-zinc-900 text-white">¿En qué ciudad naciste?</option>
-                      <option value="¿Cuál es el nombre de tu colegio o escuela primaria?" className="bg-zinc-900 text-white">¿Cuál es el nombre de tu colegio o escuela primaria?</option>
-                      <option value="¿Cuál es tu comida o color favorito?" className="bg-zinc-900 text-white">¿Cuál es tu comida o color favorito?</option>
-                      <option value="custom" className="bg-zinc-900 text-white">Pregunta Personalizada (Escribir)</option>
+                      <option value="¿Cuál es el nombre de tu primera mascota?" className="bg-white text-zinc-900">¿Cuál es el nombre de tu primera mascota?</option>
+                      <option value="¿En qué ciudad naciste?" className="bg-white text-zinc-900">¿En qué ciudad naciste?</option>
+                      <option value="¿Cuál es el nombre de tu colegio o escuela primaria?" className="bg-white text-zinc-900">¿Cuál es el nombre de tu colegio o escuela primaria?</option>
+                      <option value="¿Cuál es tu comida o color favorito?" className="bg-white text-zinc-900">¿Cuál es tu comida o color favorito?</option>
+                      <option value="custom" className="bg-white text-zinc-900">Pregunta Personalizada (Escribir)</option>
                     </select>
                   </div>
 
                   {selectedSecurityQuestion === 'custom' && (
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-xs font-bold text-zinc-300 uppercase tracking-wider">Tu Pregunta Personalizada</label>
+                      <label className="text-xs font-bold text-zinc-700 uppercase tracking-wider">Tu Pregunta Personalizada</label>
                       <input
                         type="text"
                         placeholder="Ej. ¿Cuál es el nombre de mi abuela?"
                         value={customSecurityQuestion}
                         onChange={(e) => setCustomSecurityQuestion(e.target.value)}
-                        className="w-full min-h-[44px] px-3.5 py-2.5 bg-zinc-800/90 border border-zinc-700 hover:border-zinc-600 rounded-xl focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-white placeholder-zinc-400 focus:outline-none transition-all text-xs"
+                        className="w-full min-h-[44px] px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 hover:border-zinc-300 rounded-xl focus:bg-white focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-zinc-900 placeholder-zinc-400 focus:outline-none transition-all text-xs shadow-xs"
                       />
                     </div>
                   )}
 
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-zinc-300 uppercase tracking-wider">Respuesta Secreta</label>
+                    <label className="text-xs font-bold text-zinc-700 uppercase tracking-wider">Respuesta Secreta</label>
                     <input
                       type="text"
                       placeholder="Escribe tu respuesta de seguridad"
                       value={adminSecurityAnswer}
                       onChange={(e) => setAdminSecurityAnswer(e.target.value)}
-                      className="w-full min-h-[44px] px-3.5 py-2.5 bg-zinc-800/90 border border-zinc-700 hover:border-zinc-600 rounded-xl focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-white placeholder-zinc-400 focus:outline-none transition-all text-xs"
+                      className="w-full min-h-[44px] px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 hover:border-zinc-300 rounded-xl focus:bg-white focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-zinc-900 placeholder-zinc-400 focus:outline-none transition-all text-xs shadow-xs"
                     />
-                    <span className="text-[11px] text-zinc-400">Esta respuesta te permitirá recuperar la clave en la pantalla de inicio si la olvidas.</span>
+                    <span className="text-[11px] text-zinc-500">Esta respuesta te permitirá recuperar la clave en la pantalla de inicio si la olvidas.</span>
                   </div>
                 </div>
 
                 <button
                   type="submit"
                   disabled={securityLoading}
-                  className="w-full min-h-[46px] py-2.5 bg-red-600 hover:bg-red-500 active:bg-red-700 active:scale-[0.98] text-white rounded-xl font-bold transition-all text-xs cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 mt-1 shadow-lg shadow-red-950/50"
+                  className="w-full min-h-[46px] py-2.5 bg-red-600 hover:bg-red-500 active:bg-red-700 active:scale-[0.98] text-white rounded-xl font-bold transition-all text-xs cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 mt-1 shadow-lg shadow-red-500/25"
                 >
                   {securityLoading ? (
                     'Guardando...'
@@ -1632,12 +1630,12 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
           </div>
 
           {/* COLUMNA DERECHA: Listado de Productos (7 cols) */}
-          <section className="lg:col-span-7 p-6 rounded-3xl bg-zinc-900/90 border border-zinc-800 backdrop-blur-md shadow-xl flex flex-col gap-6">
+          <section className="lg:col-span-7 p-6 rounded-3xl bg-white border border-zinc-200/90 shadow-xl shadow-zinc-200/50 flex flex-col gap-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold tracking-wide text-white">Productos ({filteredProducts.length})</h2>
+              <h2 className="text-xl font-black tracking-wide text-zinc-950">Productos ({filteredProducts.length})</h2>
               {priceSavingId && (
-                <div className="flex items-center gap-1.5 text-xs text-emerald-400 font-bold animate-pulse">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                <div className="flex items-center gap-1.5 text-xs text-emerald-600 font-bold animate-pulse">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                   Guardando cambios...
                 </div>
               )}
@@ -1658,7 +1656,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                   setAdminSearchQuery(e.target.value);
                   setAdminPage(1); // Resetear a la primera página al escribir
                 }}
-                className="w-full min-h-[44px] pl-10 pr-4 py-2.5 bg-zinc-800/90 border border-zinc-700 hover:border-zinc-600 rounded-xl focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-white placeholder-zinc-400 focus:outline-none transition-all text-sm font-medium"
+                className="w-full min-h-[44px] pl-10 pr-4 py-2.5 bg-zinc-50 border border-zinc-200 hover:border-zinc-300 rounded-xl focus:bg-white focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-zinc-900 placeholder-zinc-400 focus:outline-none transition-all text-sm font-medium shadow-xs"
               />
             </div>
 
@@ -1673,14 +1671,14 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                   return (
                     <div 
                       key={prod._id}
-                      className={`group flex flex-col sm:flex-row gap-4 items-start sm:items-center border rounded-2xl p-4 relative transition-all ${
+                      className={`group flex flex-col sm:flex-row gap-4 items-start sm:items-center border rounded-2xl p-4 relative transition-all shadow-xs ${
                         isPaused 
-                          ? 'border-amber-500/40 bg-amber-950/20 hover:border-amber-500/60' 
-                          : 'bg-zinc-800/80 border-zinc-700/80 hover:border-zinc-600 hover:bg-zinc-800 shadow-md shadow-black/20'
+                          ? 'border-amber-300 bg-amber-50/70 hover:border-amber-400' 
+                          : 'bg-white border-zinc-200 hover:border-red-500/40 hover:shadow-md'
                       }`}
                     >
                       {/* Miniatura de Imagen con Badge +N y Estado Pausado */}
-                      <div className="relative w-16 h-16 rounded-xl bg-zinc-900 overflow-hidden flex-shrink-0 border border-zinc-700">
+                      <div className="relative w-16 h-16 rounded-xl bg-zinc-100 overflow-hidden flex-shrink-0 border border-zinc-200">
                         <img 
                           src={thumbnail} 
                           alt={prod.name} 
@@ -1703,21 +1701,21 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                         <div className="flex justify-between items-start gap-4">
                           <div>
                             <div className="flex items-center gap-2">
-                              <h3 className={`font-bold text-sm tracking-wide truncate pr-2 ${isPaused ? 'text-zinc-300' : 'text-white'}`} title={prod.name}>
+                              <h3 className={`font-bold text-sm tracking-wide truncate pr-2 ${isPaused ? 'text-zinc-600' : 'text-zinc-950'}`} title={prod.name}>
                                 {prod.name}
                               </h3>
                             </div>
                             <div className="flex flex-wrap items-center gap-2 mt-0.5">
-                              <span className="text-[10px] uppercase tracking-wider text-red-400 font-bold block">
+                              <span className="text-[10px] uppercase tracking-wider text-red-600 font-bold block">
                                 {prodCategory}
                               </span>
                               {isPaused && (
-                                <span className="text-[9px] bg-amber-950/90 border border-amber-500/50 text-amber-300 font-bold px-1.5 py-0.5 rounded uppercase tracking-wider flex items-center gap-1 shadow-sm">
+                                <span className="text-[9px] bg-amber-100 border border-amber-300 text-amber-800 font-bold px-1.5 py-0.5 rounded uppercase tracking-wider flex items-center gap-1 shadow-xs">
                                   <span>⏸️ Pausado (Oculto en tienda)</span>
                                 </span>
                               )}
                               {!isPaused && prod.isOffer && prod.offerPrice && (
-                                <span className="text-[9px] bg-red-600 text-white font-black px-1.5 py-0.5 rounded font-mono uppercase tracking-wider flex items-center gap-1 shadow-sm shadow-red-950/40">
+                                <span className="text-[9px] bg-red-600 text-white font-black px-1.5 py-0.5 rounded font-mono uppercase tracking-wider flex items-center gap-1 shadow-sm shadow-red-500/25">
                                   <span>🔥 Oferta:</span>
                                   <span>{globalCurrency === 'EUR' ? '€' : '$'}{prod.offerPrice.toFixed(2)}</span>
                                 </span>
@@ -1729,24 +1727,24 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                         {/* Controles de Precio In-line */}
                         <div className="mt-3 flex flex-wrap gap-4 items-center">
                           <div className="flex items-center gap-1.5">
-                            <span className="text-[10px] text-zinc-300 uppercase font-bold">Al detal:</span>
+                            <span className="text-[10px] text-zinc-500 uppercase font-bold">Al detal:</span>
                             <input
                               type="text"
                               value={prod.priceDetal}
                               onChange={(e) => handlePriceFieldChange(prod._id, 'priceDetal', e.target.value)}
                               onBlur={() => handleSavePrices(prod)}
-                              className="w-20 min-h-[32px] px-2 py-1 bg-zinc-900 border border-zinc-700 rounded-lg text-xs text-white font-mono font-bold focus:border-red-500 focus:outline-none transition-colors text-center"
+                              className="w-20 min-h-[32px] px-2 py-1 bg-zinc-50 border border-zinc-300 hover:border-zinc-400 rounded-lg text-xs text-zinc-950 font-mono font-bold focus:bg-white focus:border-red-500 focus:outline-none transition-colors text-center shadow-xs"
                             />
                           </div>
 
                           <div className="flex items-center gap-1.5">
-                            <span className="text-[10px] text-zinc-300 uppercase font-bold">Al mayor:</span>
+                            <span className="text-[10px] text-zinc-500 uppercase font-bold">Al mayor:</span>
                             <input
                               type="text"
                               value={prod.priceMayor}
                               onChange={(e) => handlePriceFieldChange(prod._id, 'priceMayor', e.target.value)}
                               onBlur={() => handleSavePrices(prod)}
-                              className="w-20 min-h-[32px] px-2 py-1 bg-zinc-900 border border-zinc-700 rounded-lg text-xs text-white font-mono font-bold focus:border-red-500 focus:outline-none transition-colors text-center"
+                              className="w-20 min-h-[32px] px-2 py-1 bg-zinc-50 border border-zinc-300 hover:border-zinc-400 rounded-lg text-xs text-zinc-950 font-mono font-bold focus:bg-white focus:border-red-500 focus:outline-none transition-colors text-center shadow-xs"
                             />
                           </div>
 
@@ -1761,10 +1759,10 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                         {/* Botón para Pausar / Reanudar Publicación */}
                         <button
                           onClick={() => handleToggleProductStatus(prod._id, isPaused ? 'active' : 'paused')}
-                          className={`w-9 h-9 rounded-full flex items-center justify-center transition-all active:scale-95 cursor-pointer focus:outline-none border shadow-sm ${
+                          className={`w-9 h-9 rounded-full flex items-center justify-center transition-all active:scale-95 cursor-pointer focus:outline-none border shadow-xs ${
                             isPaused
-                              ? 'bg-emerald-950/70 text-emerald-300 border-emerald-500/50 hover:bg-emerald-600 hover:text-white shadow-emerald-950/50'
-                              : 'bg-zinc-800 text-amber-300 border-zinc-700 hover:bg-amber-500/20 hover:text-amber-200 hover:border-amber-500/50'
+                              ? 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-600 hover:text-white'
+                              : 'bg-zinc-100 text-amber-600 border-zinc-200 hover:bg-amber-100 hover:text-amber-800'
                           }`}
                           title={isPaused ? 'Reanudar publicación (Mostrar en tienda)' : 'Pausar publicación (Ocultar de la tienda)'}
                         >
@@ -1782,7 +1780,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                         {/* Botón para Editar Producto (Pencil) */}
                         <button
                           onClick={() => handleStartEdit(prod)}
-                          className="w-9 h-9 rounded-full bg-zinc-800 hover:bg-zinc-750 hover:text-red-400 active:scale-95 text-zinc-300 flex items-center justify-center transition-all cursor-pointer focus:outline-none border border-zinc-700 shadow-sm"
+                          className="w-9 h-9 rounded-full bg-zinc-100 hover:bg-zinc-200 hover:text-zinc-950 active:scale-95 text-zinc-600 flex items-center justify-center transition-all cursor-pointer focus:outline-none border border-zinc-200 shadow-xs"
                           title="Editar producto"
                         >
                           <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1793,7 +1791,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                         {/* Botón para Eliminar Producto (Trash Can) */}
                         <button
                           onClick={() => handleDeleteProduct(prod._id)}
-                          className="w-9 h-9 rounded-full bg-zinc-800 hover:bg-red-950/70 text-zinc-300 hover:text-red-400 active:scale-95 flex items-center justify-center transition-all cursor-pointer focus:outline-none border border-zinc-700 shadow-sm"
+                          className="w-9 h-9 rounded-full bg-zinc-100 hover:bg-red-50 text-zinc-600 hover:text-red-600 active:scale-95 flex items-center justify-center transition-all cursor-pointer focus:outline-none border border-zinc-200 shadow-xs"
                           title="Eliminar producto"
                         >
                           <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1806,23 +1804,23 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                 })}
               </div>
             ) : (
-              <div className="w-full py-16 flex flex-col items-center justify-center text-center rounded-2xl bg-zinc-900/10 border border-zinc-900 border-dashed">
-                <svg className="w-12 h-12 text-zinc-700 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-full py-16 flex flex-col items-center justify-center text-center rounded-2xl bg-zinc-50 border border-zinc-200 border-dashed">
+                <svg className="w-12 h-12 text-zinc-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 11m8 4V5M4 11v10l8 4" />
                 </svg>
-                <h3 className="text-base font-bold text-zinc-400">Sin productos</h3>
-                <p className="text-zinc-600 text-xs mt-0.5">No hay productos que coincidan con la búsqueda.</p>
+                <h3 className="text-base font-bold text-zinc-600">Sin productos</h3>
+                <p className="text-zinc-400 text-xs mt-0.5">No hay productos que coincidan con la búsqueda.</p>
               </div>
             )}
 
             {/* Controles de Paginación */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-between border-t border-zinc-800/80 pt-4 mt-2">
+              <div className="flex items-center justify-between border-t border-zinc-200 pt-4 mt-2">
                 <button
                   type="button"
                   disabled={activeAdminPage <= 1}
                   onClick={() => setAdminPage((prev) => Math.max(1, prev - 1))}
-                  className="min-h-[42px] px-4 py-2.5 bg-zinc-800 hover:bg-zinc-750 active:scale-95 border border-zinc-700 disabled:opacity-30 disabled:hover:bg-zinc-800 text-zinc-200 hover:text-white rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
+                  className="min-h-[42px] px-4 py-2.5 bg-white hover:bg-zinc-50 active:scale-95 border border-zinc-300 disabled:opacity-40 disabled:hover:bg-white text-zinc-700 hover:text-zinc-950 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
@@ -1830,7 +1828,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                   Anterior
                 </button>
                 
-                <span className="text-xs text-zinc-400 font-bold uppercase tracking-wider">
+                <span className="text-xs text-zinc-600 font-bold uppercase tracking-wider">
                   Página {activeAdminPage} de {totalPages}
                 </span>
 
@@ -1838,7 +1836,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                   type="button"
                   disabled={activeAdminPage >= totalPages}
                   onClick={() => setAdminPage((prev) => Math.min(totalPages, prev + 1))}
-                  className="min-h-[42px] px-4 py-2.5 bg-zinc-800 hover:bg-zinc-750 active:scale-95 border border-zinc-700 disabled:opacity-30 disabled:hover:bg-zinc-800 text-zinc-200 hover:text-white rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
+                  className="min-h-[42px] px-4 py-2.5 bg-white hover:bg-zinc-50 active:scale-95 border border-zinc-300 disabled:opacity-40 disabled:hover:bg-white text-zinc-700 hover:text-zinc-950 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
                 >
                   Siguiente
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1854,21 +1852,21 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
 
       {/* Modal de Confirmación de Eliminación */}
       {productToDelete && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-950/85 backdrop-blur-md animate-fadeIn">
-          <div className="w-full max-w-sm p-6 rounded-3xl bg-zinc-900 border border-zinc-750 shadow-2xl flex flex-col gap-4 animate-scaleUp">
-            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-red-950/50 border border-red-500/40 text-red-400 mx-auto shadow-sm">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-950/60 backdrop-blur-sm animate-fadeIn">
+          <div className="w-full max-w-sm p-6 rounded-3xl bg-white border border-zinc-200 shadow-2xl flex flex-col gap-4 animate-scaleUp">
+            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-red-100 border border-red-200 text-red-600 mx-auto shadow-sm">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
             </div>
             <div className="text-center">
-              <h3 className="text-base font-bold text-white">¿Está seguro de que desea borrar este producto?</h3>
-              <p className="text-xs text-zinc-400 mt-1.5">Esta acción no se puede deshacer y el producto desaparecerá del catálogo público.</p>
+              <h3 className="text-base font-bold text-zinc-950">¿Está seguro de que desea borrar este producto?</h3>
+              <p className="text-xs text-zinc-500 mt-1.5">Esta acción no se puede deshacer y el producto desaparecerá del catálogo público.</p>
             </div>
             <div className="grid grid-cols-2 gap-3 mt-2">
               <button
                 onClick={() => setProductToDelete(null)}
-                className="min-h-[44px] py-2.5 bg-zinc-800 hover:bg-zinc-750 active:scale-95 border border-zinc-700 text-zinc-200 hover:text-white rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm"
+                className="min-h-[44px] py-2.5 bg-zinc-100 hover:bg-zinc-200 active:scale-95 border border-zinc-200 text-zinc-700 hover:text-zinc-950 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-xs"
               >
                 Cancelar
               </button>
@@ -1879,7 +1877,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                     setProductToDelete(null);
                   }
                 }}
-                className="min-h-[44px] py-2.5 bg-red-600 hover:bg-red-500 active:bg-red-700 active:scale-95 text-white rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center shadow-md shadow-red-950/50"
+                className="min-h-[44px] py-2.5 bg-red-600 hover:bg-red-500 active:bg-red-700 active:scale-95 text-white rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center shadow-md shadow-red-500/25"
               >
                 Eliminar
               </button>
