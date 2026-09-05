@@ -736,10 +736,10 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
   // VISTA 1: LOGIN CARD
   if (!isAuthorized) {
     return (
-      <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center p-4 selection:bg-red-600 selection:text-white">
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-80 h-80 bg-red-600/10 rounded-full blur-[80px] pointer-events-none"></div>
+      <div className="min-h-screen bg-[#121216] bg-brand-lines flex flex-col items-center justify-center p-4 selection:bg-red-600 selection:text-white relative">
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-red-600/10 rounded-full blur-[100px] pointer-events-none"></div>
 
-        <div className="w-full max-w-md p-8 rounded-3xl bg-zinc-950/80 border border-zinc-900/60 shadow-2xl shadow-black/90 backdrop-blur-md relative z-10 text-center">
+        <div className="w-full max-w-md p-8 rounded-3xl bg-zinc-900/90 border border-zinc-800 shadow-2xl shadow-black/60 backdrop-blur-md relative z-10 text-center">
           <div className="flex flex-col items-center mb-6">
             <svg className="w-14 h-14 mb-2 drop-shadow-[0_0_8px_rgba(255,45,45,0.4)]" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M50 85C42 77 15 54 15 37C15 17 31 5 50 5C69 5 85 17 85 37C85 54 58 77 50 85Z" stroke="#FF2D2D" strokeWidth="6"/>
@@ -908,9 +908,9 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
 
   // VISTA 2: PANEL DE CONTROL
   return (
-    <div className="min-h-screen bg-zinc-950 text-white font-sans selection:bg-red-600 selection:text-white">
+    <div className="min-h-screen bg-[#121216] bg-brand-lines text-white font-sans selection:bg-red-600 selection:text-white">
       {/* Navbar de control */}
-      <nav className="w-full py-4 border-b border-zinc-900 bg-zinc-950/80 sticky top-0 z-50 backdrop-blur-md">
+      <nav className="w-full py-4 border-b border-zinc-800 bg-zinc-900/90 sticky top-0 z-50 backdrop-blur-xl shadow-md shadow-black/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <svg className="w-8 h-8 drop-shadow-[0_0_4px_rgba(255,45,45,0.4)]" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
