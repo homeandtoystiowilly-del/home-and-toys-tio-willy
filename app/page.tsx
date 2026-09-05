@@ -2,8 +2,9 @@ import { seedDatabase } from '@/lib/dbSeed';
 import Catalog from '@/components/Catalog';
 import { Metadata } from 'next';
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+// ISR (Incremental Static Regeneration): Vercel sirve la página desde Edge CDN en <100ms
+// y se revalida automáticamente en segundo plano o al editar/crear productos desde el admin.
+export const revalidate = 30;
 
 // Configuración de SEO y Metadatos para la landing page
 export const metadata: Metadata = {

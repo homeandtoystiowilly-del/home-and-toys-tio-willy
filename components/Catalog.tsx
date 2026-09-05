@@ -157,6 +157,8 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
         <img 
           src={currentImage} 
           alt={`${product.name} - ${currentVariety}`}
+          loading="lazy"
+          decoding="async"
           className="w-full h-full object-cover transition-all duration-700 scale-100 group-hover:scale-105"
         />
         
@@ -1967,6 +1969,8 @@ export default function Catalog({
                       <img 
                         src={offerProd.images[0] || '/images/chair_red.jpg'} 
                         alt={offerProd.name} 
+                        loading="lazy"
+                        decoding="async"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent opacity-60"></div>
