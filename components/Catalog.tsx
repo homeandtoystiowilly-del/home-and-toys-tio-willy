@@ -1357,108 +1357,138 @@ export default function Catalog({
           </div>
         </div>
       )}
-      {/* Sticky Top Navbar */}
-      <nav className="sticky top-0 z-30 w-full bg-zinc-900/90 border-b border-zinc-800/80 backdrop-blur-xl py-4 transition-all shadow-md shadow-black/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-          {/* Logo compact */}
-          <a href="#" className="flex items-center gap-2.5 group">
-            <svg className="w-6.5 h-6.5 text-red-500 group-hover:scale-105 transition-transform" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M50 85C42 77 15 54 15 37C15 17 31 5 50 5C69 5 85 17 85 37C85 54 58 77 50 85Z" stroke="#FF2D2D" strokeWidth="8"/>
-              <path d="M38 48V62H62V48M32 48L50 32L68 48" stroke="#FF2D2D" strokeWidth="7"/>
-              <rect x="46" y="52" width="8" height="10" fill="#FF2D2D" />
-            </svg>
-            <span className="font-black tracking-widest text-xs uppercase leading-none block text-white font-sans">
-              HOME & TOYS <span className="text-red-500 font-bold block text-[8px] tracking-[0.2em] mt-0.5">Tío Willy</span>
-            </span>
+      {/* Sticky Top Navbar de Alta Gama */}
+      <nav className="sticky top-0 z-30 w-full bg-zinc-900/95 border-b border-zinc-800/90 backdrop-blur-xl transition-all shadow-lg shadow-black/30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-4">
+          
+          {/* 1. Logo Compacto de Alta Jerarquía */}
+          <a href="#" className="flex items-center gap-2.5 group shrink-0">
+            <div className="relative">
+              <div className="absolute -inset-1 rounded-full bg-red-600/20 blur-sm opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <svg className="w-7 h-7 text-red-500 group-hover:scale-105 transition-transform relative" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50 85C42 77 15 54 15 37C15 17 31 5 50 5C69 5 85 17 85 37C85 54 58 77 50 85Z" stroke="#FF2D2D" strokeWidth="8"/>
+                <path d="M38 48V62H62V48M32 48L50 32L68 48" stroke="#FF2D2D" strokeWidth="7"/>
+                <rect x="46" y="52" width="8" height="10" fill="#FF2D2D" />
+              </svg>
+            </div>
+            <div className="flex flex-col">
+              <span className="font-black tracking-wider text-xs uppercase leading-none text-white font-sans flex items-center gap-1.5">
+                HOME & TOYS
+              </span>
+              <span className="text-red-500 font-bold text-[9px] tracking-[0.25em] uppercase leading-none mt-1">
+                Tío Willy
+              </span>
+            </div>
           </a>
 
-          {/* Desktop Navigation Links */}
-          <div className="hidden md:flex items-center gap-6">
+          {/* 2. Navegación Central Estratégica (Limpia y sin colisiones) */}
+          <div className="hidden lg:flex items-center gap-1 xl:gap-2">
             <button 
               onClick={() => { setSelectedCategory('todos'); document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' }); }} 
-              className={`text-xs font-bold uppercase tracking-widest transition-colors cursor-pointer ${selectedCategory === 'todos' ? 'text-red-500' : 'text-zinc-400 hover:text-white'}`}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                selectedCategory === 'todos' 
+                  ? 'bg-red-600 text-white shadow-md shadow-red-950/30' 
+                  : 'text-zinc-300 hover:text-white hover:bg-zinc-800/80'
+              }`}
             >
-              Todos
+              Catálogo
             </button>
-            {initialCategorias.map((cat) => (
-              <button
-                key={cat._id}
-                onClick={() => { setSelectedCategory(cat._id); document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' }); }}
-                className={`text-xs font-bold uppercase tracking-widest transition-colors cursor-pointer ${selectedCategory === cat._id ? 'text-red-500' : 'text-zinc-400 hover:text-white'}`}
-              >
-                {cat.name}
-              </button>
-            ))}
-          </div>
 
-          {/* Contact / Drawer Trigger */}
-          <div className="flex items-center gap-3">
-            <button
+            {offerProducts.length > 0 && (
+              <button 
+                onClick={() => document.getElementById('seccion-ofertas')?.scrollIntoView({ behavior: 'smooth' })} 
+                className="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider text-amber-400 hover:text-amber-300 hover:bg-amber-950/30 transition-all flex items-center gap-1.5 cursor-pointer"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                <span>Ofertas</span>
+              </button>
+            )}
+
+            <button 
               onClick={handleGenerateCatalogPDF}
               disabled={pdfLoading}
-              className="hidden md:flex items-center gap-1.5 px-4 py-2 rounded-full bg-zinc-800/90 border border-zinc-700/80 hover:border-red-500/50 hover:bg-zinc-800 active:scale-95 text-zinc-300 hover:text-white text-xs font-bold transition-all uppercase tracking-wider cursor-pointer disabled:opacity-50 shadow-sm"
+              className="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider text-zinc-300 hover:text-white hover:bg-zinc-800/80 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+              title="Descargar Catálogo B2B para Mayoristas"
             >
               {pdfLoading ? (
                 <>
                   <span className="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
-                  Generando...
+                  <span className="text-red-400">Generando...</span>
                 </>
               ) : (
                 <>
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3.5 h-3.5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
-                  Trabaja con nosotros
+                  <span>Mayoristas (PDF)</span>
                 </>
               )}
             </button>
-            <a 
-              href="https://wa.me/584244576086"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-3.5 py-2 rounded-full bg-red-950/40 border border-red-500/30 hover:bg-red-600 hover:text-white active:scale-95 text-red-500 text-xs font-bold transition-all uppercase tracking-wider shadow-sm flex items-center gap-1.5"
-            >
-              <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
-                <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.835-9.977c.311.089.822.112 1.134.112.31 0 .82-.112 1.131-.492.311-.38.82-1.993.899-2.15.079-.156.13-.339.028-.553-.102-.213-.822-1.994-.822-1.994-.127-.278-.261-.318-.466-.318-.17 0-.368-.012-.566-.012-.397 0-.907.146-1.22.492-.311.38-1.189 1.163-1.189 2.833 0 1.67 1.218 3.282 1.388 3.507.17.225 2.4 3.665 5.811 5.138.81.35 1.442.56 1.933.717.813.259 1.554.223 2.14.136.652-.097 1.993-.815 2.276-1.602.283-.787.283-1.46.198-1.602-.085-.142-.311-.225-.652-.393-.34-.168-1.993-.984-2.276-1.085-.283-.101-.49-.152-.697.152-.207.304-.803 1.085-.984 1.288-.18.203-.362.228-.703.06-.34-.168-1.436-.53-2.735-1.688-1.01-.902-1.693-2.016-1.892-2.355-.198-.339-.021-.523.149-.692.153-.152.34-.393.51-.59.17-.197.226-.338.339-.564.113-.225.056-.422-.028-.59-.084-.168-.703-1.692-1.01-2.434-.298-.718-.604-.621-.822-.631-.212-.01-.453-.012-.694-.012-.24 0-.631.09-.962.45-.33.36-1.26 1.23-1.26 3.003 0 1.77 1.29 3.48 1.47 3.73.18.25 2.54 3.88 6.16 5.45.86.37 1.53.59 2.06.76.87.28 1.66.24 2.28.15.69-.1 2.12-.87 2.42-1.71.3-.84.3-1.56.21-1.71-.09-.15-.33-.24-.72-.43z"/>
-              </svg>
-              <span>WhatsApp</span>
-            </a>
 
-            {/* Social Icons (TikTok & Instagram) */}
-            <div className="hidden lg:flex items-center gap-1.5 pl-1 border-l border-zinc-700/60">
+            <button 
+              onClick={() => document.getElementById('ubicacion')?.scrollIntoView({ behavior: 'smooth' })} 
+              className="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider text-zinc-300 hover:text-white hover:bg-zinc-800/80 transition-all cursor-pointer"
+            >
+              Ubicación
+            </button>
+          </div>
+
+          {/* 3. Grupo de Conversión y Redes Sociales */}
+          <div className="flex items-center gap-2.5">
+            
+            {/* Redes Sociales Oficiales con Badges Circulares */}
+            <div className="hidden sm:flex items-center gap-1.5 pr-1 border-r border-zinc-700/60">
               <a
                 href="https://www.tiktok.com/@hogaryjuguetestiowilly"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-8 h-8 rounded-full bg-zinc-800/90 border border-zinc-700 hover:border-zinc-500 hover:bg-zinc-700 text-zinc-300 hover:text-white flex items-center justify-center transition-all active:scale-95 shadow-sm"
-                title="Síguenos en TikTok @hogaryjuguetestiowilly"
+                className="w-9 h-9 rounded-full bg-zinc-800/90 border border-zinc-700 hover:border-zinc-500 hover:bg-zinc-700 text-zinc-300 hover:text-white flex items-center justify-center transition-all active:scale-95 shadow-sm group"
+                title="TikTok Oficial @hogaryjuguetestiowilly"
                 aria-label="TikTok Oficial"
               >
-                <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5 fill-current group-hover:scale-110 transition-transform" viewBox="0 0 24 24">
                   <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.24 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/>
                 </svg>
               </a>
+
               <a
                 href="https://www.instagram.com/hogaryjuguetestiowilly"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-8 h-8 rounded-full bg-zinc-800/90 border border-zinc-700 hover:border-pink-500/50 hover:bg-zinc-700 text-zinc-300 hover:text-pink-400 flex items-center justify-center transition-all active:scale-95 shadow-sm"
-                title="Síguenos en Instagram @hogaryjuguetestiowilly"
+                className="w-9 h-9 rounded-full bg-zinc-800/90 border border-zinc-700 hover:border-pink-500/50 hover:bg-zinc-700 text-zinc-300 hover:text-pink-400 flex items-center justify-center transition-all active:scale-95 shadow-sm group"
+                title="Instagram Oficial @hogaryjuguetestiowilly"
                 aria-label="Instagram Oficial"
               >
-                <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5 fill-current group-hover:scale-110 transition-transform" viewBox="0 0 24 24">
                   <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
                 </svg>
               </a>
             </div>
 
-            {/* Mobile Hamburger Button */}
+            {/* Botón WhatsApp de Alto Impacto */}
+            <a 
+              href="https://wa.me/584244576086"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="h-10 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white text-xs font-black transition-all uppercase tracking-wider shadow-md shadow-emerald-950/40 flex items-center gap-2 active:scale-95"
+            >
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-300 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-200"></span>
+              </span>
+              <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
+                <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.835-9.977c.311.089.822.112 1.134.112.31 0 .82-.112 1.131-.492.311-.38.82-1.993.899-2.15.079-.156.13-.339.028-.553-.102-.213-.822-1.994-.822-1.994-.127-.278-.261-.318-.466-.318-.17 0-.368-.012-.566-.012-.397 0-.907.146-1.22.492-.311.38-1.189 1.163-1.189 2.833 0 1.67 1.218 3.282 1.388 3.507.17.225 2.4 3.665 5.811 5.138.81.35 1.442.56 1.933.717.813.259 1.554.223 2.14.136.652-.097 1.993-.815 2.276-1.602.283-.787.283-1.46.198-1.602-.085-.142-.311-.225-.652-.393-.34-.168-1.993-.984-2.276-1.085-.283-.101-.49-.152-.697.152-.207.304-.803 1.085-.984 1.288-.18.203-.362.228-.703.06-.34-.168-1.436-.53-2.735-1.688-1.01-.902-1.693-2.016-1.892-2.355-.198-.339-.021-.523.149-.692.153-.152.34-.393.51-.59.17-.197.226-.338.339-.564.113-.225.056-.422-.028-.59-.084-.168-.703-1.692-1.01-2.434-.298-.718-.604-.621-.822-.631-.212-.01-.453-.012-.694-.012-.24 0-.631.09-.962.45-.33.36-1.26 1.23-1.26 3.003 0 1.77 1.29 3.48 1.47 3.73.18.25 2.54 3.88 6.16 5.45.86.37 1.53.59 2.06.76.87.28 1.66.24 2.28.15.69-.1 2.12-.87 2.42-1.71.3-.84.3-1.56.21-1.71-.09-.15-.33-.24-.72-.43z"/>
+              </svg>
+              <span>WhatsApp</span>
+            </a>
+
+            {/* Botón Menú Móvil Hamburger */}
             <button
               onClick={() => setIsDrawerOpen(true)}
-              className="md:hidden p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 active:scale-90 rounded-xl transition-all focus:outline-none cursor-pointer"
-              aria-label="Abrir menú móvil"
+              className="lg:hidden w-10 h-10 flex items-center justify-center text-zinc-300 hover:text-white bg-zinc-800/80 hover:bg-zinc-700 active:scale-95 rounded-xl border border-zinc-700 transition-all focus:outline-none cursor-pointer"
+              aria-label="Abrir menú de navegación y categorías"
             >
-              <svg className="w-5.5 h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 6h16M4 12h16m-7 6h7" />
               </svg>
             </button>
