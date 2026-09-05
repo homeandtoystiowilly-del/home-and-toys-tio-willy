@@ -317,202 +317,324 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
 
       {/* Modal flotante de información completa del producto */}
       {isModalOpen && (
-        <div 
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/85 backdrop-blur-md transition-all duration-300 animate-fadeIn"
-          onClick={(e) => {
-            e.stopPropagation();
-            setIsModalOpen(false);
-          }}
-        >
-          {/* Tarjeta del Modal */}
-          <div 
-            className="w-full max-w-2xl bg-zinc-950 border border-zinc-800 rounded-3xl overflow-hidden shadow-2xl shadow-black relative flex flex-col max-h-[90vh] md:max-h-[85vh] animate-scaleUp"
-            onClick={(e) => e.stopPropagation()}
+        <ProductDetailModal
+          product={product}
+          categoryName={categoryName}
+          currency={currency}
+          initialActiveIdx={activeIdx}
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+// Componente Modal de Detalle de Producto de Alta Jerarquía y Responsividad Perfecta
+export function ProductDetailModal({
+  product,
+  categoryName,
+  currency = 'USD',
+  initialActiveIdx = 0,
+  onClose,
+}: {
+  product: Product;
+  categoryName?: string;
+  currency?: string;
+  initialActiveIdx?: number;
+  onClose: () => void;
+}) {
+  const [modalActiveIdx, setModalActiveIdx] = useState(initialActiveIdx);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const minSwipeDistance = 50;
+
+  const currentImage = product.images[modalActiveIdx] || product.images[0] || '/images/chair_red.jpg';
+  const currentVariety = product.varieties[modalActiveIdx] || product.varieties[0] || 'Estándar';
+  const symbol = currency === 'EUR' ? '€' : '$';
+  const isOfferActive = !!(product.isOffer && product.offerPrice && product.offerPrice > 0);
+  const discountPct = isOfferActive && product.priceDetal > (product.offerPrice || 0)
+    ? Math.round(((product.priceDetal - (product.offerPrice || 0)) / product.priceDetal) * 100)
+    : null;
+
+  const handlePrev = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    if (product.images.length <= 1) return;
+    setModalActiveIdx((prev) => (prev - 1 + product.images.length) % product.images.length);
+  };
+
+  const handleNext = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    if (product.images.length <= 1) return;
+    setModalActiveIdx((prev) => (prev + 1) % product.images.length);
+  };
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    if (distance > minSwipeDistance && product.images.length > 1) {
+      setModalActiveIdx((prev) => (prev + 1) % product.images.length);
+    } else if (distance < -minSwipeDistance && product.images.length > 1) {
+      setModalActiveIdx((prev) => (prev - 1 + product.images.length) % product.images.length);
+    }
+  };
+
+  const phone = '584244576086';
+  const textMessage = isOfferActive
+    ? `Hola Tío Willy, me interesa comprar en *OFERTA ESPECIAL* el producto:\n\n📌 *${product.name}*\n- *Variedad:* ${currentVariety}\n- *Precio Oferta:* ${symbol}${product.offerPrice!.toFixed(2)} (Antes ${symbol}${product.priceDetal.toFixed(2)})\n- *Precio Mayor:* ${symbol}${product.priceMayor.toFixed(2)} (A partir de ${product.minMayor} unidades)\n\n¿Tienen stock disponible para entrega o envío?`
+    : `Hola Tío Willy, me interesa comprar el producto:\n\n📌 *${product.name}*\n- *Variedad:* ${currentVariety}\n- *Precio Detal:* ${symbol}${product.priceDetal.toFixed(2)}\n- *Precio Mayor:* ${symbol}${product.priceMayor.toFixed(2)} (A partir de ${product.minMayor} unidades)\n\n¿Tienen stock disponible para entrega o envío?`;
+
+  const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(textMessage)}`;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 md:p-6 bg-black/85 backdrop-blur-md transition-all duration-300 animate-fadeIn"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-lg md:max-w-4xl bg-zinc-950 border border-zinc-800 rounded-3xl overflow-hidden shadow-2xl shadow-black relative flex flex-col max-h-[92vh] animate-scaleUp"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Cabecera Superior del Modal con Botón de Cerrar Seguro */}
+        <div className="flex items-center justify-between px-5 sm:px-7 py-4 border-b border-zinc-850/80 bg-zinc-900/60 backdrop-blur-md shrink-0">
+          <div className="flex items-center gap-2.5 min-w-0 pr-4">
+            <span className="px-3 py-1 text-[10px] font-extrabold uppercase tracking-widest text-red-400 bg-red-950/40 border border-red-500/30 rounded-full shrink-0">
+              {categoryName || product.category}
+            </span>
+            {isOfferActive && (
+              <span className="bg-red-600 text-white font-black text-[10px] tracking-wider px-2.5 py-0.5 rounded-full uppercase shadow-sm shrink-0">
+                🔥 Oferta
+              </span>
+            )}
+            <span className="text-xs text-zinc-400 font-medium truncate hidden sm:inline">
+              {product.name}
+            </span>
+          </div>
+
+          <button
+            onClick={onClose}
+            className="w-9 h-9 rounded-full bg-zinc-800 hover:bg-red-600 active:scale-95 text-zinc-300 hover:text-white flex items-center justify-center transition-all duration-200 cursor-pointer focus:outline-none border border-zinc-700/60 shadow-md shrink-0 ml-auto"
+            aria-label="Cerrar modal"
           >
-            {/* Botón de Cerrar */}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsModalOpen(false);
-              }}
-              className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-zinc-900/80 hover:bg-red-600 active:scale-95 text-white flex items-center justify-center transition-all duration-200 backdrop-blur-md cursor-pointer focus:outline-none border border-zinc-800 shadow-md"
-              aria-label="Cerrar modal"
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Contenedor Interior con Scroll Suave */}
+        <div className="overflow-y-auto p-5 sm:p-7 flex flex-col md:flex-row gap-6 md:gap-8 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent">
+          
+          {/* Columna Izquierda: Galería Principal y Miniaturas */}
+          <div className="w-full md:w-1/2 flex flex-col gap-3.5">
+            {/* Foto Principal */}
+            <div
+              className="relative aspect-square w-full bg-zinc-900 rounded-2xl overflow-hidden cursor-grab active:cursor-grabbing select-none border border-zinc-850 shadow-inner group/heroimg"
+              onTouchStart={onTouchStart}
+              onTouchMove={onTouchMove}
+              onTouchEnd={onTouchEnd}
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+              <img
+                src={currentImage}
+                alt={`${product.name} - ${currentVariety}`}
+                className="w-full h-full object-cover transition-transform duration-300 group-hover/heroimg:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/70 via-transparent to-transparent opacity-60 pointer-events-none"></div>
 
-            {/* Contenedor de Contenido con Scroll */}
-            <div className="overflow-y-auto flex flex-col md:flex-row gap-6 p-6 sm:p-8">
-              
-              {/* Columna Izquierda: Galería/Carrusel del Producto */}
-              <div className="w-full md:w-1/2 flex flex-col gap-4">
-                <div 
-                  className="relative aspect-square w-full bg-zinc-900 rounded-2xl overflow-hidden cursor-grab active:cursor-grabbing select-none border border-zinc-900"
-                  onTouchStart={onTouchStart}
-                  onTouchMove={onTouchMove}
-                  onTouchEnd={onTouchEnd}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <img 
-                    src={currentImage} 
-                    alt={`${product.name} - ${currentVariety}`}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent opacity-40"></div>
+              {/* Botones de navegación si hay más de 1 imagen */}
+              {product.images.length > 1 && (
+                <>
+                  <button
+                    onClick={handlePrev}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-zinc-950/80 hover:bg-red-600 active:scale-95 text-white flex items-center justify-center transition-all duration-200 backdrop-blur-md focus:outline-none shadow-lg border border-zinc-700/70"
+                    aria-label="Imagen anterior"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={handleNext}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-zinc-950/80 hover:bg-red-600 active:scale-95 text-white flex items-center justify-center transition-all duration-200 backdrop-blur-md focus:outline-none shadow-lg border border-zinc-700/70"
+                    aria-label="Siguiente imagen"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </>
+              )}
 
-                  {product.images.length > 1 && (
-                    <>
-                      <button 
-                        onClick={handlePrev}
-                        className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-zinc-950/80 hover:bg-red-600 active:scale-95 text-white flex items-center justify-center transition-all duration-200 backdrop-blur-md focus:outline-none shadow-md"
-                        aria-label="Imagen anterior"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
-                        </svg>
-                      </button>
-                      <button 
-                        onClick={handleNext}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-zinc-950/80 hover:bg-red-600 active:scale-95 text-white flex items-center justify-center transition-all duration-200 backdrop-blur-md focus:outline-none shadow-md"
-                        aria-label="Siguiente imagen"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                        </svg>
-                      </button>
-                    </>
-                  )}
+              {/* Contador de fotos en badge flotante */}
+              {product.images.length > 1 && (
+                <div className="absolute bottom-3 right-3 z-10 px-2.5 py-1 rounded-full bg-zinc-950/80 border border-zinc-800 text-[11px] font-mono text-zinc-300 backdrop-blur-sm shadow-md font-bold">
+                  {modalActiveIdx + 1} / {product.images.length}
+                </div>
+              )}
+            </div>
 
-                  {/* Puntos del Carrusel */}
-                  <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-10">
-                    {product.images.map((_, idx: number) => (
+            {/* Fila de Miniaturas Clicables (Thumbnails) para ver todas las fotos */}
+            {product.images.length > 1 && (
+              <div className="flex flex-col gap-1.5">
+                <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                  <span>📷 Todas las fotos ({product.images.length})</span>
+                  <span className="text-zinc-500 font-normal">Toca para ampliar:</span>
+                </span>
+                <div className="flex gap-2.5 overflow-x-auto pb-1.5 pt-0.5 scrollbar-thin scrollbar-thumb-zinc-800">
+                  {product.images.map((imgSrc, idx) => (
+                    <button
+                      key={`thumb-${idx}`}
+                      onClick={() => setModalActiveIdx(idx)}
+                      className={`relative w-16 h-16 sm:w-18 sm:h-18 flex-shrink-0 rounded-xl overflow-hidden border-2 transition-all duration-200 cursor-pointer ${
+                        idx === modalActiveIdx
+                          ? 'border-red-500 ring-2 ring-red-500/30 scale-105 shadow-md shadow-red-950/50'
+                          : 'border-zinc-800 hover:border-zinc-600 opacity-70 hover:opacity-100'
+                      }`}
+                      aria-label={`Ver foto ${idx + 1}`}
+                    >
+                      <img
+                        src={imgSrc || '/images/chair_red.jpg'}
+                        alt={`Miniatura ${idx + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                      {idx === modalActiveIdx && (
+                        <div className="absolute inset-0 bg-red-600/10 pointer-events-none"></div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Columna Derecha: Información, Variedades, Precios y Compra */}
+          <div className="w-full md:w-1/2 flex flex-col justify-between gap-5 text-left">
+            <div>
+              {/* Título Principal Grande */}
+              <h2 className="text-xl sm:text-2xl font-black text-white tracking-wide leading-tight">
+                {product.name}
+              </h2>
+
+              {/* Variedades Disponibles */}
+              {product.varieties.length > 1 && (
+                <div className="mt-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[10px] text-zinc-400 uppercase font-extrabold tracking-wider">
+                      Variedades / Modelos:
+                    </span>
+                    <span className="text-xs text-red-400 font-bold">
+                      {currentVariety}
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {product.varieties.map((varName: string, idx: number) => (
                       <button
                         key={idx}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setActiveIdx(idx);
-                        }}
-                        className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                          idx === activeIdx ? 'bg-red-500 w-4' : 'bg-white/40 hover:bg-white/80'
+                        onClick={() => setModalActiveIdx(idx)}
+                        className={`text-xs px-3 py-1.5 rounded-xl border transition-all duration-200 font-semibold cursor-pointer ${
+                          idx === modalActiveIdx
+                            ? 'bg-red-950/60 text-red-300 border-red-500 shadow-md shadow-red-950/40'
+                            : 'bg-zinc-900 text-zinc-300 border-zinc-800 hover:border-zinc-700 hover:text-white'
                         }`}
-                      />
+                      >
+                        {varName}
+                      </button>
                     ))}
                   </div>
                 </div>
+              )}
 
-                {/* Categoría Badge */}
-                <div className="flex items-center gap-2">
-                  <span className="px-3 py-1 text-[10px] font-extrabold uppercase tracking-widest text-red-500 bg-red-950/40 border border-red-500/30 rounded-full">
-                    {categoryName || product.category}
+              <div className="h-[1px] bg-zinc-850 my-4"></div>
+
+              {/* Descripción con scroll independiente si es muy larga */}
+              <div>
+                <span className="text-[10px] text-zinc-400 block mb-1.5 uppercase font-extrabold tracking-wider">
+                  Descripción y Detalles:
+                </span>
+                <p className="text-zinc-300 text-sm leading-relaxed whitespace-pre-line font-normal overflow-y-auto max-h-[140px] md:max-h-[200px] pr-2 scrollbar-thin scrollbar-thumb-zinc-800">
+                  {product.description || 'Sin descripción detallada disponible.'}
+                </p>
+              </div>
+            </div>
+
+            {/* Caja de Precios Estructurada en Filas Claras (Sin Solapamientos) */}
+            <div className="pt-2">
+              <div className="p-4 sm:p-5 rounded-2xl bg-zinc-900/90 border border-zinc-800 flex flex-col gap-3 shadow-lg shadow-black/40">
+                {isOfferActive ? (
+                  <div className="flex flex-col gap-2">
+                    {/* Fila Antes + Badge de Descuento */}
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-xs text-zinc-400 line-through font-mono">
+                        Precio Regular: {symbol}{product.priceDetal.toFixed(2)}
+                      </span>
+                      {discountPct && (
+                        <span className="bg-red-600 text-white border border-red-400 text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider font-mono shadow-sm">
+                          -{discountPct}% DCTO
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Fila Precio de Oferta */}
+                    <div className="flex items-baseline justify-between gap-2 pt-1 border-t border-zinc-800/80">
+                      <span className="text-xs text-red-400 font-extrabold uppercase tracking-wide flex items-center gap-1">
+                        <span>🔥 Precio Oferta:</span>
+                      </span>
+                      <span className="text-2xl sm:text-3xl font-black text-red-500 font-mono">
+                        {symbol}{product.offerPrice!.toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-baseline justify-between gap-2">
+                    <span className="text-xs text-zinc-400 font-bold uppercase tracking-wider">Precio Detal:</span>
+                    <span className="text-2xl sm:text-3xl font-black text-white font-mono">{symbol}{product.priceDetal.toFixed(2)}</span>
+                  </div>
+                )}
+
+                {/* Línea Divisoria */}
+                <div className="h-[1px] bg-zinc-800"></div>
+
+                {/* Fila Precio al Mayor */}
+                <div className="flex items-baseline justify-between gap-2">
+                  <div className="flex flex-col">
+                    <span className="text-xs text-red-400 font-bold uppercase tracking-wider">Precio al Mayor:</span>
+                    <span className="text-[10px] text-zinc-400">A partir de {product.minMayor} unidades</span>
+                  </div>
+                  <span className="text-xl sm:text-2xl font-black text-red-400 font-mono">
+                    {symbol}{product.priceMayor.toFixed(2)}
                   </span>
                 </div>
               </div>
 
-              {/* Columna Derecha: Información Detallada */}
-              <div className="w-full md:w-1/2 flex flex-col justify-between gap-5 text-left">
-                <div>
-                  <h3 className="text-xl sm:text-2xl font-black text-white tracking-wide leading-tight">
-                    {product.name}
-                  </h3>
-                  
-                  {/* Selección de Variedades en Modal */}
-                  {product.varieties.length > 1 && (
-                    <div className="mt-4">
-                      <span className="text-[10px] text-zinc-500 block mb-2 uppercase font-extrabold tracking-wider">Variedades disponibles:</span>
-                      <div className="flex flex-wrap gap-2">
-                        {product.varieties.map((varName: string, idx: number) => (
-                          <button
-                            key={idx}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setActiveIdx(idx);
-                            }}
-                            className={`text-xs px-3 py-1.5 rounded-xl border transition-all duration-300 font-medium ${
-                              idx === activeIdx
-                                ? 'bg-red-950/40 text-red-400 border-red-500/50'
-                                : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:border-zinc-700 hover:text-white'
-                            }`}
-                          >
-                            {varName}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="h-[1px] bg-zinc-900 my-4"></div>
-
-                  <span className="text-[10px] text-zinc-500 block mb-1 uppercase font-extrabold tracking-wider">Descripción del Producto:</span>
-                  <p className="text-zinc-350 text-sm leading-relaxed whitespace-pre-line font-medium overflow-y-auto max-h-[150px] md:max-h-[220px] pr-2 scrollbar-thin">
-                    {product.description}
-                  </p>
-                </div>
-
-                <div>
-                  {/* Caja de Precios en el Modal */}
-                  <div className="p-4 rounded-2xl bg-zinc-900/60 border border-zinc-900 flex flex-col gap-2.5">
-                    {isOfferActive ? (
-                      <div className="flex justify-between items-baseline">
-                        <div className="flex flex-col">
-                          <span className="text-xs text-zinc-500 line-through font-mono">
-                            Antes: {symbol}{product.priceDetal.toFixed(2)}
-                          </span>
-                          <span className="text-xs text-red-500 font-bold uppercase tracking-wide flex items-center gap-1.5 mt-0.5">
-                            <span>🔥 Precio de Oferta:</span>
-                            {product.priceDetal > (product.offerPrice || 0) && (
-                              <span className="bg-red-950/80 text-red-400 border border-red-500/40 text-[10px] font-black px-2 py-0.5 rounded-full">
-                                -{Math.round(((product.priceDetal - (product.offerPrice || 0)) / product.priceDetal) * 100)}% DCTO
-                              </span>
-                            )}
-                          </span>
-                        </div>
-                        <span className="text-3xl font-black text-red-500 font-mono animate-pulse">
-                          {symbol}{product.offerPrice!.toFixed(2)}
-                        </span>
-                      </div>
-                    ) : (
-                      <div className="flex justify-between items-baseline">
-                        <span className="text-xs text-zinc-400 font-medium uppercase tracking-wide">Precio Detal:</span>
-                        <span className="text-2xl font-black text-white font-mono">{symbol}{product.priceDetal.toFixed(2)}</span>
-                      </div>
-                    )}
-                    
-                    <div className="h-[1px] bg-zinc-800/40"></div>
-                    <div className="flex justify-between items-baseline">
-                      <div className="flex flex-col">
-                        <span className="text-xs text-red-500 font-bold uppercase tracking-wide">Precio Mayor:</span>
-                        <span className="text-[10px] text-zinc-500 italic">Mínimo {product.minMayor} unidades</span>
-                      </div>
-                      <span className="text-xl font-black text-red-400 font-mono">{symbol}{product.priceMayor.toFixed(2)}</span>
-                    </div>
-                  </div>
-
-                  {/* Enlace WhatsApp de Compra */}
-                  <a
-                    href={whatsappUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      trackEventAction('whatsapp_click', product._id).catch(err => console.error("Error tracking click:", err));
-                    }}
-                    className="mt-4 w-full py-3.5 px-4 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-xl font-bold flex items-center justify-center gap-2.5 transition-all duration-300 shadow-lg shadow-red-900/20 active:scale-[0.98] focus:outline-none"
-                  >
-                    <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                      <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.835-9.977c.311.089.822.112 1.134.112.31 0 .82-.112 1.131-.492.311-.38.82-1.993.899-2.15.079-.156.13-.339.028-.553-.102-.213-.822-1.994-.822-1.994-.127-.278-.261-.318-.466-.318-.17 0-.368-.012-.566-.012-.397 0-.907.146-1.22.492-.311.38-1.189 1.163-1.189 2.833 0 1.67 1.218 3.282 1.388 3.507.17.225 2.4 3.665 5.811 5.138.81.35 1.442.56 1.933.717.813.259 1.554.223 2.14.136.652-.097 1.993-.815 2.276-1.602.283-.787.283-1.46.198-1.602-.085-.142-.311-.225-.652-.393-.34-.168-1.993-.984-2.276-1.085-.283-.101-.49-.152-.697.152-.207.304-.803 1.085-.984 1.288-.18.203-.362.228-.703.06-.34-.168-1.436-.53-2.735-1.688-1.01-.902-1.693-2.016-1.892-2.355-.198-.339-.021-.523.149-.692.153-.152.34-.393.51-.59.17-.197.226-.338.339-.564.113-.225.056-.422-.028-.59-.084-.168-.703-1.692-1.01-2.434-.298-.718-.604-.621-.822-.631-.212-.01-.453-.012-.694-.012-.24 0-.631.09-.962.45-.33.36-1.26 1.23-1.26 3.003 0 1.77 1.29 3.48 1.47 3.73.18.25 2.54 3.88 6.16 5.45.86.37 1.53.59 2.06.76.87.28 1.66.24 2.28.15.69-.1 2.12-.87 2.42-1.71.3-.84.3-1.56.21-1.71-.09-.15-.33-.24-.72-.43z"/>
-                    </svg>
-                    Pedir por WhatsApp
-                  </a>
-                </div>
-
-              </div>
-
+              {/* Botón WhatsApp de Compra Inmediata */}
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => {
+                  trackEventAction('whatsapp_click', product._id).catch((err) => console.error("Error tracking click:", err));
+                }}
+                className="mt-4 w-full min-h-[48px] py-3.5 px-5 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-xl font-black text-sm flex items-center justify-center gap-2.5 transition-all duration-300 shadow-xl shadow-red-950/60 hover:shadow-red-600/30 active:scale-[0.98] cursor-pointer uppercase tracking-wider"
+              >
+                <svg className="w-5 h-5 fill-current shrink-0" viewBox="0 0 24 24">
+                  <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.835-9.977c.311.089.822.112 1.134.112.31 0 .82-.112 1.131-.492.311-.38.82-1.993.899-2.15.079-.156.13-.339.028-.553-.102-.213-.822-1.994-.822-1.994-.127-.278-.261-.318-.466-.318-.17 0-.368-.012-.566-.012-.397 0-.907.146-1.22.492-.311.38-1.189 1.163-1.189 2.833 0 1.67 1.218 3.282 1.388 3.507.17.225 2.4 3.665 5.811 5.138.81.35 1.442.56 1.933.717.813.259 1.554.223 2.14.136.652-.097 1.993-.815 2.276-1.602.283-.787.283-1.46.198-1.602-.085-.142-.311-.225-.652-.393-.34-.168-1.993-.984-2.276-1.085-.283-.101-.49-.152-.697.152-.207.304-.803 1.085-.984 1.288-.18.203-.362.228-.703.06-.34-.168-1.436-.53-2.735-1.688-1.01-.902-1.693-2.016-1.892-2.355-.198-.339-.021-.523.149-.692.153-.152.34-.393.51-.59.17-.197.226-.338.339-.564.113-.225.056-.422-.028-.59-.084-.168-.703-1.692-1.01-2.434-.298-.718-.604-.621-.822-.631-.212-.01-.453-.012-.694-.012-.24 0-.631.09-.962.45-.33.36-1.26 1.23-1.26 3.003 0 1.77 1.29 3.48 1.47 3.73.18.25 2.54 3.88 6.16 5.45.86.37 1.53.59 2.06.76.87.28 1.66.24 2.28.15.69-.1 2.12-.87 2.42-1.71.3-.84.3-1.56.21-1.71-.09-.15-.33-.24-.72-.43z"/>
+                </svg>
+                <span>Pedir por WhatsApp</span>
+              </a>
             </div>
+
           </div>
+
         </div>
-      )}
+      </div>
     </div>
   );
 }
@@ -693,6 +815,7 @@ export default function Catalog({
   const [showInactivityAlert, setShowInactivityAlert] = useState<boolean>(false);
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>('todos');
   const [pdfLoading, setPdfLoading] = useState<boolean>(false);
+  const [selectedOfferProduct, setSelectedOfferProduct] = useState<Product | null>(null);
 
   // Estados del Carrusel de la Cabecera (Hero Slider)
   const [currentHeroSlide, setCurrentHeroSlide] = useState<number>(0);
@@ -1962,7 +2085,8 @@ export default function Catalog({
                 return (
                   <div 
                     key={`offer-${offerProd._id}`}
-                    className="w-72 sm:w-80 flex-shrink-0 bg-zinc-900/95 border border-red-500/40 hover:border-red-500 rounded-2xl overflow-hidden flex flex-col group transition-all duration-300 hover:shadow-2xl hover:shadow-red-950/50 snap-start"
+                    onClick={() => setSelectedOfferProduct(offerProd)}
+                    className="w-72 sm:w-80 flex-shrink-0 bg-zinc-900/95 border border-red-500/40 hover:border-red-500 rounded-2xl overflow-hidden flex flex-col group transition-all duration-300 hover:shadow-2xl hover:shadow-red-950/50 snap-start cursor-pointer"
                   >
                     {/* Imagen con Badges */}
                     <div className="relative aspect-video w-full bg-zinc-950 overflow-hidden">
@@ -1988,6 +2112,16 @@ export default function Catalog({
                       <div className="absolute top-3 right-3 z-10 bg-zinc-900/90 border border-zinc-800 text-zinc-300 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase backdrop-blur-sm">
                         {catName}
                       </div>
+
+                      {/* Badge de Fotos Disponibles */}
+                      {offerProd.images.length > 1 && (
+                        <div className="absolute bottom-2.5 right-3 z-10 bg-black/80 border border-zinc-700/80 text-zinc-200 text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1 backdrop-blur-sm shadow-md">
+                          <svg className="w-3 h-3 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                          <span>{offerProd.images.length} fotos</span>
+                        </div>
+                      )}
                     </div>
 
                     {/* Información y CTA */}
@@ -2564,6 +2698,19 @@ export default function Catalog({
           Acceso Administrador
         </a>
       </footer>
+
+      {/* Modal para producto seleccionado en sección Super Ofertas */}
+      {selectedOfferProduct && (
+        <ProductDetailModal
+          product={selectedOfferProduct}
+          categoryName={
+            initialCategorias.find((c) => c._id === selectedOfferProduct.category)?.name ||
+            selectedOfferProduct.category
+          }
+          currency={currency}
+          onClose={() => setSelectedOfferProduct(null)}
+        />
+      )}
     </div>
   );
 }
