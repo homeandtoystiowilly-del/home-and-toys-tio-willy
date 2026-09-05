@@ -161,7 +161,7 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
           <>
             <button 
               onClick={handlePrev}
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/60 hover:bg-red-600/90 text-white flex items-center justify-center transition-colors duration-300 backdrop-blur-sm opacity-0 group-hover:opacity-100 focus:opacity-100 focus:outline-none"
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-zinc-950/80 hover:bg-red-600 active:scale-95 text-white flex items-center justify-center transition-all duration-200 backdrop-blur-md opacity-0 group-hover:opacity-100 focus:opacity-100 focus:outline-none shadow-md shadow-black/50"
               aria-label="Imagen anterior"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -170,7 +170,7 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
             </button>
             <button 
               onClick={handleNext}
-              className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/60 hover:bg-red-600/90 text-white flex items-center justify-center transition-colors duration-300 backdrop-blur-sm opacity-0 group-hover:opacity-100 focus:opacity-100 focus:outline-none"
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-zinc-950/80 hover:bg-red-600 active:scale-95 text-white flex items-center justify-center transition-all duration-200 backdrop-blur-md opacity-0 group-hover:opacity-100 focus:opacity-100 focus:outline-none shadow-md shadow-black/50"
               aria-label="Siguiente imagen"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -209,7 +209,7 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
           <div className="absolute top-4 right-4 z-10 bg-red-600 border border-red-400 text-white font-black text-xs tracking-wider px-3 py-1 rounded-full uppercase shadow-lg shadow-black/80 flex items-center gap-1.5 backdrop-blur-sm">
             <span>🔥 OFERTA</span>
             {product.priceDetal > (product.offerPrice || 0) && (
-              <span className="bg-black/50 text-white px-1.5 py-0.5 rounded text-[10px] font-mono font-bold">
+              <span className="bg-zinc-950/60 text-white px-1.5 py-0.5 rounded text-[10px] font-mono font-bold">
                 -{Math.round(((product.priceDetal - (product.offerPrice || 0)) / product.priceDetal) * 100)}%
               </span>
             )}
@@ -309,7 +309,7 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
       {/* Modal flotante de información completa del producto */}
       {isModalOpen && (
         <div 
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md transition-all duration-300 animate-fadeIn"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/85 backdrop-blur-md transition-all duration-300 animate-fadeIn"
           onClick={(e) => {
             e.stopPropagation();
             setIsModalOpen(false);
@@ -317,7 +317,7 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
         >
           {/* Tarjeta del Modal */}
           <div 
-            className="w-full max-w-2xl bg-zinc-950 border border-zinc-900 rounded-3xl overflow-hidden shadow-2xl shadow-black relative flex flex-col max-h-[90vh] md:max-h-[85vh] animate-scaleUp"
+            className="w-full max-w-2xl bg-zinc-950 border border-zinc-800 rounded-3xl overflow-hidden shadow-2xl shadow-black relative flex flex-col max-h-[90vh] md:max-h-[85vh] animate-scaleUp"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Botón de Cerrar */}
@@ -326,7 +326,7 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
                 e.stopPropagation();
                 setIsModalOpen(false);
               }}
-              className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-black/70 hover:bg-red-600 text-white flex items-center justify-center transition-colors duration-300 backdrop-blur-md cursor-pointer focus:outline-none"
+              className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-zinc-900/80 hover:bg-red-600 active:scale-95 text-white flex items-center justify-center transition-all duration-200 backdrop-blur-md cursor-pointer focus:outline-none border border-zinc-800 shadow-md"
               aria-label="Cerrar modal"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -357,7 +357,7 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
                     <>
                       <button 
                         onClick={handlePrev}
-                        className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/60 hover:bg-red-600/90 text-white flex items-center justify-center transition-colors duration-300 backdrop-blur-sm focus:outline-none"
+                        className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-zinc-950/80 hover:bg-red-600 active:scale-95 text-white flex items-center justify-center transition-all duration-200 backdrop-blur-md focus:outline-none shadow-md"
                         aria-label="Imagen anterior"
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -366,7 +366,7 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
                       </button>
                       <button 
                         onClick={handleNext}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/60 hover:bg-red-600/90 text-white flex items-center justify-center transition-colors duration-300 backdrop-blur-sm focus:outline-none"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-zinc-950/80 hover:bg-red-600 active:scale-95 text-white flex items-center justify-center transition-all duration-200 backdrop-blur-md focus:outline-none shadow-md"
                         aria-label="Siguiente imagen"
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1351,7 +1351,7 @@ export default function Catalog({
         </div>
       )}
       {/* Sticky Top Navbar */}
-      <nav className="sticky top-0 z-30 w-full bg-black/85 border-b border-zinc-900/60 backdrop-blur-md py-4 transition-all">
+      <nav className="sticky top-0 z-30 w-full bg-zinc-950/90 border-b border-zinc-800/80 backdrop-blur-md py-4 transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
           {/* Logo compact */}
           <a href="#" className="flex items-center gap-2.5 group">
@@ -1389,7 +1389,7 @@ export default function Catalog({
             <button
               onClick={handleGenerateCatalogPDF}
               disabled={pdfLoading}
-              className="hidden md:flex items-center gap-1.5 px-4 py-2 rounded-full bg-zinc-900 border border-zinc-800 hover:border-red-500/50 hover:bg-zinc-800 text-zinc-400 hover:text-white text-xs font-bold transition-all uppercase tracking-wider cursor-pointer disabled:opacity-50"
+              className="hidden md:flex items-center gap-1.5 px-4 py-2 rounded-full bg-zinc-900 border border-zinc-800 hover:border-red-500/50 hover:bg-zinc-800 active:scale-95 text-zinc-400 hover:text-white text-xs font-bold transition-all uppercase tracking-wider cursor-pointer disabled:opacity-50 shadow-sm"
             >
               {pdfLoading ? (
                 <>
@@ -1409,7 +1409,7 @@ export default function Catalog({
               href="https://wa.me/584244576086"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-4 py-2 rounded-full bg-red-950/40 border border-red-500/30 hover:bg-red-600 hover:text-white text-red-500 text-xs font-bold transition-all uppercase tracking-wider"
+              className="px-4 py-2 rounded-full bg-red-950/40 border border-red-500/30 hover:bg-red-600 hover:text-white active:scale-95 text-red-500 text-xs font-bold transition-all uppercase tracking-wider shadow-sm"
             >
               WhatsApp
             </a>
@@ -1417,7 +1417,7 @@ export default function Catalog({
             {/* Mobile Hamburger Button */}
             <button
               onClick={() => setIsDrawerOpen(true)}
-              className="md:hidden p-2 text-zinc-400 hover:text-white hover:bg-zinc-900 rounded-xl transition-colors focus:outline-none cursor-pointer"
+              className="md:hidden p-2 text-zinc-400 hover:text-white hover:bg-zinc-900 active:scale-90 rounded-xl transition-all focus:outline-none cursor-pointer"
               aria-label="Abrir menú móvil"
             >
               <svg className="w-5.5 h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1433,7 +1433,7 @@ export default function Catalog({
         {/* Backdrop (fondo oscuro semitransparente) */}
         <div 
           onClick={() => setIsDrawerOpen(false)}
-          className={`absolute inset-0 bg-black/70 backdrop-blur-sm transition-opacity duration-300 ${isDrawerOpen ? 'opacity-100' : 'opacity-0'}`}
+          className={`absolute inset-0 bg-zinc-950/80 backdrop-blur-md transition-opacity duration-300 ${isDrawerOpen ? 'opacity-100' : 'opacity-0'}`}
         ></div>
 
         {/* Panel lateral */}
@@ -1751,13 +1751,13 @@ export default function Catalog({
                       <div className="absolute top-3 left-3 z-10 bg-red-600 border border-red-400 text-white font-black text-xs tracking-wider px-3 py-1 rounded-full uppercase shadow-lg shadow-black/80 flex items-center gap-1.5 backdrop-blur-sm">
                         <span>🔥 OFERTA</span>
                         {discountPct && (
-                          <span className="bg-black/50 text-white px-1.5 py-0.5 rounded text-[10px] font-mono font-bold">
+                          <span className="bg-zinc-950/60 text-white px-1.5 py-0.5 rounded text-[10px] font-mono font-bold">
                             -{discountPct}%
                           </span>
                         )}
                       </div>
 
-                      <div className="absolute top-3 right-3 z-10 bg-black/80 border border-zinc-700 text-zinc-300 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase backdrop-blur-sm">
+                      <div className="absolute top-3 right-3 z-10 bg-zinc-900/90 border border-zinc-800 text-zinc-300 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase backdrop-blur-sm">
                         {catName}
                       </div>
                     </div>

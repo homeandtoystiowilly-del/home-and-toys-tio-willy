@@ -1673,10 +1673,10 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                   return (
                     <div 
                       key={prod._id}
-                      className={`group flex flex-col sm:flex-row gap-4 items-start sm:items-center bg-[#0d0d0f] border rounded-2xl p-4 relative transition-all ${
+                      className={`group flex flex-col sm:flex-row gap-4 items-start sm:items-center bg-zinc-900/60 border rounded-2xl p-4 relative transition-all ${
                         isPaused 
-                          ? 'border-amber-500/30 bg-amber-950/5 hover:border-amber-500/50' 
-                          : 'border-zinc-900 hover:border-zinc-800'
+                          ? 'border-amber-500/30 bg-amber-950/10 hover:border-amber-500/50' 
+                          : 'border-zinc-800/80 hover:border-zinc-700 hover:bg-zinc-900/90 hover:shadow-lg hover:shadow-black/30'
                       }`}
                     >
                       {/* Miniatura de Imagen con Badge +N y Estado Pausado */}
@@ -1687,12 +1687,12 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                           className={`w-full h-full object-cover transition-opacity ${isPaused ? 'opacity-50 grayscale-[30%]' : ''}`} 
                         />
                         {isPaused && (
-                          <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-amber-400 font-black text-[9px] uppercase tracking-wider select-none">
+                          <div className="absolute inset-0 bg-zinc-950/70 backdrop-blur-xs flex items-center justify-center text-amber-400 font-black text-[9px] uppercase tracking-wider select-none">
                             ⏸️ Pausa
                           </div>
                         )}
                         {!isPaused && totalImages > 1 && (
-                          <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white font-bold text-xs select-none pointer-events-none">
+                          <div className="absolute inset-0 bg-zinc-950/60 backdrop-blur-xs flex items-center justify-center text-white font-bold text-xs select-none pointer-events-none">
                             +{totalImages - 1}
                           </div>
                         )}
@@ -1761,9 +1761,9 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                         {/* Botón para Pausar / Reanudar Publicación */}
                         <button
                           onClick={() => handleToggleProductStatus(prod._id, isPaused ? 'active' : 'paused')}
-                          className={`w-8 h-8 rounded-full flex items-center justify-center transition-all cursor-pointer focus:outline-none border ${
+                          className={`w-8 h-8 rounded-full flex items-center justify-center transition-all active:scale-90 cursor-pointer focus:outline-none border shadow-sm ${
                             isPaused
-                              ? 'bg-emerald-950/60 text-emerald-400 border-emerald-500/50 hover:bg-emerald-600 hover:text-white shadow-sm shadow-emerald-950/50'
+                              ? 'bg-emerald-950/60 text-emerald-400 border-emerald-500/50 hover:bg-emerald-600 hover:text-white shadow-emerald-950/50'
                               : 'bg-zinc-900 text-amber-400 border-zinc-800 hover:bg-amber-500/20 hover:text-amber-300 hover:border-amber-500/40'
                           }`}
                           title={isPaused ? 'Reanudar publicación (Mostrar en tienda)' : 'Pausar publicación (Ocultar de la tienda)'}
@@ -1782,7 +1782,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                         {/* Botón para Editar Producto (Pencil) */}
                         <button
                           onClick={() => handleStartEdit(prod)}
-                          className="w-8 h-8 rounded-full bg-zinc-900 hover:bg-zinc-800 hover:text-red-400 text-zinc-500 flex items-center justify-center transition-colors cursor-pointer focus:outline-none border border-zinc-800"
+                          className="w-8 h-8 rounded-full bg-zinc-900 hover:bg-zinc-800 hover:text-red-400 active:scale-90 text-zinc-400 flex items-center justify-center transition-all cursor-pointer focus:outline-none border border-zinc-800 shadow-sm"
                           title="Editar producto"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1793,7 +1793,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                         {/* Botón para Eliminar Producto (Trash Can) */}
                         <button
                           onClick={() => handleDeleteProduct(prod._id)}
-                          className="w-8 h-8 rounded-full bg-zinc-900 hover:bg-red-950/60 text-zinc-500 hover:text-red-500 flex items-center justify-center transition-colors cursor-pointer focus:outline-none border border-zinc-800"
+                          className="w-8 h-8 rounded-full bg-zinc-900 hover:bg-red-950/60 text-zinc-400 hover:text-red-500 active:scale-90 flex items-center justify-center transition-all cursor-pointer focus:outline-none border border-zinc-800 shadow-sm"
                           title="Eliminar producto"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1854,21 +1854,21 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
 
       {/* Modal de Confirmación de Eliminación */}
       {productToDelete && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn">
-          <div className="w-full max-w-sm p-6 rounded-3xl bg-zinc-950 border border-zinc-900 shadow-2xl flex flex-col gap-4 animate-scaleUp">
-            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-red-950/40 border border-red-500/30 text-red-500 mx-auto">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-950/85 backdrop-blur-md animate-fadeIn">
+          <div className="w-full max-w-sm p-6 rounded-3xl bg-zinc-950 border border-zinc-800 shadow-2xl flex flex-col gap-4 animate-scaleUp">
+            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-red-950/40 border border-red-500/30 text-red-500 mx-auto shadow-sm">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
             </div>
             <div className="text-center">
               <h3 className="text-base font-bold text-white">¿Está seguro de que desea borrar este producto?</h3>
-              <p className="text-xs text-zinc-500 mt-1.5">Esta acción no se puede deshacer y el producto desaparecerá del catálogo público.</p>
+              <p className="text-xs text-zinc-400 mt-1.5">Esta acción no se puede deshacer y el producto desaparecerá del catálogo público.</p>
             </div>
             <div className="grid grid-cols-2 gap-3 mt-2">
               <button
                 onClick={() => setProductToDelete(null)}
-                className="py-2.5 bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 text-zinc-350 hover:text-white rounded-xl text-xs font-bold transition-all cursor-pointer"
+                className="min-h-[44px] py-2.5 bg-zinc-900 hover:bg-zinc-800 active:scale-95 border border-zinc-800 text-zinc-300 hover:text-white rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm"
               >
                 Cancelar
               </button>
@@ -1879,7 +1879,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                     setProductToDelete(null);
                   }
                 }}
-                className="py-2.5 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center"
+                className="min-h-[44px] py-2.5 bg-red-600 hover:bg-red-500 active:bg-red-700 active:scale-95 text-white rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center shadow-md shadow-red-950/50"
               >
                 Eliminar
               </button>
