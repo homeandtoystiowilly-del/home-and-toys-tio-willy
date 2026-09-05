@@ -1329,10 +1329,10 @@ export default function Catalog({
   }, [selectedCategory, searchQuery]);
 
   return (
-    <div className="min-h-screen bg-black text-white font-sans selection:bg-red-500 selection:text-white relative">
+    <div className="min-h-screen bg-zinc-950 text-white font-sans selection:bg-red-600 selection:text-white relative">
       {/* Aviso de cierre de sesión por inactividad */}
       {showInactivityAlert && (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 animate-bounce duration-500">
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 animate-pulse duration-700">
           <div className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-zinc-950/90 border border-red-500/40 text-red-500 shadow-2xl shadow-black backdrop-blur-md text-xs sm:text-sm font-bold tracking-wide">
             <svg className="w-5 h-5 text-red-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -1558,10 +1558,10 @@ export default function Catalog({
         onTouchStart={onHeroTouchStart}
         onTouchMove={onHeroTouchMove}
         onTouchEnd={onHeroTouchEnd}
-        className="relative w-full min-h-[460px] md:min-h-[520px] overflow-hidden flex flex-col items-center justify-center border-b border-zinc-900 bg-black cursor-grab active:cursor-grabbing select-none"
+        className="relative w-full min-h-[460px] md:min-h-[520px] overflow-hidden flex flex-col items-center justify-center border-b border-zinc-900 bg-zinc-950 cursor-grab active:cursor-grabbing select-none"
       >
         {/* Fondo con degradados dinámicos */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-red-950/25 via-zinc-950 to-black pointer-events-none"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-red-950/25 via-zinc-950 to-zinc-950 pointer-events-none"></div>
         <div className="absolute top-0 left-1/4 -translate-x-1/2 w-96 h-96 bg-red-600/10 rounded-full blur-[120px] pointer-events-none"></div>
         <div className="absolute top-0 right-1/4 translate-x-1/2 w-96 h-96 bg-red-600/10 rounded-full blur-[120px] pointer-events-none"></div>
 
@@ -1651,7 +1651,7 @@ export default function Catalog({
         {/* Flechas de navegación del Slider (>= 44px) */}
         <button
           onClick={() => setCurrentHeroSlide((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length)}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-zinc-900/80 hover:bg-red-600 border border-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center transition-all cursor-pointer shadow-lg hidden sm:flex active:scale-95"
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-zinc-900/90 hover:bg-red-600 border border-zinc-800 text-white flex items-center justify-center transition-all cursor-pointer shadow-lg hidden sm:flex active:scale-95"
           aria-label="Slide anterior"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1660,7 +1660,7 @@ export default function Catalog({
         </button>
         <button
           onClick={() => setCurrentHeroSlide((prev) => (prev + 1) % HERO_SLIDES.length)}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-zinc-900/80 hover:bg-red-600 border border-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center transition-all cursor-pointer shadow-lg hidden sm:flex active:scale-95"
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-zinc-900/90 hover:bg-red-600 border border-zinc-800 text-white flex items-center justify-center transition-all cursor-pointer shadow-lg hidden sm:flex active:scale-95"
           aria-label="Siguiente slide"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1697,7 +1697,7 @@ export default function Catalog({
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 relative z-10">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-2xl animate-bounce">🔥</span>
+                  <span className="text-2xl animate-pulse">🔥</span>
                   <h3 className="text-xl sm:text-2xl font-black text-white tracking-wide uppercase">
                     Super Ofertas Destacadas
                   </h3>

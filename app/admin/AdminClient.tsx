@@ -736,7 +736,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
   // VISTA 1: LOGIN CARD
   if (!isAuthorized) {
     return (
-      <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4 selection:bg-red-500 selection:text-white">
+      <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center p-4 selection:bg-red-600 selection:text-white">
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-80 h-80 bg-red-600/10 rounded-full blur-[80px] pointer-events-none"></div>
 
         <div className="w-full max-w-md p-8 rounded-3xl bg-zinc-950/80 border border-zinc-900/60 shadow-2xl shadow-black/90 backdrop-blur-md relative z-10 text-center">
@@ -908,7 +908,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
 
   // VISTA 2: PANEL DE CONTROL
   return (
-    <div className="min-h-screen bg-black text-white font-sans selection:bg-red-500 selection:text-white">
+    <div className="min-h-screen bg-zinc-950 text-white font-sans selection:bg-red-600 selection:text-white">
       {/* Navbar de control */}
       <nav className="w-full py-4 border-b border-zinc-900 bg-zinc-950/80 sticky top-0 z-50 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
@@ -926,9 +926,9 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
           
           <button
             onClick={() => handleLogout(false)}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-400 font-bold text-xs transition-colors duration-300 border border-zinc-850"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white font-bold text-xs transition-all duration-200 border border-zinc-800 active:scale-95 cursor-pointer"
           >
-            Cerrar Sesión
+            <span>Cerrar Sesión</span>
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
             </svg>
