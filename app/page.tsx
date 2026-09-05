@@ -2,6 +2,9 @@ import { seedDatabase } from '@/lib/dbSeed';
 import Catalog from '@/components/Catalog';
 import { Metadata } from 'next';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 // Configuración de SEO y Metadatos para la landing page
 export const metadata: Metadata = {
   title: 'Home and Toys Tío Willy - Catálogo Premium de Hogar y Juguetes',
