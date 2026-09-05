@@ -57,7 +57,7 @@ function LogoTioWilly({ className = '' }: { className?: string }) {
       </div>
       
       {/* HOME */}
-      <h1 className="text-4xl md:text-5xl font-black tracking-[0.2em] text-zinc-950 leading-none select-none flex items-center font-sans drop-shadow-sm">
+      <h1 className="text-4xl md:text-5xl font-black tracking-[0.2em] text-white leading-none select-none flex items-center font-sans drop-shadow-[0_2px_14px_rgba(255,255,255,0.2)]">
         H
         <span className="relative inline-flex items-center justify-center">
           O
@@ -68,7 +68,7 @@ function LogoTioWilly({ className = '' }: { className?: string }) {
       </h1>
       
       {/* AND TOYS */}
-      <h2 className="text-2xl md:text-3xl font-extrabold tracking-[0.25em] text-[#FF2D2D] leading-none select-none mt-1 font-sans drop-shadow-[0_0_8px_rgba(255,45,45,0.25)]">
+      <h2 className="text-2xl md:text-3xl font-extrabold tracking-[0.25em] text-[#FF2D2D] leading-none select-none mt-1 font-sans drop-shadow-[0_0_12px_rgba(255,45,45,0.4)]">
         AND TOYS
       </h2>
       
@@ -76,7 +76,7 @@ function LogoTioWilly({ className = '' }: { className?: string }) {
       <div className="w-52 h-[1.5px] bg-gradient-to-r from-transparent via-red-500 to-transparent my-3 opacity-90"></div>
       
       {/* TÍO WILLY */}
-      <h3 className="text-lg md:text-xl font-bold tracking-[0.35em] text-zinc-800 leading-none select-none font-sans uppercase">
+      <h3 className="text-lg md:text-xl font-bold tracking-[0.35em] text-zinc-300 leading-none select-none font-sans uppercase">
         Tío Willy
       </h3>
     </div>
@@ -1461,18 +1461,18 @@ export default function Catalog({
   }, [selectedCategory, searchQuery]);
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] text-zinc-900 font-sans selection:bg-red-600 selection:text-white relative bg-brand-lines">
+    <div className="min-h-screen bg-gradient-to-b from-[#09090b] via-[#18181b]/5 via-white to-zinc-100 text-zinc-900 font-sans selection:bg-red-600 selection:text-white relative bg-brand-lines">
       {/* Aviso de cierre de sesión por inactividad */}
       {showInactivityAlert && (
         <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 animate-pulse duration-700">
-          <div className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-white/95 border border-red-500/40 text-red-600 shadow-xl shadow-zinc-300/50 backdrop-blur-md text-xs sm:text-sm font-bold tracking-wide">
-            <svg className="w-5 h-5 text-red-600 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-zinc-900/95 border border-red-500/40 text-red-500 shadow-2xl backdrop-blur-md text-xs sm:text-sm font-bold tracking-wide">
+            <svg className="w-5 h-5 text-red-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
             <span>Sesión cerrada por inactividad</span>
             <button
               onClick={() => setShowInactivityAlert(false)}
-              className="text-zinc-400 hover:text-zinc-700 transition-colors focus:outline-none ml-2 cursor-pointer"
+              className="text-zinc-400 hover:text-white transition-colors focus:outline-none ml-2 cursor-pointer"
               aria-label="Cerrar aviso"
             >
               <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1482,14 +1482,14 @@ export default function Catalog({
           </div>
         </div>
       )}
-      {/* Sticky Top Navbar de Alta Gama */}
-      <nav className="sticky top-0 z-30 w-full bg-white/95 border-b border-zinc-200 backdrop-blur-xl transition-all shadow-sm">
+      {/* Sticky Top Navbar de Alta Gama en Cristal Ahumado Oscuro */}
+      <nav className="sticky top-0 z-30 w-full bg-zinc-950/90 border-b border-zinc-800/80 backdrop-blur-xl transition-all shadow-2xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-4">
           
           {/* 1. Logo Compacto de Alta Jerarquía */}
           <a href="#" className="flex items-center gap-2.5 group shrink-0">
             <div className="relative">
-              <div className="absolute -inset-1 rounded-full bg-red-600/20 blur-sm opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div className="absolute -inset-1 rounded-full bg-red-600/30 blur-sm opacity-0 group-hover:opacity-100 transition-opacity"></div>
               <svg className="w-7 h-7 text-red-500 group-hover:scale-105 transition-transform relative" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M50 85C42 77 15 54 15 37C15 17 31 5 50 5C69 5 85 17 85 37C85 54 58 77 50 85Z" stroke="#FF2D2D" strokeWidth="8"/>
                 <path d="M38 48V62H62V48M32 48L50 32L68 48" stroke="#FF2D2D" strokeWidth="7"/>
@@ -1497,10 +1497,10 @@ export default function Catalog({
               </svg>
             </div>
             <div className="flex flex-col">
-              <span className="font-black tracking-wider text-xs uppercase leading-none text-zinc-950 font-sans flex items-center gap-1.5">
+              <span className="font-black tracking-wider text-xs uppercase leading-none text-white font-sans flex items-center gap-1.5">
                 HOME & TOYS
               </span>
-              <span className="text-red-600 font-bold text-[9px] tracking-[0.25em] uppercase leading-none mt-1">
+              <span className="text-red-500 font-bold text-[9px] tracking-[0.25em] uppercase leading-none mt-1">
                 Tío Willy
               </span>
             </div>
@@ -1513,7 +1513,7 @@ export default function Catalog({
               className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
                 selectedCategory === 'todos' 
                   ? 'bg-red-600 text-white shadow-md shadow-red-600/30' 
-                  : 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100'
+                  : 'text-zinc-300 hover:text-white hover:bg-zinc-900'
               }`}
             >
               Catálogo
@@ -1522,9 +1522,9 @@ export default function Catalog({
             {offerProducts.length > 0 && (
               <button 
                 onClick={() => document.getElementById('seccion-ofertas')?.scrollIntoView({ behavior: 'smooth' })} 
-                className="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider text-amber-600 hover:text-amber-700 hover:bg-amber-50 transition-all flex items-center gap-1.5 cursor-pointer"
+                className="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider text-amber-400 hover:text-amber-300 hover:bg-amber-950/30 transition-all flex items-center gap-1.5 cursor-pointer"
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
                 <span>Ofertas</span>
               </button>
             )}
@@ -1532,17 +1532,17 @@ export default function Catalog({
             <button 
               onClick={handleGenerateCatalogPDF}
               disabled={pdfLoading}
-              className="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+              className="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider text-zinc-300 hover:text-white hover:bg-zinc-900 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
               title="Descargar Catálogo B2B para Mayoristas"
             >
               {pdfLoading ? (
                 <>
                   <span className="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
-                  <span className="text-red-600">Generando...</span>
+                  <span className="text-red-400">Generando...</span>
                 </>
               ) : (
                 <>
-                  <svg className="w-3.5 h-3.5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3.5 h-3.5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                   <span>Mayoristas (PDF)</span>
@@ -1552,7 +1552,7 @@ export default function Catalog({
 
             <button 
               onClick={() => document.getElementById('ubicacion')?.scrollIntoView({ behavior: 'smooth' })} 
-              className="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 transition-all cursor-pointer"
+              className="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider text-zinc-300 hover:text-white hover:bg-zinc-900 transition-all cursor-pointer"
             >
               Ubicación
             </button>
@@ -1562,12 +1562,12 @@ export default function Catalog({
           <div className="flex items-center gap-2.5">
             
             {/* Redes Sociales Oficiales con Badges Circulares */}
-            <div className="hidden sm:flex items-center gap-1.5 pr-1 border-r border-zinc-200">
+            <div className="hidden sm:flex items-center gap-1.5 pr-1 border-r border-zinc-800">
               <a
                 href="https://www.tiktok.com/@hogaryjuguetestiowilly"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-9 h-9 rounded-full bg-zinc-100 border border-zinc-200 hover:border-zinc-300 hover:bg-zinc-200 text-zinc-700 hover:text-zinc-950 flex items-center justify-center transition-all active:scale-95 shadow-sm group"
+                className="w-9 h-9 rounded-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-800 text-zinc-300 hover:text-white flex items-center justify-center transition-all active:scale-95 shadow-sm group"
                 title="TikTok Oficial @hogaryjuguetestiowilly"
                 aria-label="TikTok Oficial"
               >
@@ -1580,7 +1580,7 @@ export default function Catalog({
                 href="https://www.instagram.com/hogaryjuguetestiowilly"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-9 h-9 rounded-full bg-zinc-100 border border-zinc-200 hover:border-pink-300 hover:bg-zinc-200 text-zinc-700 hover:text-pink-600 flex items-center justify-center transition-all active:scale-95 shadow-sm group"
+                className="w-9 h-9 rounded-full bg-zinc-900 border border-zinc-800 hover:border-pink-500/50 hover:bg-zinc-800 text-zinc-300 hover:text-pink-400 flex items-center justify-center transition-all active:scale-95 shadow-sm group"
                 title="Instagram Oficial @hogaryjuguetestiowilly"
                 aria-label="Instagram Oficial"
               >
@@ -1595,7 +1595,7 @@ export default function Catalog({
               href="https://wa.me/584244576086"
               target="_blank"
               rel="noopener noreferrer"
-              className="h-10 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white text-xs font-black transition-all uppercase tracking-wider shadow-md shadow-emerald-600/30 flex items-center gap-2 active:scale-95"
+              className="h-10 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white text-xs font-black transition-all uppercase tracking-wider shadow-md shadow-emerald-950/40 flex items-center gap-2 active:scale-95"
             >
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-300 opacity-75"></span>
@@ -1610,7 +1610,7 @@ export default function Catalog({
             {/* Botón Menú Móvil Hamburger */}
             <button
               onClick={() => setIsDrawerOpen(true)}
-              className="lg:hidden w-10 h-10 flex items-center justify-center text-zinc-700 hover:text-zinc-950 bg-zinc-100 hover:bg-zinc-200 active:scale-95 rounded-xl border border-zinc-200 transition-all focus:outline-none cursor-pointer"
+              className="lg:hidden w-10 h-10 flex items-center justify-center text-zinc-300 hover:text-white bg-zinc-900 hover:bg-zinc-800 active:scale-95 rounded-xl border border-zinc-800 transition-all focus:outline-none cursor-pointer"
               aria-label="Abrir menú de navegación y categorías"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1780,48 +1780,48 @@ export default function Catalog({
         onTouchStart={onHeroTouchStart}
         onTouchMove={onHeroTouchMove}
         onTouchEnd={onHeroTouchEnd}
-        className="relative w-full min-h-[500px] md:min-h-[560px] overflow-hidden flex flex-col items-center justify-center border-b border-zinc-200 bg-gradient-to-b from-white via-zinc-50 to-zinc-100 cursor-grab active:cursor-grabbing select-none"
+        className="relative w-full min-h-[500px] md:min-h-[560px] overflow-hidden flex flex-col items-center justify-center border-b border-zinc-200/80 bg-gradient-to-b from-[#09090b] via-[#1c1917]/25 via-zinc-50 to-white cursor-grab active:cursor-grabbing select-none"
       >
         {/* Malla Geométrica y Figuras Decorativas de Fondo con Aura Radial */}
         <div className="absolute inset-0 bg-brand-grid opacity-80 pointer-events-none"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_15%,_rgba(255,45,45,0.08)_0%,_transparent_65%)] pointer-events-none"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_15%,_rgba(255,45,45,0.12)_0%,_transparent_65%)] pointer-events-none"></div>
         
         {/* Figuras geométricas y luces volumétricas */}
-        <div className="absolute top-8 left-10 w-80 h-80 bg-red-600/10 rounded-full blur-[110px] pointer-events-none animate-pulse"></div>
+        <div className="absolute top-8 left-10 w-80 h-80 bg-red-600/15 rounded-full blur-[110px] pointer-events-none animate-pulse"></div>
         <div className="absolute bottom-8 right-10 w-96 h-96 bg-red-500/5 rounded-full blur-[120px] pointer-events-none"></div>
-        <div className="absolute top-1/4 right-[9%] w-36 h-36 border border-red-500/15 rounded-3xl rotate-12 pointer-events-none hidden lg:block backdrop-blur-[1px]"></div>
+        <div className="absolute top-1/4 right-[9%] w-36 h-36 border border-red-500/20 rounded-3xl rotate-12 pointer-events-none hidden lg:block backdrop-blur-[1px]"></div>
         <div className="absolute bottom-1/4 left-[7%] w-28 h-28 border border-zinc-300/60 rounded-2xl -rotate-6 pointer-events-none hidden lg:block backdrop-blur-[1px]"></div>
 
         {/* Cápsulas Flotantes de Colección (Floating Feature Pills en Desktop) */}
-        <div className="hidden xl:flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-white/95 border border-zinc-200 backdrop-blur-md shadow-lg shadow-zinc-200/60 text-xs font-bold text-zinc-800 absolute top-28 left-8 xl:left-14 animate-float-slow z-20 pointer-events-none">
-          <span className="w-8 h-8 rounded-xl bg-red-50 border border-red-200 flex items-center justify-center text-base shrink-0">🚴‍♂️</span>
+        <div className="hidden xl:flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-zinc-900/85 border border-white/15 backdrop-blur-md shadow-2xl text-xs font-bold text-white absolute top-28 left-8 xl:left-14 animate-float-slow z-20 pointer-events-none">
+          <span className="w-8 h-8 rounded-xl bg-red-500/20 border border-red-500/30 flex items-center justify-center text-base shrink-0 text-white">🚴‍♂️</span>
           <div className="flex flex-col text-left">
-            <span className="text-[10px] text-zinc-500 uppercase tracking-widest font-semibold">Bicicletas</span>
-            <span className="text-zinc-950 text-xs font-black">Rin 12 a Rin 29</span>
+            <span className="text-[10px] text-zinc-400 uppercase tracking-widest font-semibold">Bicicletas</span>
+            <span className="text-white text-xs font-black">Rin 12 a Rin 29</span>
           </div>
         </div>
 
-        <div className="hidden xl:flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-white/95 border border-zinc-200 backdrop-blur-md shadow-lg shadow-zinc-200/60 text-xs font-bold text-zinc-800 absolute top-24 right-8 xl:right-14 animate-float-reverse z-20 pointer-events-none">
-          <span className="w-8 h-8 rounded-xl bg-red-50 border border-red-200 flex items-center justify-center text-base shrink-0">🎧</span>
+        <div className="hidden xl:flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-zinc-900/85 border border-white/15 backdrop-blur-md shadow-2xl text-xs font-bold text-white absolute top-24 right-8 xl:right-14 animate-float-reverse z-20 pointer-events-none">
+          <span className="w-8 h-8 rounded-xl bg-red-500/20 border border-red-500/30 flex items-center justify-center text-base shrink-0 text-white">🎧</span>
           <div className="flex flex-col text-left">
-            <span className="text-[10px] text-zinc-500 uppercase tracking-widest font-semibold">Tecnología</span>
-            <span className="text-zinc-950 text-xs font-black">Audio & Gaming</span>
+            <span className="text-[10px] text-zinc-400 uppercase tracking-widest font-semibold">Tecnología</span>
+            <span className="text-white text-xs font-black">Audio & Gaming</span>
           </div>
         </div>
 
-        <div className="hidden xl:flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-white/95 border border-zinc-200 backdrop-blur-md shadow-lg shadow-zinc-200/60 text-xs font-bold text-zinc-800 absolute bottom-24 left-10 xl:left-16 animate-float-reverse z-20 pointer-events-none">
-          <span className="w-8 h-8 rounded-xl bg-red-50 border border-red-200 flex items-center justify-center text-base shrink-0">📦</span>
+        <div className="hidden xl:flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-zinc-900/85 border border-white/15 backdrop-blur-md shadow-2xl text-xs font-bold text-white absolute bottom-24 left-10 xl:left-16 animate-float-reverse z-20 pointer-events-none">
+          <span className="w-8 h-8 rounded-xl bg-red-500/20 border border-red-500/30 flex items-center justify-center text-base shrink-0 text-white">📦</span>
           <div className="flex flex-col text-left">
-            <span className="text-[10px] text-zinc-500 uppercase tracking-widest font-semibold">Mayoristas</span>
-            <span className="text-zinc-950 text-xs font-black">Tarifas de Fábrica</span>
+            <span className="text-[10px] text-zinc-400 uppercase tracking-widest font-semibold">Mayoristas</span>
+            <span className="text-white text-xs font-black">Tarifas de Fábrica</span>
           </div>
         </div>
 
-        <div className="hidden xl:flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-white/95 border border-zinc-200 backdrop-blur-md shadow-lg shadow-zinc-200/60 text-xs font-bold text-zinc-800 absolute bottom-20 right-10 xl:right-16 animate-float-slow z-20 pointer-events-none">
-          <span className="w-8 h-8 rounded-xl bg-red-50 border border-red-200 flex items-center justify-center text-base shrink-0">⚡</span>
+        <div className="hidden xl:flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-zinc-900/85 border border-white/15 backdrop-blur-md shadow-2xl text-xs font-bold text-white absolute bottom-20 right-10 xl:right-16 animate-float-slow z-20 pointer-events-none">
+          <span className="w-8 h-8 rounded-xl bg-red-500/20 border border-red-500/30 flex items-center justify-center text-base shrink-0 text-white">⚡</span>
           <div className="flex flex-col text-left">
-            <span className="text-[10px] text-zinc-500 uppercase tracking-widest font-semibold">Envíos Rápidos</span>
-            <span className="text-zinc-950 text-xs font-black">Caracas & Nacional</span>
+            <span className="text-[10px] text-zinc-400 uppercase tracking-widest font-semibold">Envíos Rápidos</span>
+            <span className="text-white text-xs font-black">Caracas & Nacional</span>
           </div>
         </div>
 
@@ -1832,16 +1832,16 @@ export default function Catalog({
 
         {/* Micro-Badges de Especialidad para Móvil (Scrollable horizontal muy suave) */}
         <div className="flex xl:hidden items-center gap-2 z-10 px-4 py-1.5 mb-2 max-w-full overflow-x-auto scrollbar-none">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/90 border border-zinc-200 text-[11px] font-bold text-zinc-700 whitespace-nowrap shadow-sm backdrop-blur-xs">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-900/80 border border-white/15 text-[11px] font-bold text-zinc-200 whitespace-nowrap shadow-md backdrop-blur-md">
             <span>🚴‍♂️</span> Bicicletas
           </span>
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/90 border border-zinc-200 text-[11px] font-bold text-zinc-700 whitespace-nowrap shadow-sm backdrop-blur-xs">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-900/80 border border-white/15 text-[11px] font-bold text-zinc-200 whitespace-nowrap shadow-md backdrop-blur-md">
             <span>🎧</span> Audio & Tech
           </span>
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/90 border border-zinc-200 text-[11px] font-bold text-zinc-700 whitespace-nowrap shadow-sm backdrop-blur-xs">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-900/80 border border-white/15 text-[11px] font-bold text-zinc-200 whitespace-nowrap shadow-md backdrop-blur-md">
             <span>📦</span> Mayor & Detal
           </span>
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/90 border border-zinc-200 text-[11px] font-bold text-zinc-700 whitespace-nowrap shadow-sm backdrop-blur-xs">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-900/80 border border-white/15 text-[11px] font-bold text-zinc-200 whitespace-nowrap shadow-md backdrop-blur-md">
             <span>⚡</span> Envíos 24h
           </span>
         </div>
@@ -1935,7 +1935,7 @@ export default function Catalog({
         {/* Flechas de navegación del Slider (>= 44px) */}
         <button
           onClick={() => setCurrentHeroSlide((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length)}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/90 hover:bg-red-600 border border-zinc-200 hover:border-red-500 text-zinc-700 hover:text-white flex items-center justify-center transition-all cursor-pointer shadow-md hidden sm:flex active:scale-95"
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-zinc-900/80 hover:bg-red-600 border border-white/15 hover:border-red-500 text-white flex items-center justify-center transition-all cursor-pointer shadow-xl hidden sm:flex active:scale-95 backdrop-blur-md"
           aria-label="Slide anterior"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1944,7 +1944,7 @@ export default function Catalog({
         </button>
         <button
           onClick={() => setCurrentHeroSlide((prev) => (prev + 1) % HERO_SLIDES.length)}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/90 hover:bg-red-600 border border-zinc-200 hover:border-red-500 text-zinc-700 hover:text-white flex items-center justify-center transition-all cursor-pointer shadow-md hidden sm:flex active:scale-95"
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-zinc-900/80 hover:bg-red-600 border border-white/15 hover:border-red-500 text-white flex items-center justify-center transition-all cursor-pointer shadow-xl hidden sm:flex active:scale-95 backdrop-blur-md"
           aria-label="Siguiente slide"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2039,22 +2039,22 @@ export default function Catalog({
         
         {/* Franja de Super Ofertas Destacadas (Si existen productos con isOffer) */}
         {offerProducts.length > 0 && (
-          <section id="seccion-ofertas" className="mb-12 sm:mb-16 p-6 sm:p-8 rounded-3xl bg-gradient-to-b from-red-50/60 via-white to-red-50/30 border border-red-200 shadow-xl relative overflow-hidden bg-brand-lines">
+          <section id="seccion-ofertas" className="mb-12 sm:mb-16 p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-zinc-950 via-zinc-900 to-black border border-red-500/30 shadow-2xl shadow-zinc-950/20 relative overflow-hidden text-white bg-brand-lines">
             {/* Luces decorativas */}
-            <div className="absolute top-0 right-0 w-96 h-96 bg-red-600/5 rounded-full blur-[100px] pointer-events-none"></div>
+            <div className="absolute top-0 right-0 w-96 h-96 bg-red-600/10 rounded-full blur-[100px] pointer-events-none animate-pulse"></div>
             
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 relative z-10">
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-2xl animate-pulse">🔥</span>
-                  <h3 className="text-xl sm:text-2xl font-black text-zinc-950 tracking-wide uppercase">
+                  <h3 className="text-xl sm:text-2xl font-black text-white tracking-wide uppercase">
                     Super Ofertas Destacadas
                   </h3>
-                  <span className="bg-red-600 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider font-mono">
+                  <span className="bg-red-600 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider font-mono shadow-md shadow-red-600/40">
                     {offerProducts.length} {offerProducts.length === 1 ? 'Producto' : 'Productos'}
                   </span>
                 </div>
-                <p className="text-zinc-600 text-xs sm:text-sm mt-1">
+                <p className="text-zinc-400 text-xs sm:text-sm mt-1">
                   Precios especiales por tiempo limitado en artículos seleccionados. ¡Aprovecha estas promociones!
                 </p>
               </div>
@@ -2062,7 +2062,7 @@ export default function Catalog({
                 href="https://wa.me/584244576086?text=¡Hola!%20Quisiera%20consultar%20por%20las%20super%20ofertas%20destacadas%20de%20la%20tienda"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="self-start sm:self-auto min-h-[44px] flex items-center gap-2 px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 active:bg-red-700 text-white text-xs font-extrabold transition-all uppercase tracking-wider shadow-md shadow-red-600/30 active:scale-95"
+                className="self-start sm:self-auto min-h-[44px] flex items-center gap-2 px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 active:bg-red-700 text-white text-xs font-extrabold transition-all uppercase tracking-wider shadow-lg shadow-red-600/40 active:scale-95"
               >
                 <span>Consultar en WhatsApp</span>
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2072,7 +2072,7 @@ export default function Catalog({
             </div>
 
             {/* Carrusel Deslizable de Tarjetas de Oferta */}
-            <div className="flex gap-4 sm:gap-6 overflow-x-auto pb-4 pt-1 scrollbar-thin scrollbar-thumb-zinc-300 scrollbar-track-transparent scroll-smooth snap-x snap-mandatory">
+            <div className="flex gap-4 sm:gap-6 overflow-x-auto pb-4 pt-1 scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-transparent scroll-smooth snap-x snap-mandatory">
               {offerProducts.map((offerProd) => {
                 const catName = initialCategorias.find((c) => c._id === offerProd.category)?.name || offerProd.category;
                 const discountPct = offerProd.priceDetal > (offerProd.offerPrice || 0) 
@@ -2086,10 +2086,10 @@ export default function Catalog({
                   <div 
                     key={`offer-${offerProd._id}`}
                     onClick={() => setSelectedOfferProduct(offerProd)}
-                    className="w-72 sm:w-80 flex-shrink-0 bg-white border border-red-200 hover:border-red-500 rounded-2xl overflow-hidden flex flex-col group transition-all duration-300 hover:shadow-xl hover:shadow-red-950/10 snap-start cursor-pointer"
+                    className="w-72 sm:w-80 flex-shrink-0 bg-zinc-900/90 border border-zinc-800 hover:border-red-500 rounded-2xl overflow-hidden flex flex-col group transition-all duration-300 hover:shadow-2xl hover:shadow-red-950/40 snap-start cursor-pointer"
                   >
                     {/* Imagen con Badges */}
-                    <div className="relative aspect-video w-full bg-zinc-100 overflow-hidden">
+                    <div className="relative aspect-video w-full bg-zinc-950 overflow-hidden">
                       <img 
                         src={offerProd.images[0] || '/images/chair_red.jpg'} 
                         alt={offerProd.name} 
@@ -2097,26 +2097,26 @@ export default function Catalog({
                         decoding="async"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-40"></div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-60"></div>
                       
                       {/* Badge Oferta / Descuento */}
                       <div className="absolute top-3 left-3 z-10 bg-red-600 border border-red-400 text-white font-black text-xs tracking-wider px-3 py-1 rounded-full uppercase shadow-md flex items-center gap-1.5 backdrop-blur-sm">
                         <span>🔥 OFERTA</span>
                         {discountPct && (
-                          <span className="bg-zinc-900/80 text-white px-1.5 py-0.5 rounded text-[10px] font-mono font-bold">
+                          <span className="bg-black/60 text-white px-1.5 py-0.5 rounded text-[10px] font-mono font-bold">
                             -{discountPct}%
                           </span>
                         )}
                       </div>
 
-                      <div className="absolute top-3 right-3 z-10 bg-white/90 border border-zinc-200 text-zinc-700 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase backdrop-blur-sm shadow-sm">
+                      <div className="absolute top-3 right-3 z-10 bg-black/60 border border-white/10 text-zinc-300 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase backdrop-blur-md shadow-sm">
                         {catName}
                       </div>
 
                       {/* Badge de Fotos Disponibles */}
                       {offerProd.images.length > 1 && (
-                        <div className="absolute bottom-2.5 right-3 z-10 bg-white/90 border border-zinc-200 text-zinc-800 text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1 backdrop-blur-sm shadow-sm">
-                          <svg className="w-3 h-3 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="absolute bottom-2.5 right-3 z-10 bg-zinc-900/90 border border-zinc-700 text-zinc-200 text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1 backdrop-blur-sm shadow-sm">
+                          <svg className="w-3 h-3 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                           </svg>
                           <span>{offerProd.images.length} fotos</span>
@@ -2126,19 +2126,19 @@ export default function Catalog({
 
                     {/* Información y CTA */}
                     <div className="p-4 sm:p-5 flex flex-col flex-1">
-                      <h4 className="text-zinc-900 font-bold text-sm line-clamp-1 group-hover:text-red-600 transition-colors">
+                      <h4 className="text-white font-bold text-sm line-clamp-1 group-hover:text-red-400 transition-colors">
                         {offerProd.name}
                       </h4>
-                      <p className="text-zinc-600 text-xs mt-1 line-clamp-2">
+                      <p className="text-zinc-400 text-xs mt-1 line-clamp-2">
                         {offerProd.description}
                       </p>
 
-                      <div className="mt-auto pt-4 flex items-end justify-between border-t border-zinc-200">
+                      <div className="mt-auto pt-4 flex items-end justify-between border-t border-zinc-800">
                         <div>
-                          <span className="text-[11px] text-zinc-400 line-through font-mono block">
+                          <span className="text-[11px] text-zinc-500 line-through font-mono block">
                             Antes: {currencySymbol}{offerProd.priceDetal.toFixed(2)}
                           </span>
-                          <span className="text-xl font-black text-red-600 font-mono">
+                          <span className="text-xl font-black text-red-500 font-mono">
                             {currencySymbol}{offerProd.offerPrice?.toFixed(2)}
                           </span>
                         </div>
@@ -2462,7 +2462,7 @@ export default function Catalog({
       </main>
 
       {/* Sección de Ubicación y Contacto con diseño luminoso premium y halos de marca */}
-      <section id="ubicacion" className="w-full py-20 bg-zinc-50 border-t border-zinc-200 scroll-mt-20 relative overflow-hidden">
+      <section id="ubicacion" className="w-full py-20 bg-gradient-to-b from-white via-zinc-100 to-zinc-900 border-t border-zinc-200 scroll-mt-20 relative overflow-hidden text-zinc-900">
         {/* Halos decorativos de fondo */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-red-600/5 rounded-full blur-[140px] pointer-events-none"></div>
 
@@ -2645,8 +2645,8 @@ export default function Catalog({
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="w-full py-12 border-t border-zinc-200 bg-white text-center text-zinc-600 text-sm flex flex-col items-center gap-3">
+      {/* Footer en Acabado Obsidian Elegante */}
+      <footer className="w-full py-12 border-t border-zinc-800 bg-zinc-950 text-center text-zinc-400 text-sm flex flex-col items-center gap-3">
         <LogoTioWilly className="scale-75 opacity-90 mb-1" />
 
         {/* Social Icons Bar in Footer */}
@@ -2655,7 +2655,7 @@ export default function Catalog({
             href="https://www.tiktok.com/@hogaryjuguetestiowilly"
             target="_blank"
             rel="noopener noreferrer"
-            className="w-9 h-9 rounded-full bg-zinc-100 border border-zinc-200 hover:border-zinc-300 hover:bg-zinc-200 text-zinc-700 hover:text-zinc-950 flex items-center justify-center transition-all active:scale-95 shadow-sm"
+            className="w-9 h-9 rounded-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-800 text-zinc-300 hover:text-white flex items-center justify-center transition-all active:scale-95 shadow-md"
             title="TikTok Oficial"
             aria-label="TikTok Oficial"
           >
@@ -2667,7 +2667,7 @@ export default function Catalog({
             href="https://www.instagram.com/hogaryjuguetestiowilly"
             target="_blank"
             rel="noopener noreferrer"
-            className="w-9 h-9 rounded-full bg-zinc-100 border border-zinc-200 hover:border-pink-300 hover:bg-zinc-200 text-zinc-700 hover:text-pink-600 flex items-center justify-center transition-all active:scale-95 shadow-sm"
+            className="w-9 h-9 rounded-full bg-zinc-900 border border-zinc-800 hover:border-pink-500/50 hover:bg-zinc-800 text-zinc-300 hover:text-pink-400 flex items-center justify-center transition-all active:scale-95 shadow-md"
             title="Instagram Oficial"
             aria-label="Instagram Oficial"
           >
@@ -2679,7 +2679,7 @@ export default function Catalog({
             href="https://wa.me/584244576086"
             target="_blank"
             rel="noopener noreferrer"
-            className="w-9 h-9 rounded-full bg-zinc-100 border border-zinc-200 hover:border-emerald-500/50 hover:bg-zinc-200 text-zinc-700 hover:text-emerald-600 flex items-center justify-center transition-all active:scale-95 shadow-sm"
+            className="w-9 h-9 rounded-full bg-zinc-900 border border-zinc-800 hover:border-emerald-500/50 hover:bg-zinc-800 text-zinc-300 hover:text-emerald-400 flex items-center justify-center transition-all active:scale-95 shadow-md"
             title="WhatsApp Directo"
             aria-label="WhatsApp Directo"
           >
@@ -2689,11 +2689,11 @@ export default function Catalog({
           </a>
         </div>
 
-        <p className="mt-2 text-zinc-600">© 2026 Home and Toys Tío Willy. Todos los derechos reservados.</p>
-        <p className="text-xs text-zinc-400 italic">Desarrollado con pasión para una experiencia de compra premium.</p>
+        <p className="mt-2 text-zinc-400">© 2026 Home and Toys Tío Willy. Todos los derechos reservados.</p>
+        <p className="text-xs text-zinc-500 italic">Desarrollado con pasión para una experiencia de compra premium.</p>
         <a 
           href="/admin" 
-          className="text-xs text-red-600 hover:text-red-500 transition-colors duration-300 uppercase tracking-widest font-bold mt-2 hover:underline"
+          className="text-xs text-red-500 hover:text-red-400 transition-colors duration-300 uppercase tracking-widest font-bold mt-2 hover:underline"
         >
           Acceso Administrador
         </a>
