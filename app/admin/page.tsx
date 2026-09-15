@@ -37,20 +37,30 @@ export default async function AdminPage() {
   // Obtener las categorías y productos dinámicos (creados en la base de datos o fallback)
   const { categorias, productos, mapUrl, currency } = await seedDatabase();
 
-  // Obtener estadísticas de tráfico desde MongoDB de forma segura
+  // Obtener estadísticas de tráfico y configuración de seguridad desde MongoDB de forma segura
   let stats = { visitas: 0, whatsapp: 0 };
+  let autoLockSeconds = 60; // 1 minuto por defecto
+
   try {
     const client = await clientPromise;
     const db = client.db('tio_willy_db');
-    const doc = await (db.collection('metricas') as any).findOne({ _id: 'general' });
-    if (doc) {
+    const [statsDoc, secDoc] = await Promise.all([
+      (db.collection('metricas') as any).findOne({ _id: 'general' }),
+      (db.collection('configuracion') as any).findOne({ _id: 'seguridad' })
+    ]);
+
+    if (statsDoc) {
       stats = {
-        visitas: doc.visitas || 0,
-        whatsapp: doc.whatsapp || 0,
+        visitas: statsDoc.visitas || 0,
+        whatsapp: statsDoc.whatsapp || 0,
       };
     }
+
+    if (secDoc && typeof secDoc.autoLockSeconds === 'number') {
+      autoLockSeconds = secDoc.autoLockSeconds;
+    }
   } catch (err) {
-    console.error('Error al cargar estadísticas en panel:', err);
+    console.error('Error al cargar estadísticas y configuración de seguridad en panel:', err);
   }
 
   return (
@@ -61,6 +71,7 @@ export default async function AdminPage() {
       initialMapUrl={mapUrl} 
       initialCurrency={currency || 'USD'} 
       initialStats={stats} 
+      initialAutoLockSeconds={autoLockSeconds}
     />
   );
 }

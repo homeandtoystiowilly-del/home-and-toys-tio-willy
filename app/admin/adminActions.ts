@@ -194,16 +194,66 @@ export async function updateSecurityConfigAction(formData: FormData) {
       updateFields.securityAnswer = normalizeAnswer(securityAnswer);
     }
 
+    const autoLockRaw = formData.get('autoLockSeconds');
+    if (autoLockRaw !== null && autoLockRaw !== undefined) {
+      const lockSeconds = Math.max(0, Math.floor(Number(autoLockRaw) || 0));
+      updateFields.autoLockSeconds = lockSeconds;
+    }
+
     await (db.collection('configuracion') as any).updateOne(
       { _id: 'seguridad' },
       { $set: updateFields },
       { upsert: true }
     );
 
+    revalidatePath('/admin');
     return { success: true, message: 'Configuración de seguridad actualizada correctamente.' };
   } catch (err: any) {
     console.error('Error al actualizar configuración de seguridad:', err);
     return { success: false, error: getFriendlyError(err, 'Error al actualizar seguridad.') };
+  }
+}
+
+// Acción para actualizar el tiempo de bloqueo automático por inactividad
+export async function updateAutoLockAction(seconds: number) {
+  try {
+    const cookieStore = await cookies();
+    const session = cookieStore.get('admin_session')?.value;
+    if (!verifySessionToken(session)) {
+      return { success: false, error: 'No autorizado. Inicie sesión nuevamente.' };
+    }
+
+    const lockSeconds = Math.max(0, Math.floor(Number(seconds) || 0));
+
+    const client = await clientPromise;
+    const db = client.db('tio_willy_db');
+    await (db.collection('configuracion') as any).updateOne(
+      { _id: 'seguridad' },
+      { 
+        $set: { 
+          autoLockSeconds: lockSeconds,
+          updatedAt: new Date()
+        } 
+      },
+      { upsert: true }
+    );
+
+    revalidatePath('/admin');
+    let friendlyDuration = `${lockSeconds} segundos`;
+    if (lockSeconds === 60) friendlyDuration = '1 minuto';
+    else if (lockSeconds === 90) friendlyDuration = '1 minuto y medio';
+    else if (lockSeconds >= 60) friendlyDuration = `${lockSeconds / 60} minutos`;
+
+    return { 
+      success: true, 
+      seconds: lockSeconds,
+      message: lockSeconds === 0 
+        ? 'Bloqueo automático desactivado.' 
+        : `Bloqueo automático configurado a ${friendlyDuration}.`
+    };
+  } catch (err: any) {
+    console.error('Error al actualizar tiempo de bloqueo:', err);
+    return { success: false, error: getFriendlyError(err, 'Error al actualizar tiempo de bloqueo.') };
   }
 }
 

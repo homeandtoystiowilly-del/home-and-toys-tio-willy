@@ -16,6 +16,7 @@ import {
   getSecurityQuestionAction,
   recoverPasswordAction,
   updateSecurityConfigAction,
+  updateAutoLockAction,
   toggleProductStatusAction
 } from './adminActions';
 
@@ -108,15 +109,30 @@ interface AdminClientProps {
   initialMapUrl: string;
   initialCurrency: string;
   initialStats: Stats;
+  initialAutoLockSeconds?: number;
 }
 
-export default function AdminClient({ isAuthorized, categories: serverCategories, initialProducts, initialMapUrl, initialCurrency, initialStats }: AdminClientProps) {
+export default function AdminClient({ 
+  isAuthorized, 
+  categories: serverCategories, 
+  initialProducts, 
+  initialMapUrl, 
+  initialCurrency, 
+  initialStats,
+  initialAutoLockSeconds = 60
+}: AdminClientProps) {
   const router = useRouter();
 
   // Estado reactivo local para sincronización instantánea
   const [categories, setCategories] = useState<Category[]>(serverCategories);
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [stats, setStats] = useState<Stats>(initialStats);
+
+  // Estado de bloqueo automático configurable (en segundos)
+  const [autoLockSeconds, setAutoLockSeconds] = useState<number>(initialAutoLockSeconds);
+  const [autoLockLoading, setAutoLockLoading] = useState<boolean>(false);
+  const [autoLockMsg, setAutoLockMsg] = useState<string>('');
+  const [isLockedByInactivity, setIsLockedByInactivity] = useState<boolean>(false);
 
   // Sincronizar estados locales cuando cambian las props del servidor
   useEffect(() => {
@@ -131,6 +147,28 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
     setStats(initialStats);
   }, [initialStats]);
 
+  useEffect(() => {
+    if (initialAutoLockSeconds !== undefined) {
+      setAutoLockSeconds(initialAutoLockSeconds);
+    } else {
+      // Fallback a localStorage si existiera una preferencia guardada previamente
+      const saved = localStorage.getItem('tio_willy_autolock');
+      if (saved !== null) {
+        setAutoLockSeconds(Number(saved));
+      }
+    }
+  }, [initialAutoLockSeconds]);
+
+  // Detectar si el usuario fue redirigido a login por bloqueo de inactividad
+  useEffect(() => {
+    if (!isAuthorized && typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('lock') === '1' || params.get('inactivity') === '1') {
+        setIsLockedByInactivity(true);
+      }
+    }
+  }, [isAuthorized]);
+
   // Obtener los 5 productos más consultados
   const topProducts = useMemo(() => {
     return [...products]
@@ -139,21 +177,21 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
       .slice(0, 5);
   }, [products]);
 
-  // Temporizador de inactividad de 60 segundos
+  // Temporizador de inactividad configurable dinámicamente
   useEffect(() => {
-    // Solo activar el temporizador si el usuario está autorizado
-    if (!isAuthorized) return;
+    // Solo activar el temporizador si el usuario está autorizado y el contador es mayor a 0
+    if (!isAuthorized || autoLockSeconds <= 0) return;
 
     let timeoutId: NodeJS.Timeout;
 
     const resetTimer = () => {
       clearTimeout(timeoutId);
       timeoutId = setTimeout(() => {
-        handleLogout(true); // Cerrar sesión y redirigir con parámetro
-      }, 60000); // 60 segundos (1 minuto)
+        handleLogout(true); // Cerrar sesión y redirigir con parámetro de bloqueo
+      }, autoLockSeconds * 1000);
     };
 
-    // Eventos a monitorear para detectar actividad
+    // Eventos a monitorear para detectar actividad real del usuario
     const events = ['mousemove', 'mousedown', 'click', 'scroll', 'keypress', 'keydown', 'touchstart'];
 
     // Inicializar el timer
@@ -161,17 +199,42 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
 
     // Agregar event listeners
     events.forEach((event) => {
-      window.addEventListener(event, resetTimer);
+      window.addEventListener(event, resetTimer, { passive: true });
     });
 
-    // Cleanup al desmontar o desautorizar
+    // Cleanup al desmontar, desautorizar o cambiar el tiempo configurado
     return () => {
       clearTimeout(timeoutId);
       events.forEach((event) => {
         window.removeEventListener(event, resetTimer);
       });
     };
-  }, [isAuthorized]);
+  }, [isAuthorized, autoLockSeconds]);
+
+  // Guardar cambio de tiempo de bloqueo automático
+  const handleUpdateAutoLock = async (newSeconds: number) => {
+    setAutoLockSeconds(newSeconds);
+    setAutoLockLoading(true);
+    setAutoLockMsg('');
+
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('tio_willy_autolock', newSeconds.toString());
+      }
+      const res = await updateAutoLockAction(newSeconds);
+      if (res.success) {
+        setAutoLockMsg(res.message || 'Tiempo de bloqueo actualizado');
+        setTimeout(() => setAutoLockMsg(''), 4500);
+      } else {
+        setAutoLockMsg(res.error || 'Error al guardar');
+      }
+    } catch (err: any) {
+      console.error('Error al actualizar bloqueo automático:', err);
+      setAutoLockMsg('Error al conectar');
+    } finally {
+      setAutoLockLoading(false);
+    }
+  };
 
   // Estados de Login
   const [password, setPassword] = useState('');
@@ -367,6 +430,7 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
       formData.append('newPassword', newAdminPassword);
       formData.append('securityQuestion', questionToSave);
       formData.append('securityAnswer', adminSecurityAnswer);
+      formData.append('autoLockSeconds', autoLockSeconds.toString());
 
       const res = await updateSecurityConfigAction(formData);
       if (res.success) {
@@ -430,8 +494,9 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
     } catch (err) {
       console.error('Error al cerrar sesión:', err);
     } finally {
-      // Redirigir automáticamente a la página principal del catálogo
-      window.location.href = inactivityRedirect ? '/?inactivity=1' : '/';
+      // Si fue por inactividad, dejar al administrador en la pantalla de desbloqueo del panel admin
+      // Si fue voluntario con el botón "Cerrar Sesión", redirigir al catálogo público
+      window.location.href = inactivityRedirect ? '/admin?lock=1' : '/';
     }
   };
 
@@ -753,6 +818,15 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
               Tío Willy
             </h3>
           </div>
+
+          {isLockedByInactivity && !isRecovering && (
+            <div className="mb-4 p-3 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs font-semibold flex items-center gap-2.5 text-left shadow-xs animate-fadeIn">
+              <span className="text-base flex-shrink-0">🔒</span>
+              <span>
+                <strong>Sesión bloqueada por inactividad.</strong> Por seguridad de tu tienda, ingresa tu contraseña para continuar donde lo dejaste.
+              </span>
+            </div>
+          )}
 
           {!isRecovering ? (
             <form onSubmit={handleLogin} className="flex flex-col gap-4">
@@ -1607,6 +1681,53 @@ export default function AdminClient({ isAuthorized, categories: serverCategories
                     />
                     <span className="text-[11px] text-zinc-500">Esta respuesta te permitirá recuperar la clave en la pantalla de inicio si la olvidas.</span>
                   </div>
+                </div>
+
+                {/* Configuración de Bloqueo Automático por Inactividad */}
+                <div className="pt-3 border-t border-zinc-200 flex flex-col gap-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <svg className="w-4.5 h-4.5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <label className="text-xs font-bold text-zinc-700 uppercase tracking-wider">
+                        Bloqueo Automático por Inactividad
+                      </label>
+                    </div>
+                    {autoLockLoading && (
+                      <span className="text-[11px] text-zinc-500 font-semibold animate-pulse">Guardando...</span>
+                    )}
+                  </div>
+
+                  <select
+                    value={autoLockSeconds}
+                    onChange={(e) => handleUpdateAutoLock(Number(e.target.value))}
+                    disabled={autoLockLoading}
+                    className="w-full min-h-[44px] px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 hover:border-zinc-300 rounded-xl focus:bg-white focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-zinc-900 focus:outline-none transition-all text-xs font-bold cursor-pointer disabled:opacity-50 shadow-xs"
+                  >
+                    <option value={30}>⏱️ 30 segundos</option>
+                    <option value={60}>⏱️ 1 minuto (60 seg)</option>
+                    <option value={90}>⏱️ 1 minuto y medio (90 seg)</option>
+                    <option value={120}>⏱️ 2 minutos (120 seg)</option>
+                    <option value={180}>⏱️ 3 minutos (180 seg)</option>
+                    <option value={240}>⏱️ 4 minutos (240 seg)</option>
+                    <option value={300}>⏱️ 5 minutos (300 seg)</option>
+                    <option value={600}>⏱️ 10 minutos (600 seg)</option>
+                    <option value={0}>🔒 Desactivado (No bloquear automáticamente)</option>
+                  </select>
+
+                  {autoLockMsg && (
+                    <div className="text-[11px] text-emerald-700 font-semibold bg-emerald-50 border border-emerald-200 rounded-lg px-2.5 py-1.5 flex items-center gap-1.5 animate-fadeIn shadow-xs">
+                      <svg className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span>{autoLockMsg}</span>
+                    </div>
+                  )}
+
+                  <span className="text-[11px] text-zinc-500 leading-relaxed">
+                    El panel se bloqueará de forma automática si no detecta interacción (movimiento de mouse, teclas o toques en móvil) durante el tiempo seleccionado.
+                  </span>
                 </div>
 
                 <button
