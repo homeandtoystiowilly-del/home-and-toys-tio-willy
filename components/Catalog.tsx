@@ -37,39 +37,33 @@ export function buildWhatsAppLink(phone: string, text?: string): string {
 }
 
 // Helpers para construir URLs limpias y seguras tanto en SSR como en Cliente
-export function getProductCatalogUrl(productId: string, varietyIndex: number = 0): string {
+export function getProductCatalogUrl(productId: string, varietyIndex: number = 0, explicitOrigin?: string): string {
   const vParam = varietyIndex > 0 ? `&v=${varietyIndex}` : '';
-  if (typeof window !== 'undefined' && window.location.origin) {
-    return `${window.location.origin}/?p=${encodeURIComponent(productId)}${vParam}`;
+  const origin = explicitOrigin || (typeof window !== 'undefined' ? window.location.origin : '');
+  if (origin) {
+    return `${origin}/?p=${encodeURIComponent(productId)}${vParam}`;
   }
   return `/?p=${encodeURIComponent(productId)}${vParam}`;
 }
 
-export function getAbsolutePhotoUrl(imgUrl?: string, productId?: string, varietyIndex: number = 0): string {
-  // Si no hay imagen, pero tenemos el ID del producto, usamos el endpoint de la imagen
-  if (!imgUrl) {
-    if (productId && typeof window !== 'undefined' && window.location.origin) {
-      const vParam = varietyIndex > 0 ? `&v=${varietyIndex}` : '';
-      return `${window.location.origin}/api/product-image?id=${encodeURIComponent(productId)}${vParam}`;
-    }
-    return '';
-  }
+export function getAbsolutePhotoUrl(imgUrl?: string, productId?: string, varietyIndex: number = 0, explicitOrigin?: string): string {
+  const origin = explicitOrigin || (typeof window !== 'undefined' ? window.location.origin : '');
 
   // Si ya es una URL pública externa (ej. Cloudinary https://res.cloudinary.com/...)
-  if ((imgUrl.startsWith('https://') || imgUrl.startsWith('http://')) && !imgUrl.startsWith('data:')) {
+  if (imgUrl && (imgUrl.startsWith('https://') || imgUrl.startsWith('http://')) && !imgUrl.startsWith('data:')) {
     return imgUrl;
   }
 
-  // Si es Base64 (data:image/...) o una ruta relativa (/images/...)
+  // Si no hay imagen, o si es Base64 (data:image/...) o una ruta relativa (/images/...)
   // Usamos el endpoint API dedicado /api/product-image para generar un enlace ligero y accesible
-  if (typeof window !== 'undefined' && window.location.origin && productId) {
+  if (origin && productId) {
     const vParam = varietyIndex > 0 ? `&v=${varietyIndex}` : '';
-    return `${window.location.origin}/api/product-image?id=${encodeURIComponent(productId)}${vParam}`;
+    return `${origin}/api/product-image?id=${encodeURIComponent(productId)}${vParam}`;
   }
 
   // Fallback si no hay productId pero hay ruta relativa local
-  if (imgUrl.startsWith('/') && typeof window !== 'undefined' && window.location.origin) {
-    return `${window.location.origin}${imgUrl}`;
+  if (imgUrl && imgUrl.startsWith('/') && origin) {
+    return `${origin}${imgUrl}`;
   }
 
   return '';
@@ -87,6 +81,7 @@ export function buildProductWhatsAppMessage({
   productId,
   varietyIndex = 0,
   imageUrl,
+  origin,
 }: {
   productName: string;
   variety?: string;
@@ -99,10 +94,11 @@ export function buildProductWhatsAppMessage({
   productId: string;
   varietyIndex?: number;
   imageUrl?: string;
+  origin?: string;
 }): string {
   const isOfferActive = !!(isOffer && offerPrice && offerPrice > 0);
-  const photoUrl = getAbsolutePhotoUrl(imageUrl, productId, varietyIndex);
-  const catalogUrl = getProductCatalogUrl(productId, varietyIndex);
+  const photoUrl = getAbsolutePhotoUrl(imageUrl, productId, varietyIndex, origin);
+  const catalogUrl = getProductCatalogUrl(productId, varietyIndex, origin);
 
   const lines: string[] = [];
 
@@ -249,22 +245,45 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
   const symbol = currency === 'EUR' ? '€' : '$';
   const isOfferActive = !!(product.isOffer && product.offerPrice && product.offerPrice > 0);
 
-  // Enlace de WhatsApp enriquecido y seguro (sin trigger de error 4xx)
+  // Estado para capturar el origin real del cliente (evita SSR con origin vacío)
+  const [cardOrigin, setCardOrigin] = useState<string>('');
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setCardOrigin(window.location.origin);
+    }
+  }, []);
+
   const phone = '584244576086';
-  const whatsappMessage = buildProductWhatsAppMessage({
-    productName: product.name,
-    variety: currentVariety,
-    priceDetal: product.priceDetal,
-    priceMayor: product.priceMayor,
-    minMayor: product.minMayor,
-    isOffer: product.isOffer,
-    offerPrice: product.offerPrice,
-    symbol,
-    productId: product._id,
-    varietyIndex: activeIdx,
-    imageUrl: currentImage,
-  });
-  const whatsappUrl = buildWhatsAppLink(phone, whatsappMessage);
+
+  const getWhatsAppTargetUrl = (explicitOrigin?: string) => {
+    const originToUse = explicitOrigin || cardOrigin || (typeof window !== 'undefined' ? window.location.origin : '');
+    const whatsappMessage = buildProductWhatsAppMessage({
+      productName: product.name,
+      variety: currentVariety,
+      priceDetal: product.priceDetal,
+      priceMayor: product.priceMayor,
+      minMayor: product.minMayor,
+      isOffer: product.isOffer,
+      offerPrice: product.offerPrice,
+      symbol,
+      productId: product._id,
+      varietyIndex: activeIdx,
+      imageUrl: currentImage,
+      origin: originToUse,
+    });
+    return buildWhatsAppLink(phone, whatsappMessage);
+  };
+
+  const whatsappUrl = getWhatsAppTargetUrl();
+
+  const handleWhatsAppAction = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const currentOrigin = (typeof window !== 'undefined' && window.location.origin) ? window.location.origin : cardOrigin;
+    const finalUrl = getWhatsAppTargetUrl(currentOrigin);
+    trackEventAction('whatsapp_click', product._id).catch(err => console.error("Error tracking click:", err));
+    window.open(finalUrl, '_blank', 'noopener,noreferrer');
+  };
 
   return (
     <div 
@@ -428,10 +447,7 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
           href={whatsappUrl}
           target="_blank"
           rel="noopener noreferrer"
-          onClick={(e) => {
-            e.stopPropagation();
-            trackEventAction('whatsapp_click', product._id).catch(err => console.error("Error tracking click:", err));
-          }}
+          onClick={handleWhatsAppAction}
           className="mt-3 w-full py-2.5 px-3.5 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all duration-200 shadow-sm hover:shadow-md hover:shadow-red-600/20 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-red-500/50"
         >
           {/* WhatsApp Icon */}
@@ -514,21 +530,44 @@ export function ProductDetailModal({
     }
   };
 
+  const [modalOrigin, setModalOrigin] = useState<string>('');
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setModalOrigin(window.location.origin);
+    }
+  }, []);
+
   const phone = '584244576086';
-  const whatsappMessage = buildProductWhatsAppMessage({
-    productName: product.name,
-    variety: currentVariety,
-    priceDetal: product.priceDetal,
-    priceMayor: product.priceMayor,
-    minMayor: product.minMayor,
-    isOffer: product.isOffer,
-    offerPrice: product.offerPrice,
-    symbol,
-    productId: product._id,
-    varietyIndex: modalActiveIdx,
-    imageUrl: currentImage,
-  });
-  const whatsappUrl = buildWhatsAppLink(phone, whatsappMessage);
+
+  const getModalWhatsAppTargetUrl = (explicitOrigin?: string) => {
+    const originToUse = explicitOrigin || modalOrigin || (typeof window !== 'undefined' ? window.location.origin : '');
+    const whatsappMessage = buildProductWhatsAppMessage({
+      productName: product.name,
+      variety: currentVariety,
+      priceDetal: product.priceDetal,
+      priceMayor: product.priceMayor,
+      minMayor: product.minMayor,
+      isOffer: product.isOffer,
+      offerPrice: product.offerPrice,
+      symbol,
+      productId: product._id,
+      varietyIndex: modalActiveIdx,
+      imageUrl: currentImage,
+      origin: originToUse,
+    });
+    return buildWhatsAppLink(phone, whatsappMessage);
+  };
+
+  const whatsappUrl = getModalWhatsAppTargetUrl();
+
+  const handleModalWhatsAppAction = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const currentOrigin = (typeof window !== 'undefined' && window.location.origin) ? window.location.origin : modalOrigin;
+    const finalUrl = getModalWhatsAppTargetUrl(currentOrigin);
+    trackEventAction('whatsapp_click', product._id).catch(err => console.error("Error tracking click:", err));
+    window.open(finalUrl, '_blank', 'noopener,noreferrer');
+  };
 
   return (
     <div
@@ -755,9 +794,7 @@ export function ProductDetailModal({
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={() => {
-                  trackEventAction('whatsapp_click', product._id).catch((err) => console.error("Error tracking click:", err));
-                }}
+                onClick={handleModalWhatsAppAction}
                 className="mt-4 w-full py-3 px-4 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all duration-200 shadow-md shadow-red-600/25 active:scale-[0.98] cursor-pointer uppercase tracking-wider"
               >
                 <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
@@ -954,6 +991,13 @@ export default function Catalog({
   const [selectedOfferProduct, setSelectedOfferProduct] = useState<Product | null>(null);
   const [selectedUrlProduct, setSelectedUrlProduct] = useState<Product | null>(null);
   const [selectedUrlVarietyIdx, setSelectedUrlVarietyIdx] = useState<number>(0);
+  const [catalogOrigin, setCatalogOrigin] = useState<string>('');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setCatalogOrigin(window.location.origin);
+    }
+  }, []);
 
   // Detección de producto enlazado por URL (?p=ID&v=INDEX) para abrir automáticamente la vista detallada
   useEffect(() => {
@@ -2238,6 +2282,28 @@ export default function Catalog({
                   ? Math.round(((offerProd.priceDetal - (offerProd.offerPrice || 0)) / offerProd.priceDetal) * 100)
                   : null;
                 const currencySymbol = currency === 'EUR' ? '€' : '$';
+                
+                const handleOfferWaAction = (e: React.MouseEvent) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  const currentOrigin = (typeof window !== 'undefined' && window.location.origin) ? window.location.origin : catalogOrigin;
+                  const dynamicMsg = buildProductWhatsAppMessage({
+                    productName: offerProd.name,
+                    priceDetal: offerProd.priceDetal,
+                    priceMayor: offerProd.priceMayor,
+                    minMayor: offerProd.minMayor,
+                    isOffer: true,
+                    offerPrice: offerProd.offerPrice,
+                    symbol: currencySymbol,
+                    productId: offerProd._id,
+                    imageUrl: offerProd.images[0],
+                    origin: currentOrigin,
+                  });
+                  const targetUrl = buildWhatsAppLink('584244576086', dynamicMsg);
+                  trackEventAction('whatsapp_click', offerProd._id).catch(err => console.error("Error tracking click:", err));
+                  window.open(targetUrl, '_blank', 'noopener,noreferrer');
+                };
+
                 const offerWaMsg = buildProductWhatsAppMessage({
                   productName: offerProd.name,
                   priceDetal: offerProd.priceDetal,
@@ -2248,6 +2314,7 @@ export default function Catalog({
                   symbol: currencySymbol,
                   productId: offerProd._id,
                   imageUrl: offerProd.images[0],
+                  origin: catalogOrigin,
                 });
                 const offerWaUrl = buildWhatsAppLink('584244576086', offerWaMsg);
 
@@ -2315,10 +2382,7 @@ export default function Catalog({
                           href={offerWaUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            trackEventAction('whatsapp_click', offerProd._id).catch(err => console.error("Error tracking click:", err));
-                          }}
+                          onClick={handleOfferWaAction}
                           className="min-h-[44px] px-4 py-2.5 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-xl font-extrabold text-xs flex items-center gap-2 transition-all shadow-md shadow-red-600/30 hover:shadow-red-600/40 active:scale-95 cursor-pointer uppercase tracking-wider"
                         >
                           <span>Pedir</span>
