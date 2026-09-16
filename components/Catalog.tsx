@@ -27,6 +27,25 @@ export interface Category {
   name: string;
 }
 
+// Helpers para construir URLs absolutas seguras tanto en SSR como en Cliente
+export function getAbsolutePhotoUrl(imgUrl?: string): string {
+  if (!imgUrl) return '';
+  if (imgUrl.startsWith('http://') || imgUrl.startsWith('https://')) {
+    return imgUrl;
+  }
+  if (typeof window !== 'undefined' && window.location.origin) {
+    return `${window.location.origin}${imgUrl.startsWith('/') ? '' : '/'}${imgUrl}`;
+  }
+  return imgUrl;
+}
+
+export function getProductCatalogUrl(productId: string, varietyIndex: number = 0): string {
+  if (typeof window !== 'undefined' && window.location.origin) {
+    return `${window.location.origin}/?p=${encodeURIComponent(productId)}${varietyIndex > 0 ? `&v=${varietyIndex}` : ''}#catalogo`;
+  }
+  return `/?p=${encodeURIComponent(productId)}${varietyIndex > 0 ? `&v=${varietyIndex}` : ''}#catalogo`;
+}
+
 // Replicamos el Logo Tío Willy usando SVG y Tailwind con Animación de Radar y Resplandor
 function LogoTioWilly({ className = '' }: { className?: string }) {
   return (
@@ -134,11 +153,14 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
   const symbol = currency === 'EUR' ? '€' : '$';
   const isOfferActive = !!(product.isOffer && product.offerPrice && product.offerPrice > 0);
 
-  // Enlace de WhatsApp
+  // Enlace de WhatsApp enriquecido con foto y link directo al producto
   const phone = '584244576086'; // Número del cliente
+  const photoUrl = getAbsolutePhotoUrl(currentImage);
+  const catalogUrl = getProductCatalogUrl(product._id, activeIdx);
+
   const textMessage = isOfferActive
-    ? `Hola Tío Willy, me interesa consultar por la *OFERTA ESPECIAL* del producto:\n\n📌 *${product.name}*\n- *Variedad:* ${currentVariety}\n- *Precio de Oferta:* ${symbol}${product.offerPrice!.toFixed(2)} (Antes ${symbol}${product.priceDetal.toFixed(2)})\n- *Precio Mayor:* ${symbol}${product.priceMayor.toFixed(2)} (A partir de ${product.minMayor} unidades)\n\n¿Tienen stock disponible?`
-    : `Hola Tío Willy, me interesa consultar por el producto:\n\n*${product.name}*\n- *Variedad:* ${currentVariety}\n- *Precio Detal:* ${symbol}${product.priceDetal.toFixed(2)}\n- *Precio Mayor:* ${symbol}${product.priceMayor.toFixed(2)} (A partir de ${product.minMayor} unidades)\n\n¿Tienen stock disponible?`;
+    ? `Hola Tío Willy, me interesa consultar por la *OFERTA ESPECIAL* del producto:\n\n📌 *${product.name}*\n- *Variedad:* ${currentVariety}\n- *Precio de Oferta:* ${symbol}${product.offerPrice!.toFixed(2)} (Antes ${symbol}${product.priceDetal.toFixed(2)})\n- *Precio Mayor:* ${symbol}${product.priceMayor.toFixed(2)} (A partir de ${product.minMayor} unidades)\n\n🔗 *Ver en Tienda:* ${catalogUrl}\n📸 *Foto:* ${photoUrl}\n\n¿Tienen stock disponible?`
+    : `Hola Tío Willy, me interesa consultar por el producto:\n\n📌 *${product.name}*\n- *Variedad:* ${currentVariety}\n- *Precio Detal:* ${symbol}${product.priceDetal.toFixed(2)}\n- *Precio Mayor:* ${symbol}${product.priceMayor.toFixed(2)} (A partir de ${product.minMayor} unidades)\n\n🔗 *Ver en Tienda:* ${catalogUrl}\n📸 *Foto:* ${photoUrl}\n\n¿Tienen stock disponible?`;
   
   const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(textMessage)}`;
 
@@ -388,9 +410,12 @@ export function ProductDetailModal({
   };
 
   const phone = '584244576086';
+  const photoUrl = getAbsolutePhotoUrl(currentImage);
+  const catalogUrl = getProductCatalogUrl(product._id, modalActiveIdx);
+
   const textMessage = isOfferActive
-    ? `Hola Tío Willy, me interesa comprar en *OFERTA ESPECIAL* el producto:\n\n📌 *${product.name}*\n- *Variedad:* ${currentVariety}\n- *Precio Oferta:* ${symbol}${product.offerPrice!.toFixed(2)} (Antes ${symbol}${product.priceDetal.toFixed(2)})\n- *Precio Mayor:* ${symbol}${product.priceMayor.toFixed(2)} (A partir de ${product.minMayor} unidades)\n\n¿Tienen stock disponible para entrega o envío?`
-    : `Hola Tío Willy, me interesa comprar el producto:\n\n📌 *${product.name}*\n- *Variedad:* ${currentVariety}\n- *Precio Detal:* ${symbol}${product.priceDetal.toFixed(2)}\n- *Precio Mayor:* ${symbol}${product.priceMayor.toFixed(2)} (A partir de ${product.minMayor} unidades)\n\n¿Tienen stock disponible para entrega o envío?`;
+    ? `Hola Tío Willy, me interesa comprar en *OFERTA ESPECIAL* el producto:\n\n📌 *${product.name}*\n- *Variedad:* ${currentVariety}\n- *Precio Oferta:* ${symbol}${product.offerPrice!.toFixed(2)} (Antes ${symbol}${product.priceDetal.toFixed(2)})\n- *Precio Mayor:* ${symbol}${product.priceMayor.toFixed(2)} (A partir de ${product.minMayor} unidades)\n\n🔗 *Ver en Tienda:* ${catalogUrl}\n📸 *Foto:* ${photoUrl}\n\n¿Tienen stock disponible para entrega o envío?`
+    : `Hola Tío Willy, me interesa comprar el producto:\n\n📌 *${product.name}*\n- *Variedad:* ${currentVariety}\n- *Precio Detal:* ${symbol}${product.priceDetal.toFixed(2)}\n- *Precio Mayor:* ${symbol}${product.priceMayor.toFixed(2)} (A partir de ${product.minMayor} unidades)\n\n🔗 *Ver en Tienda:* ${catalogUrl}\n📸 *Foto:* ${photoUrl}\n\n¿Tienen stock disponible para entrega o envío?`;
 
   const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(textMessage)}`;
 
@@ -816,6 +841,29 @@ export default function Catalog({
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>('todos');
   const [pdfLoading, setPdfLoading] = useState<boolean>(false);
   const [selectedOfferProduct, setSelectedOfferProduct] = useState<Product | null>(null);
+  const [selectedUrlProduct, setSelectedUrlProduct] = useState<Product | null>(null);
+  const [selectedUrlVarietyIdx, setSelectedUrlVarietyIdx] = useState<number>(0);
+
+  // Detección de producto enlazado por URL (?p=ID&v=INDEX) para abrir automáticamente la vista detallada
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const searchParams = new URLSearchParams(window.location.search);
+      const productId = searchParams.get('p');
+      const varietyStr = searchParams.get('v');
+      if (productId && initialProductos && initialProductos.length > 0) {
+        const found = initialProductos.find((p) => p._id === productId);
+        if (found) {
+          const vIdx = varietyStr ? parseInt(varietyStr, 10) : 0;
+          const safeVIdx = !isNaN(vIdx) && vIdx >= 0 && vIdx < (found.images?.length || 1) ? vIdx : 0;
+          setSelectedUrlProduct(found);
+          setSelectedUrlVarietyIdx(safeVIdx);
+        }
+      }
+    } catch (err) {
+      console.error("Error al procesar parámetros de URL:", err);
+    }
+  }, [initialProductos]);
 
   // Estados del Carrusel de la Cabecera (Hero Slider)
   const [currentHeroSlide, setCurrentHeroSlide] = useState<number>(0);
@@ -2079,7 +2127,9 @@ export default function Catalog({
                   ? Math.round(((offerProd.priceDetal - (offerProd.offerPrice || 0)) / offerProd.priceDetal) * 100)
                   : null;
                 const currencySymbol = currency === 'EUR' ? '€' : '$';
-                const offerWaMsg = `Hola Tío Willy, quiero comprar en *OFERTA* el producto:\n\n🔥 *${offerProd.name}*\n🏷️ *Precio Especial:* ${currencySymbol}${offerProd.offerPrice?.toFixed(2)} (Antes ${currencySymbol}${offerProd.priceDetal.toFixed(2)})\n\n¿Tienen disponibilidad inmediata?`;
+                const offerPhotoUrl = getAbsolutePhotoUrl(offerProd.images[0] || '/images/chair_red.jpg');
+                const offerCatalogUrl = getProductCatalogUrl(offerProd._id, 0);
+                const offerWaMsg = `Hola Tío Willy, quiero comprar en *OFERTA* el producto:\n\n🔥 *${offerProd.name}*\n🏷️ *Precio Especial:* ${currencySymbol}${offerProd.offerPrice?.toFixed(2)} (Antes ${currencySymbol}${offerProd.priceDetal.toFixed(2)})\n\n🔗 *Ver en Tienda:* ${offerCatalogUrl}\n📸 *Foto:* ${offerPhotoUrl}\n\n¿Tienen disponibilidad inmediata?`;
                 const offerWaUrl = `https://wa.me/584244576086?text=${encodeURIComponent(offerWaMsg)}`;
 
                 return (
@@ -2709,6 +2759,20 @@ export default function Catalog({
           }
           currency={currency}
           onClose={() => setSelectedOfferProduct(null)}
+        />
+      )}
+
+      {/* Modal para producto enlazado directamente por URL (?p=ID&v=INDEX) */}
+      {selectedUrlProduct && (
+        <ProductDetailModal
+          product={selectedUrlProduct}
+          categoryName={
+            initialCategorias.find((c) => c._id === selectedUrlProduct.category)?.name ||
+            selectedUrlProduct.category
+          }
+          currency={currency}
+          initialActiveIdx={selectedUrlVarietyIdx}
+          onClose={() => setSelectedUrlProduct(null)}
         />
       )}
     </div>
