@@ -27,23 +27,110 @@ export interface Category {
   name: string;
 }
 
-// Helpers para construir URLs absolutas seguras tanto en SSR como en Cliente
+// Helper para construir enlaces de WhatsApp universales y 100% compatibles, evitando el error 4xx de Cloudflare
+export function buildWhatsAppLink(phone: string, text?: string): string {
+  const cleanPhone = phone.replace(/\D/g, '');
+  if (!text) {
+    return `https://api.whatsapp.com/send?phone=${cleanPhone}`;
+  }
+  return `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(text)}`;
+}
+
+// Helpers para construir URLs seguras (omitiendo localhost para no disparar filtros de seguridad en WhatsApp)
 export function getAbsolutePhotoUrl(imgUrl?: string): string {
   if (!imgUrl) return '';
-  if (imgUrl.startsWith('http://') || imgUrl.startsWith('https://')) {
+  if (imgUrl.startsWith('https://') || imgUrl.startsWith('http://')) {
+    if (imgUrl.includes('localhost') || imgUrl.includes('127.0.0.1')) {
+      return '';
+    }
     return imgUrl;
   }
   if (typeof window !== 'undefined' && window.location.origin) {
-    return `${window.location.origin}${imgUrl.startsWith('/') ? '' : '/'}${imgUrl}`;
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.endsWith('.local')) {
+      return '';
+    }
+    if (window.location.protocol === 'https:') {
+      return `${window.location.origin}${imgUrl.startsWith('/') ? '' : '/'}${imgUrl}`;
+    }
   }
-  return imgUrl;
+  return '';
 }
 
 export function getProductCatalogUrl(productId: string, varietyIndex: number = 0): string {
   if (typeof window !== 'undefined' && window.location.origin) {
-    return `${window.location.origin}/?p=${encodeURIComponent(productId)}${varietyIndex > 0 ? `&v=${varietyIndex}` : ''}#catalogo`;
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.endsWith('.local')) {
+      return '';
+    }
+    if (window.location.protocol === 'https:') {
+      const vParam = varietyIndex > 0 ? `&v=${varietyIndex}` : '';
+      return `${window.location.origin}/?p=${encodeURIComponent(productId)}${vParam}`;
+    }
   }
-  return `/?p=${encodeURIComponent(productId)}${varietyIndex > 0 ? `&v=${varietyIndex}` : ''}#catalogo`;
+  return '';
+}
+
+export function buildProductWhatsAppMessage({
+  productName,
+  variety,
+  priceDetal,
+  priceMayor,
+  minMayor,
+  isOffer,
+  offerPrice,
+  symbol = '$',
+  productId,
+  varietyIndex = 0,
+  imageUrl,
+}: {
+  productName: string;
+  variety?: string;
+  priceDetal: number;
+  priceMayor: number;
+  minMayor: number;
+  isOffer?: boolean;
+  offerPrice?: number;
+  symbol?: string;
+  productId: string;
+  varietyIndex?: number;
+  imageUrl?: string;
+}): string {
+  const isOfferActive = !!(isOffer && offerPrice && offerPrice > 0);
+  const photoUrl = getAbsolutePhotoUrl(imageUrl);
+  const catalogUrl = getProductCatalogUrl(productId, varietyIndex);
+
+  const lines: string[] = [];
+
+  if (isOfferActive) {
+    lines.push('¡Hola Tío Willy! 👋');
+    lines.push('Deseo consultar por la *OFERTA ESPECIAL* del catálogo:');
+    lines.push('');
+    lines.push(`📌 *${productName}*`);
+    if (variety) lines.push(`▫️ *Variedad:* ${variety}`);
+    lines.push(`🔥 *Precio Oferta:* ${symbol}${offerPrice!.toFixed(2)} (Antes ${symbol}${priceDetal.toFixed(2)})`);
+    lines.push(`📦 *Precio al Mayor:* ${symbol}${priceMayor.toFixed(2)} (A partir de ${minMayor} uds.)`);
+  } else {
+    lines.push('¡Hola Tío Willy! 👋');
+    lines.push('Deseo consultar por este producto del catálogo:');
+    lines.push('');
+    lines.push(`📌 *${productName}*`);
+    if (variety) lines.push(`▫️ *Variedad:* ${variety}`);
+    lines.push(`🏷️ *Precio Detal:* ${symbol}${priceDetal.toFixed(2)}`);
+    lines.push(`📦 *Precio al Mayor:* ${symbol}${priceMayor.toFixed(2)} (A partir de ${minMayor} uds.)`);
+  }
+
+  if (catalogUrl) {
+    lines.push('');
+    lines.push(`🔗 *Ver en Tienda:* ${catalogUrl}`);
+  }
+
+  if (photoUrl) {
+    lines.push(`📸 *Foto:* ${photoUrl}`);
+  }
+
+  lines.push('');
+  lines.push('¿Tienen disponibilidad para entrega o despacho? ¡Muchas gracias!');
+
+  return lines.join('\n');
 }
 
 // Replicamos el Logo Tío Willy usando SVG y Tailwind con Animación de Radar y Resplandor
@@ -153,21 +240,27 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
   const symbol = currency === 'EUR' ? '€' : '$';
   const isOfferActive = !!(product.isOffer && product.offerPrice && product.offerPrice > 0);
 
-  // Enlace de WhatsApp enriquecido con foto y link directo al producto
-  const phone = '584244576086'; // Número del cliente
-  const photoUrl = getAbsolutePhotoUrl(currentImage);
-  const catalogUrl = getProductCatalogUrl(product._id, activeIdx);
-
-  const textMessage = isOfferActive
-    ? `Hola Tío Willy, me interesa consultar por la *OFERTA ESPECIAL* del producto:\n\n📌 *${product.name}*\n- *Variedad:* ${currentVariety}\n- *Precio de Oferta:* ${symbol}${product.offerPrice!.toFixed(2)} (Antes ${symbol}${product.priceDetal.toFixed(2)})\n- *Precio Mayor:* ${symbol}${product.priceMayor.toFixed(2)} (A partir de ${product.minMayor} unidades)\n\n🔗 *Ver en Tienda:* ${catalogUrl}\n📸 *Foto:* ${photoUrl}\n\n¿Tienen stock disponible?`
-    : `Hola Tío Willy, me interesa consultar por el producto:\n\n📌 *${product.name}*\n- *Variedad:* ${currentVariety}\n- *Precio Detal:* ${symbol}${product.priceDetal.toFixed(2)}\n- *Precio Mayor:* ${symbol}${product.priceMayor.toFixed(2)} (A partir de ${product.minMayor} unidades)\n\n🔗 *Ver en Tienda:* ${catalogUrl}\n📸 *Foto:* ${photoUrl}\n\n¿Tienen stock disponible?`;
-  
-  const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(textMessage)}`;
+  // Enlace de WhatsApp enriquecido y seguro (sin trigger de error 4xx)
+  const phone = '584244576086';
+  const whatsappMessage = buildProductWhatsAppMessage({
+    productName: product.name,
+    variety: currentVariety,
+    priceDetal: product.priceDetal,
+    priceMayor: product.priceMayor,
+    minMayor: product.minMayor,
+    isOffer: product.isOffer,
+    offerPrice: product.offerPrice,
+    symbol,
+    productId: product._id,
+    varietyIndex: activeIdx,
+    imageUrl: currentImage,
+  });
+  const whatsappUrl = buildWhatsAppLink(phone, whatsappMessage);
 
   return (
     <div 
       onClick={() => setIsModalOpen(true)}
-      className="group relative flex flex-col rounded-3xl bg-white border border-zinc-200 hover:border-red-500/50 transition-all duration-500 overflow-hidden shadow-sm hover:shadow-xl hover:shadow-red-950/10 cursor-pointer"
+      className="group relative flex flex-col rounded-2xl sm:rounded-3xl bg-white border border-zinc-200/90 hover:border-red-500/60 transition-all duration-300 overflow-hidden shadow-xs hover:shadow-xl hover:shadow-red-950/10 cursor-pointer"
     >
       {/* Carrusel de Imágenes con soporte híbrido de gestos swipe */}
       <div 
@@ -192,19 +285,19 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
           <>
             <button 
               onClick={handlePrev}
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 hover:bg-red-600 active:scale-95 text-zinc-800 hover:text-white flex items-center justify-center transition-all duration-200 backdrop-blur-md opacity-0 group-hover:opacity-100 focus:opacity-100 focus:outline-none shadow-md border border-zinc-200"
+              className="absolute left-2.5 top-1/2 -translate-y-1/2 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/90 hover:bg-red-600 active:scale-95 text-zinc-800 hover:text-white flex items-center justify-center transition-all duration-200 backdrop-blur-md opacity-0 group-hover:opacity-100 focus:opacity-100 focus:outline-none shadow-md border border-zinc-200"
               aria-label="Imagen anterior"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
               </svg>
             </button>
             <button 
               onClick={handleNext}
-              className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 hover:bg-red-600 active:scale-95 text-zinc-800 hover:text-white flex items-center justify-center transition-all duration-200 backdrop-blur-md opacity-0 group-hover:opacity-100 focus:opacity-100 focus:outline-none shadow-md border border-zinc-200"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/90 hover:bg-red-600 active:scale-95 text-zinc-800 hover:text-white flex items-center justify-center transition-all duration-200 backdrop-blur-md opacity-0 group-hover:opacity-100 focus:opacity-100 focus:outline-none shadow-md border border-zinc-200"
               aria-label="Siguiente imagen"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
               </svg>
             </button>
@@ -212,35 +305,37 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
         )}
 
         {/* Indicadores de variedad / dots */}
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-10">
-          {product.images.map((_, idx: number) => (
-            <button
-              key={idx}
-              onClick={(e) => {
-                e.stopPropagation();
-                setActiveIdx(idx);
-              }}
-              className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                idx === activeIdx ? 'bg-red-500 w-4' : 'bg-white/70 hover:bg-white'
-              }`}
-              aria-label={`Ver variedad ${idx + 1}`}
-            />
-          ))}
-        </div>
+        {product.images.length > 1 && (
+          <div className="absolute bottom-2.5 sm:bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-10">
+            {product.images.map((_, idx: number) => (
+              <button
+                key={idx}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveIdx(idx);
+                }}
+                className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full transition-all duration-300 ${
+                  idx === activeIdx ? 'bg-red-500 w-3.5 sm:w-4' : 'bg-white/70 hover:bg-white'
+                }`}
+                aria-label={`Ver variedad ${idx + 1}`}
+              />
+            ))}
+          </div>
+        )}
 
         {/* Categoría Badge */}
-        <div className="absolute top-4 left-4">
-          <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider text-red-600 bg-white/95 border border-red-200 rounded-full backdrop-blur-md shadow-sm">
+        <div className="absolute top-3 left-3">
+          <span className="px-2.5 py-0.5 sm:px-3 sm:py-1 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-red-600 bg-white/95 border border-red-200/80 rounded-full backdrop-blur-md shadow-xs">
             {categoryName || product.category}
           </span>
         </div>
 
         {/* Badge de Oferta Especial */}
         {isOfferActive && (
-          <div className="absolute top-4 right-4 z-10 bg-red-600 border border-red-400 text-white font-black text-xs tracking-wider px-3 py-1 rounded-full uppercase shadow-lg shadow-black/20 flex items-center gap-1.5 backdrop-blur-sm">
+          <div className="absolute top-3 right-3 z-10 bg-red-600 border border-red-400 text-white font-black text-[10px] sm:text-xs tracking-wider px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full uppercase shadow-md flex items-center gap-1 backdrop-blur-xs">
             <span>🔥 OFERTA</span>
             {product.priceDetal > (product.offerPrice || 0) && (
-              <span className="bg-zinc-900/80 text-white px-1.5 py-0.5 rounded text-[10px] font-mono font-bold">
+              <span className="bg-zinc-900/80 text-white px-1.5 py-0.2 rounded text-[9px] sm:text-[10px] font-mono font-bold">
                 -{Math.round(((product.priceDetal - (product.offerPrice || 0)) / product.priceDetal) * 100)}%
               </span>
             )}
@@ -249,20 +344,20 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
       </div>
 
       {/* Cuerpo de la Tarjeta */}
-      <div className="flex flex-col flex-1 p-6">
-        <h3 className="text-lg font-bold text-zinc-900 tracking-wide group-hover:text-red-600 transition-colors duration-300 min-h-[56px] line-clamp-2">
+      <div className="flex flex-col flex-1 p-4 sm:p-5">
+        <h3 className="text-sm sm:text-base font-bold text-zinc-900 tracking-tight group-hover:text-red-600 transition-colors duration-200 min-h-[40px] sm:min-h-[48px] line-clamp-2 leading-snug">
           {product.name}
         </h3>
         
-        <p className="text-zinc-600 text-sm mt-2 line-clamp-2 min-h-[40px]">
+        <p className="text-xs text-zinc-500 mt-1 line-clamp-2 min-h-[32px] leading-relaxed">
           {product.description}
         </p>
 
         {/* Selección Rápida de Variedades por Texto/Color */}
         {product.varieties.length > 1 && (
-          <div className="mt-4">
-            <span className="text-xs text-zinc-500 block mb-1.5 uppercase font-bold tracking-wider">Variedad:</span>
-            <div className="flex flex-wrap gap-1.5">
+          <div className="mt-2.5">
+            <span className="text-[10px] sm:text-xs text-zinc-500 block mb-1 uppercase font-bold tracking-wider">Variedad:</span>
+            <div className="flex flex-wrap gap-1">
               {product.varieties.map((varName: string, idx: number) => (
                 <button
                   key={idx}
@@ -270,9 +365,9 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
                     e.stopPropagation();
                     setActiveIdx(idx);
                   }}
-                  className={`text-xs px-2.5 py-1 rounded-lg border transition-all duration-300 ${
+                  className={`text-[11px] sm:text-xs px-2 py-0.5 sm:px-2.5 sm:py-0.5 rounded-lg border transition-all duration-200 ${
                     idx === activeIdx
-                      ? 'bg-red-50 text-red-600 border-red-400 font-semibold'
+                      ? 'bg-red-50 text-red-600 border-red-400 font-semibold shadow-2xs'
                       : 'bg-zinc-100 text-zinc-700 border-zinc-200 hover:border-zinc-400 hover:text-zinc-900'
                   }`}
                 >
@@ -284,41 +379,42 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
         )}
 
         {/* Espaciador */}
-        <div className="flex-1 min-h-[20px]"></div>
+        <div className="flex-1 min-h-[14px]"></div>
 
         {/* Precios */}
-        <div className="mt-4 p-4 rounded-2xl bg-zinc-50 border border-zinc-200 flex flex-col gap-2.5">
+        <div className="mt-2.5 p-3 sm:p-3.5 rounded-xl bg-zinc-50 border border-zinc-200/80 flex flex-col gap-2">
           {isOfferActive ? (
             <div className="flex justify-between items-baseline">
               <div className="flex flex-col">
                 <span className="text-[10px] text-zinc-400 line-through font-mono">
                   Antes: {symbol}{product.priceDetal.toFixed(2)}
                 </span>
-                <span className="text-xs text-red-600 font-bold uppercase tracking-wide flex items-center gap-1">
+                <span className="text-[11px] text-red-600 font-bold uppercase tracking-wide flex items-center gap-1">
                   <span>🔥 Oferta:</span>
                 </span>
               </div>
-              <span className="text-2xl font-black text-red-600 font-mono">
+              <span className="text-lg sm:text-xl font-black text-red-600 font-mono">
                 {symbol}{product.offerPrice!.toFixed(2)}
               </span>
             </div>
           ) : (
             <div className="flex justify-between items-baseline">
-              <span className="text-xs text-zinc-500 font-medium uppercase tracking-wide">Precio Detal:</span>
-              <span className="text-2xl font-black text-zinc-900 font-mono">{symbol}{product.priceDetal.toFixed(2)}</span>
+              <span className="text-[11px] text-zinc-500 font-medium uppercase tracking-wide">Precio Detal:</span>
+              <span className="text-lg sm:text-xl font-black text-zinc-900 font-mono">{symbol}{product.priceDetal.toFixed(2)}</span>
             </div>
           )}
           
-          <div className="h-[1px] bg-zinc-200"></div>
+          <div className="h-[1px] bg-zinc-200/80"></div>
           <div className="flex justify-between items-baseline">
             <div className="flex flex-col">
-              <span className="text-xs text-red-600 font-bold uppercase tracking-wide">Precio Mayor:</span>
-              <span className="text-[10px] text-zinc-500 italic">Mínimo {product.minMayor} unidades</span>
+              <span className="text-[11px] text-red-600 font-bold uppercase tracking-wide">Precio Mayor:</span>
+              <span className="text-[9px] text-zinc-500 italic">Mín. {product.minMayor} unidades</span>
             </div>
-            <span className="text-xl font-black text-red-600 font-mono">{symbol}{product.priceMayor.toFixed(2)}</span>
+            <span className="text-base sm:text-lg font-black text-red-600 font-mono">{symbol}{product.priceMayor.toFixed(2)}</span>
           </div>
         </div>
 
+        {/* Botón WhatsApp de proporción equilibrada y moderna */}
         <a
           href={whatsappUrl}
           target="_blank"
@@ -327,13 +423,13 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
             e.stopPropagation();
             trackEventAction('whatsapp_click', product._id).catch(err => console.error("Error tracking click:", err));
           }}
-          className="mt-5 w-full py-3.5 px-4 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-xl font-bold flex items-center justify-center gap-2.5 transition-all duration-300 shadow-md shadow-red-600/20 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-red-500/50"
+          className="mt-3 w-full py-2.5 px-3.5 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all duration-200 shadow-sm hover:shadow-md hover:shadow-red-600/20 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-red-500/50"
         >
           {/* WhatsApp Icon */}
-          <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+          <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
             <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.835-9.977c.311.089.822.112 1.134.112.31 0 .82-.112 1.131-.492.311-.38.82-1.993.899-2.15.079-.156.13-.339.028-.553-.102-.213-.822-1.994-.822-1.994-.127-.278-.261-.318-.466-.318-.17 0-.368-.012-.566-.012-.397 0-.907.146-1.22.492-.311.38-1.189 1.163-1.189 2.833 0 1.67 1.218 3.282 1.388 3.507.17.225 2.4 3.665 5.811 5.138.81.35 1.442.56 1.933.717.813.259 1.554.223 2.14.136.652-.097 1.993-.815 2.276-1.602.283-.787.283-1.46.198-1.602-.085-.142-.311-.225-.652-.393-.34-.168-1.993-.984-2.276-1.085-.283-.101-.49-.152-.697.152-.207.304-.803 1.085-.984 1.288-.18.203-.362.228-.703.06-.34-.168-1.436-.53-2.735-1.688-1.01-.902-1.693-2.016-1.892-2.355-.198-.339-.021-.523.149-.692.153-.152.34-.393.51-.59.17-.197.226-.338.339-.564.113-.225.056-.422-.028-.59-.084-.168-.703-1.692-1.01-2.434-.298-.718-.604-.621-.822-.631-.212-.01-.453-.012-.694-.012-.24 0-.631.09-.962.45-.33.36-1.26 1.23-1.26 3.003 0 1.77 1.29 3.48 1.47 3.73.18.25 2.54 3.88 6.16 5.45.86.37 1.53.59 2.06.76.87.28 1.66.24 2.28.15.69-.1 2.12-.87 2.42-1.71.3-.84.3-1.56.21-1.71-.09-.15-.33-.24-.72-.43z"/>
           </svg>
-          Pedir por WhatsApp
+          <span>Pedir por WhatsApp</span>
         </a>
       </div>
 
@@ -410,14 +506,20 @@ export function ProductDetailModal({
   };
 
   const phone = '584244576086';
-  const photoUrl = getAbsolutePhotoUrl(currentImage);
-  const catalogUrl = getProductCatalogUrl(product._id, modalActiveIdx);
-
-  const textMessage = isOfferActive
-    ? `Hola Tío Willy, me interesa comprar en *OFERTA ESPECIAL* el producto:\n\n📌 *${product.name}*\n- *Variedad:* ${currentVariety}\n- *Precio Oferta:* ${symbol}${product.offerPrice!.toFixed(2)} (Antes ${symbol}${product.priceDetal.toFixed(2)})\n- *Precio Mayor:* ${symbol}${product.priceMayor.toFixed(2)} (A partir de ${product.minMayor} unidades)\n\n🔗 *Ver en Tienda:* ${catalogUrl}\n📸 *Foto:* ${photoUrl}\n\n¿Tienen stock disponible para entrega o envío?`
-    : `Hola Tío Willy, me interesa comprar el producto:\n\n📌 *${product.name}*\n- *Variedad:* ${currentVariety}\n- *Precio Detal:* ${symbol}${product.priceDetal.toFixed(2)}\n- *Precio Mayor:* ${symbol}${product.priceMayor.toFixed(2)} (A partir de ${product.minMayor} unidades)\n\n🔗 *Ver en Tienda:* ${catalogUrl}\n📸 *Foto:* ${photoUrl}\n\n¿Tienen stock disponible para entrega o envío?`;
-
-  const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(textMessage)}`;
+  const whatsappMessage = buildProductWhatsAppMessage({
+    productName: product.name,
+    variety: currentVariety,
+    priceDetal: product.priceDetal,
+    priceMayor: product.priceMayor,
+    minMayor: product.minMayor,
+    isOffer: product.isOffer,
+    offerPrice: product.offerPrice,
+    symbol,
+    productId: product._id,
+    varietyIndex: modalActiveIdx,
+    imageUrl: currentImage,
+  });
+  const whatsappUrl = buildWhatsAppLink(phone, whatsappMessage);
 
   return (
     <div
@@ -647,9 +749,9 @@ export function ProductDetailModal({
                 onClick={() => {
                   trackEventAction('whatsapp_click', product._id).catch((err) => console.error("Error tracking click:", err));
                 }}
-                className="mt-4 w-full min-h-[48px] py-3.5 px-5 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-xl font-black text-sm flex items-center justify-center gap-2.5 transition-all duration-300 shadow-md shadow-red-600/20 active:scale-[0.98] cursor-pointer uppercase tracking-wider"
+                className="mt-4 w-full py-3 px-4 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all duration-200 shadow-md shadow-red-600/25 active:scale-[0.98] cursor-pointer uppercase tracking-wider"
               >
-                <svg className="w-5 h-5 fill-current shrink-0" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
                   <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.835-9.977c.311.089.822.112 1.134.112.31 0 .82-.112 1.131-.492.311-.38.82-1.993.899-2.15.079-.156.13-.339.028-.553-.102-.213-.822-1.994-.822-1.994-.127-.278-.261-.318-.466-.318-.17 0-.368-.012-.566-.012-.397 0-.907.146-1.22.492-.311.38-1.189 1.163-1.189 2.833 0 1.67 1.218 3.282 1.388 3.507.17.225 2.4 3.665 5.811 5.138.81.35 1.442.56 1.933.717.813.259 1.554.223 2.14.136.652-.097 1.993-.815 2.276-1.602.283-.787.283-1.46.198-1.602-.085-.142-.311-.225-.652-.393-.34-.168-1.993-.984-2.276-1.085-.283-.101-.49-.152-.697.152-.207.304-.803 1.085-.984 1.288-.18.203-.362.228-.703.06-.34-.168-1.436-.53-2.735-1.688-1.01-.902-1.693-2.016-1.892-2.355-.198-.339-.021-.523.149-.692.153-.152.34-.393.51-.59.17-.197.226-.338.339-.564.113-.225.056-.422-.028-.59-.084-.168-.703-1.692-1.01-2.434-.298-.718-.604-.621-.822-.631-.212-.01-.453-.012-.694-.012-.24 0-.631.09-.962.45-.33.36-1.26 1.23-1.26 3.003 0 1.77 1.29 3.48 1.47 3.73.18.25 2.54 3.88 6.16 5.45.86.37 1.53.59 2.06.76.87.28 1.66.24 2.28.15.69-.1 2.12-.87 2.42-1.71.3-.84.3-1.56.21-1.71-.09-.15-.33-.24-.72-.43z"/>
                 </svg>
                 <span>Pedir por WhatsApp</span>
@@ -794,7 +896,7 @@ const HERO_SLIDES = [
     ctaText: 'Ver Catálogo',
     ctaLink: '#catalogo',
     secondaryText: 'Pedir por WhatsApp',
-    secondaryLink: 'https://wa.me/584244576086'
+    secondaryLink: 'https://api.whatsapp.com/send?phone=584244576086'
   },
   {
     id: 2,
@@ -806,7 +908,7 @@ const HERO_SLIDES = [
     ctaText: 'Trabaja con Nosotros',
     isPdfAction: true,
     secondaryText: 'Cotizar Lotes',
-    secondaryLink: 'https://wa.me/584244576086?text=¡Hola!%20Deseo%20cotizar%20compras%20al%20mayor%20en%20Home%20and%20Toys%20Tío%20Willy.'
+    secondaryLink: 'https://api.whatsapp.com/send?phone=584244576086&text=%C2%A1Hola!%20Deseo%20cotizar%20compras%20al%20mayor%20en%20Home%20and%20Toys%20T%C3%ADo%20Willy.'
   },
   {
     id: 3,
@@ -818,7 +920,7 @@ const HERO_SLIDES = [
     ctaText: 'Ver Ofertas Destacadas',
     ctaLink: '#seccion-ofertas',
     secondaryText: 'Consultar Ofertas',
-    secondaryLink: 'https://wa.me/584244576086?text=¡Hola!%20Me%20interesa%20conocer%20las%20ofertas%20especiales%20disponibles.'
+    secondaryLink: 'https://api.whatsapp.com/send?phone=584244576086&text=%C2%A1Hola!%20Me%20interesa%20conocer%20las%20ofertas%20especiales%20disponibles.'
   }
 ];
 
@@ -1640,7 +1742,7 @@ export default function Catalog({
 
             {/* Botón WhatsApp de Alto Impacto */}
             <a 
-              href="https://wa.me/584244576086"
+              href="https://api.whatsapp.com/send?phone=584244576086"
               target="_blank"
               rel="noopener noreferrer"
               className="h-10 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white text-xs font-black transition-all uppercase tracking-wider shadow-md shadow-emerald-950/40 flex items-center gap-2 active:scale-95"
@@ -1781,7 +1883,7 @@ export default function Catalog({
           <div className="mt-auto flex flex-col gap-3">
             <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest block text-center">Atención al Cliente</span>
             <a
-              href="https://wa.me/584244576086"
+              href="https://api.whatsapp.com/send?phone=584244576086"
               target="_blank"
               rel="noopener noreferrer"
               className="w-full min-h-[44px] py-3 bg-red-600 hover:bg-red-500 border border-red-500/30 text-white rounded-xl font-bold text-center text-xs transition-colors flex items-center justify-center gap-2 shadow-md shadow-red-600/30"
@@ -2107,7 +2209,7 @@ export default function Catalog({
                 </p>
               </div>
               <a
-                href="https://wa.me/584244576086?text=¡Hola!%20Quisiera%20consultar%20por%20las%20super%20ofertas%20destacadas%20de%20la%20tienda"
+                href={buildWhatsAppLink('584244576086', '¡Hola! Quisiera consultar por las súper ofertas destacadas de la tienda')}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="self-start sm:self-auto min-h-[44px] flex items-center gap-2 px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 active:bg-red-700 text-white text-xs font-extrabold transition-all uppercase tracking-wider shadow-lg shadow-red-600/40 active:scale-95"
@@ -2127,10 +2229,18 @@ export default function Catalog({
                   ? Math.round(((offerProd.priceDetal - (offerProd.offerPrice || 0)) / offerProd.priceDetal) * 100)
                   : null;
                 const currencySymbol = currency === 'EUR' ? '€' : '$';
-                const offerPhotoUrl = getAbsolutePhotoUrl(offerProd.images[0] || '/images/chair_red.jpg');
-                const offerCatalogUrl = getProductCatalogUrl(offerProd._id, 0);
-                const offerWaMsg = `Hola Tío Willy, quiero comprar en *OFERTA* el producto:\n\n🔥 *${offerProd.name}*\n🏷️ *Precio Especial:* ${currencySymbol}${offerProd.offerPrice?.toFixed(2)} (Antes ${currencySymbol}${offerProd.priceDetal.toFixed(2)})\n\n🔗 *Ver en Tienda:* ${offerCatalogUrl}\n📸 *Foto:* ${offerPhotoUrl}\n\n¿Tienen disponibilidad inmediata?`;
-                const offerWaUrl = `https://wa.me/584244576086?text=${encodeURIComponent(offerWaMsg)}`;
+                const offerWaMsg = buildProductWhatsAppMessage({
+                  productName: offerProd.name,
+                  priceDetal: offerProd.priceDetal,
+                  priceMayor: offerProd.priceMayor,
+                  minMayor: offerProd.minMayor,
+                  isOffer: true,
+                  offerPrice: offerProd.offerPrice,
+                  symbol: currencySymbol,
+                  productId: offerProd._id,
+                  imageUrl: offerProd.images[0],
+                });
+                const offerWaUrl = buildWhatsAppLink('584244576086', offerWaMsg);
 
                 return (
                   <div 
@@ -2431,7 +2541,7 @@ export default function Catalog({
 
             {/* Grid de Productos */}
             {paginatedProducts.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
                 {paginatedProducts.map((prod: Product) => {
                   const categoryObj = initialCategorias.find((c) => c._id === prod.category);
                   const categoryName = categoryObj ? categoryObj.name : prod.category;
@@ -2600,7 +2710,7 @@ export default function Catalog({
                         </svg>
                       </a>
                       <a
-                        href="https://wa.me/584244576086"
+                        href="https://api.whatsapp.com/send?phone=584244576086"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="w-8 h-8 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 hover:text-emerald-900 flex items-center justify-center transition-colors cursor-pointer active:scale-95 border border-emerald-200"
@@ -2629,7 +2739,7 @@ export default function Catalog({
                         </svg>
                       </a>
                       <a
-                        href="https://wa.me/584241439324"
+                        href="https://api.whatsapp.com/send?phone=584241439324"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="w-8 h-8 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 hover:text-emerald-900 flex items-center justify-center transition-colors cursor-pointer active:scale-95 border border-emerald-200"
@@ -2726,7 +2836,7 @@ export default function Catalog({
             </svg>
           </a>
           <a
-            href="https://wa.me/584244576086"
+            href="https://api.whatsapp.com/send?phone=584244576086"
             target="_blank"
             rel="noopener noreferrer"
             className="w-9 h-9 rounded-full bg-zinc-900 border border-zinc-800 hover:border-emerald-500/50 hover:bg-zinc-800 text-zinc-300 hover:text-emerald-400 flex items-center justify-center transition-all active:scale-95 shadow-md"
