@@ -36,36 +36,42 @@ export function buildWhatsAppLink(phone: string, text?: string): string {
   return `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(text)}`;
 }
 
-// Helpers para construir URLs seguras (omitiendo localhost para no disparar filtros de seguridad en WhatsApp)
-export function getAbsolutePhotoUrl(imgUrl?: string): string {
-  if (!imgUrl) return '';
-  if (imgUrl.startsWith('https://') || imgUrl.startsWith('http://')) {
-    if (imgUrl.includes('localhost') || imgUrl.includes('127.0.0.1')) {
-      return '';
-    }
-    return imgUrl;
-  }
+// Helpers para construir URLs limpias y seguras tanto en SSR como en Cliente
+export function getProductCatalogUrl(productId: string, varietyIndex: number = 0): string {
+  const vParam = varietyIndex > 0 ? `&v=${varietyIndex}` : '';
   if (typeof window !== 'undefined' && window.location.origin) {
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.endsWith('.local')) {
-      return '';
-    }
-    if (window.location.protocol === 'https:') {
-      return `${window.location.origin}${imgUrl.startsWith('/') ? '' : '/'}${imgUrl}`;
-    }
+    return `${window.location.origin}/?p=${encodeURIComponent(productId)}${vParam}`;
   }
-  return '';
+  return `/?p=${encodeURIComponent(productId)}${vParam}`;
 }
 
-export function getProductCatalogUrl(productId: string, varietyIndex: number = 0): string {
-  if (typeof window !== 'undefined' && window.location.origin) {
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.endsWith('.local')) {
-      return '';
-    }
-    if (window.location.protocol === 'https:') {
+export function getAbsolutePhotoUrl(imgUrl?: string, productId?: string, varietyIndex: number = 0): string {
+  // Si no hay imagen, pero tenemos el ID del producto, usamos el endpoint de la imagen
+  if (!imgUrl) {
+    if (productId && typeof window !== 'undefined' && window.location.origin) {
       const vParam = varietyIndex > 0 ? `&v=${varietyIndex}` : '';
-      return `${window.location.origin}/?p=${encodeURIComponent(productId)}${vParam}`;
+      return `${window.location.origin}/api/product-image?id=${encodeURIComponent(productId)}${vParam}`;
     }
+    return '';
   }
+
+  // Si ya es una URL pública externa (ej. Cloudinary https://res.cloudinary.com/...)
+  if ((imgUrl.startsWith('https://') || imgUrl.startsWith('http://')) && !imgUrl.startsWith('data:')) {
+    return imgUrl;
+  }
+
+  // Si es Base64 (data:image/...) o una ruta relativa (/images/...)
+  // Usamos el endpoint API dedicado /api/product-image para generar un enlace ligero y accesible
+  if (typeof window !== 'undefined' && window.location.origin && productId) {
+    const vParam = varietyIndex > 0 ? `&v=${varietyIndex}` : '';
+    return `${window.location.origin}/api/product-image?id=${encodeURIComponent(productId)}${vParam}`;
+  }
+
+  // Fallback si no hay productId pero hay ruta relativa local
+  if (imgUrl.startsWith('/') && typeof window !== 'undefined' && window.location.origin) {
+    return `${window.location.origin}${imgUrl}`;
+  }
+
   return '';
 }
 
@@ -95,7 +101,7 @@ export function buildProductWhatsAppMessage({
   imageUrl?: string;
 }): string {
   const isOfferActive = !!(isOffer && offerPrice && offerPrice > 0);
-  const photoUrl = getAbsolutePhotoUrl(imageUrl);
+  const photoUrl = getAbsolutePhotoUrl(imageUrl, productId, varietyIndex);
   const catalogUrl = getProductCatalogUrl(productId, varietyIndex);
 
   const lines: string[] = [];
@@ -120,11 +126,14 @@ export function buildProductWhatsAppMessage({
 
   if (catalogUrl) {
     lines.push('');
-    lines.push(`🔗 *Ver en Tienda:* ${catalogUrl}`);
+    lines.push('🔗 *Ver en Tienda:*');
+    lines.push(catalogUrl);
   }
 
   if (photoUrl) {
-    lines.push(`📸 *Foto:* ${photoUrl}`);
+    lines.push('');
+    lines.push('📸 *Ver Foto del Producto:*');
+    lines.push(photoUrl);
   }
 
   lines.push('');
