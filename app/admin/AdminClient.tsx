@@ -317,6 +317,34 @@ export default function AdminClient({
   const [adminPage, setAdminPage] = useState(1);
   const [productToDelete, setProductToDelete] = useState<string | null>(null);
 
+  // Estados para el Visor / Lightbox de Fotos de Producto
+  const [previewingProduct, setPreviewingProduct] = useState<Product | null>(null);
+  const [activePreviewIndex, setActivePreviewIndex] = useState<number>(0);
+
+  // Soporte de navegación por teclado en el visor de fotos (Esc para cerrar, Flechas para cambiar)
+  useEffect(() => {
+    if (!previewingProduct) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setPreviewingProduct(null);
+      } else if (e.key === 'ArrowRight') {
+        const total = previewingProduct.images.length;
+        if (total > 1) {
+          setActivePreviewIndex((prev) => (prev + 1) % total);
+        }
+      } else if (e.key === 'ArrowLeft') {
+        const total = previewingProduct.images.length;
+        if (total > 1) {
+          setActivePreviewIndex((prev) => (prev - 1 + total) % total);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [previewingProduct]);
+
   // Estados para recuperación de contraseña en Login
   const [isRecovering, setIsRecovering] = useState(false);
   const [recoveryQuestion, setRecoveryQuestion] = useState('');
@@ -1798,24 +1826,48 @@ export default function AdminClient({
                           : 'bg-white border-zinc-200 hover:border-red-500/40 hover:shadow-md'
                       }`}
                     >
-                      {/* Miniatura de Imagen con Badge +N y Estado Pausado */}
-                      <div className="relative w-16 h-16 rounded-xl bg-zinc-100 overflow-hidden flex-shrink-0 border border-zinc-200">
+                      {/* Miniatura de Imagen con Clic para Ampliar y Badge Compacto */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPreviewingProduct(prod);
+                          setActivePreviewIndex(0);
+                        }}
+                        className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-zinc-100 overflow-hidden flex-shrink-0 border border-zinc-200 group/thumb cursor-pointer hover:border-red-500/70 hover:shadow-md active:scale-95 transition-all text-left focus:outline-none focus:ring-2 focus:ring-red-500/40"
+                        title="Toca para ampliar y ver todas las fotos"
+                      >
                         <img 
                           src={thumbnail} 
                           alt={prod.name} 
-                          className={`w-full h-full object-cover transition-opacity ${isPaused ? 'opacity-50 grayscale-[30%]' : ''}`} 
+                          className={`w-full h-full object-cover group-hover/thumb:scale-105 transition-all duration-300 ${isPaused ? 'opacity-50 grayscale-[30%]' : ''}`} 
                         />
+
+                        {/* Icono de Lupa Sutil en Hover / Toque */}
+                        <div className="absolute inset-0 bg-black/25 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                          <div className="w-7 h-7 rounded-full bg-white/95 text-zinc-900 flex items-center justify-center shadow-md">
+                            <svg className="w-3.5 h-3.5 text-zinc-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+                            </svg>
+                          </div>
+                        </div>
+
+                        {/* Badge de Estado Pausado */}
                         {isPaused && (
-                          <div className="absolute inset-0 bg-zinc-950/75 backdrop-blur-xs flex items-center justify-center text-amber-300 font-black text-[9px] uppercase tracking-wider select-none">
+                          <div className="absolute top-1 left-1 bg-zinc-950/85 text-amber-300 font-black text-[8px] px-1 py-0.5 rounded uppercase tracking-wider select-none shadow-xs pointer-events-none">
                             ⏸️ Pausa
                           </div>
                         )}
+
+                        {/* Badge Compacto de Fotos Adicionales (NO tapa la foto) */}
                         {!isPaused && totalImages > 1 && (
-                          <div className="absolute inset-0 bg-zinc-950/60 backdrop-blur-xs flex items-center justify-center text-white font-bold text-xs select-none pointer-events-none">
-                            +{totalImages - 1}
+                          <div className="absolute bottom-1 right-1 bg-zinc-950/85 text-white text-[9px] font-black px-1.5 py-0.5 rounded-md border border-white/20 shadow-md flex items-center gap-1 select-none pointer-events-none">
+                            <svg className="w-2.5 h-2.5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <span>+{totalImages - 1}</span>
                           </div>
                         )}
-                      </div>
+                      </button>
 
                       {/* Detalles del Producto */}
                       <div className="flex-1 w-full min-w-0">
@@ -2002,6 +2054,145 @@ export default function AdminClient({
               >
                 Eliminar
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Visor de Fotos / Lightbox de Producto */}
+      {previewingProduct && (
+        <div 
+          className="fixed inset-0 z-[110] flex items-center justify-center p-3 sm:p-6 bg-zinc-950/85 backdrop-blur-md animate-fadeIn"
+          onClick={() => setPreviewingProduct(null)}
+        >
+          <div 
+            className="w-full max-w-lg sm:max-w-xl bg-white border border-zinc-200 rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-scaleUp max-h-[94vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Cabecera del Visor */}
+            <div className="flex items-center justify-between px-5 py-3.5 border-b border-zinc-200 bg-zinc-50/80">
+              <div className="min-w-0 pr-3">
+                <h3 className="text-sm sm:text-base font-black text-zinc-950 truncate" title={previewingProduct.name}>
+                  {previewingProduct.name}
+                </h3>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <span className="text-[10px] uppercase font-bold text-red-600">
+                    {categories.find((c) => c._id === previewingProduct.category)?.name || previewingProduct.category}
+                  </span>
+                  {previewingProduct.images.length > 1 && (
+                    <span className="text-[10px] text-zinc-500 font-mono font-bold">
+                      · Foto {activePreviewIndex + 1} de {previewingProduct.images.length}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setPreviewingProduct(null)}
+                className="w-8 h-8 rounded-full bg-zinc-200 hover:bg-zinc-300 text-zinc-700 hover:text-zinc-950 flex items-center justify-center transition-colors cursor-pointer focus:outline-none flex-shrink-0"
+                title="Cerrar (Esc)"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Área Central de la Imagen Grande con Flechas */}
+            <div className="relative bg-zinc-950 flex items-center justify-center min-h-[260px] sm:min-h-[360px] max-h-[55vh] overflow-hidden select-none">
+              <img 
+                src={previewingProduct.images[activePreviewIndex] || '/images/chair_red.jpg'} 
+                alt={previewingProduct.name}
+                className="w-full h-full max-h-[55vh] object-contain transition-all duration-300"
+              />
+
+              {/* Botón Anterior */}
+              {previewingProduct.images.length > 1 && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const total = previewingProduct.images.length;
+                    setActivePreviewIndex((prev) => (prev - 1 + total) % total);
+                  }}
+                  className="absolute left-2.5 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/60 hover:bg-black/85 text-white flex items-center justify-center backdrop-blur-sm border border-white/20 shadow-lg cursor-pointer transition-transform active:scale-90 focus:outline-none"
+                  title="Foto anterior"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+              )}
+
+              {/* Botón Siguiente */}
+              {previewingProduct.images.length > 1 && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const total = previewingProduct.images.length;
+                    setActivePreviewIndex((prev) => (prev + 1) % total);
+                  }}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/60 hover:bg-black/85 text-white flex items-center justify-center backdrop-blur-sm border border-white/20 shadow-lg cursor-pointer transition-transform active:scale-90 focus:outline-none"
+                  title="Foto siguiente"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              )}
+            </div>
+
+            {/* Carrusel de Miniaturas Inferior (si tiene más de 1 imagen) */}
+            {previewingProduct.images.length > 1 && (
+              <div className="p-3 bg-zinc-100 border-t border-zinc-200 flex items-center justify-center gap-2 overflow-x-auto">
+                {previewingProduct.images.map((imgUrl, idx) => (
+                  <button
+                    key={`modal-thumb-${idx}`}
+                    type="button"
+                    onClick={() => setActivePreviewIndex(idx)}
+                    className={`relative w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 border-2 transition-all cursor-pointer ${
+                      activePreviewIndex === idx 
+                        ? 'border-red-600 scale-105 shadow-md' 
+                        : 'border-transparent opacity-60 hover:opacity-100'
+                    }`}
+                  >
+                    <img src={imgUrl} alt={`thumb-${idx}`} className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Barra Inferior con Botón de Edición Directa */}
+            <div className="p-4 bg-white border-t border-zinc-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div className="text-xs text-zinc-500 text-center sm:text-left font-medium">
+                Precio detal: <span className="font-bold text-zinc-900 font-mono">{globalCurrency === 'EUR' ? '€' : '$'}{previewingProduct.priceDetal.toFixed(2)}</span> · Mayor: <span className="font-bold text-zinc-900 font-mono">{globalCurrency === 'EUR' ? '€' : '$'}{previewingProduct.priceMayor.toFixed(2)}</span>
+              </div>
+
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <button
+                  type="button"
+                  onClick={() => setPreviewingProduct(null)}
+                  className="flex-1 sm:flex-initial min-h-[42px] px-4 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-xs"
+                >
+                  Cerrar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const prodToEdit = previewingProduct;
+                    setPreviewingProduct(null);
+                    handleStartEdit(prodToEdit);
+                  }}
+                  className="flex-1 sm:flex-initial min-h-[42px] px-5 py-2 bg-red-600 hover:bg-red-500 active:scale-95 text-white rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2 shadow-md shadow-red-500/25"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                  </svg>
+                  Editar este producto
+                </button>
+              </div>
             </div>
           </div>
         </div>
