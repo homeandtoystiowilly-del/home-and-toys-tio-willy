@@ -393,6 +393,8 @@ export async function createProductAction(formData: FormData) {
       subcategory: subcategory || undefined,
       isOffer: isOffer || false,
       offerPrice: isOffer && offerPrice ? offerPrice : undefined,
+      status: 'active',
+      pausedVarieties: [],
       createdAt: new Date()
     };
 
@@ -630,6 +632,19 @@ export async function updateProductAction(productId: string, formData: FormData)
     const offerPriceRaw = formData.get('offerPrice') as string;
     const offerPrice = offerPriceRaw && !isNaN(parseFloat(offerPriceRaw)) ? parseFloat(offerPriceRaw) : undefined;
 
+    const existingProduct = await db.collection('productos').findOne({ _id: queryId as any });
+    const pausedVarietiesRaw = formData.get('pausedVarieties') as string;
+    let finalPausedVarieties: string[] = [];
+    if (pausedVarietiesRaw) {
+      try {
+        finalPausedVarieties = JSON.parse(pausedVarietiesRaw).filter((v: string) => varieties.includes(v));
+      } catch {
+        finalPausedVarieties = [];
+      }
+    } else if (existingProduct && Array.isArray(existingProduct.pausedVarieties)) {
+      finalPausedVarieties = existingProduct.pausedVarieties.filter((v: string) => varieties.includes(v));
+    }
+
     await db.collection('productos').updateOne(
       { _id: queryId as any },
       {
@@ -646,6 +661,7 @@ export async function updateProductAction(productId: string, formData: FormData)
           subcategory: subcategory || undefined,
           isOffer: isOffer || false,
           offerPrice: isOffer && offerPrice ? offerPrice : undefined,
+          pausedVarieties: finalPausedVarieties,
           updatedAt: new Date()
         }
       }
@@ -842,5 +858,67 @@ export async function toggleProductStatusAction(
   } catch (error: any) {
     console.error('Error al cambiar el estado del producto:', error);
     return { success: false, error: getFriendlyError(error, 'Error interno al cambiar el estado del producto.') };
+  }
+}
+
+export async function toggleProductVarietyStatusAction(
+  productId: string,
+  varietyName: string
+): Promise<{ success: boolean; error?: string; pausedVarieties?: string[]; message?: string }> {
+  const cookieStore = await cookies();
+  const session = cookieStore.get('admin_session')?.value;
+  if (!verifySessionToken(session)) {
+    return { success: false, error: 'No autorizado. La sesión ha expirado.' };
+  }
+
+  if (!productId || !varietyName) {
+    return { success: false, error: 'ID de producto o nombre de variedad no válido.' };
+  }
+
+  try {
+    const client = await clientPromise;
+    const db = client.db('tio_willy_db');
+    const queryId = ObjectId.isValid(productId) && productId.length === 24 ? new ObjectId(productId) : productId;
+
+    const prod = await db.collection('productos').findOne({ _id: queryId as any });
+    if (!prod) {
+      return { success: false, error: 'Producto no encontrado.' };
+    }
+
+    const currentPaused: string[] = Array.isArray(prod.pausedVarieties) ? prod.pausedVarieties : [];
+    let updatedPaused: string[];
+
+    if (currentPaused.includes(varietyName)) {
+      // Si ya estaba en la lista de pausadas, se reactiva (se quita)
+      updatedPaused = currentPaused.filter((v: string) => v !== varietyName);
+    } else {
+      // Se agrega a la lista de pausadas (se agota)
+      updatedPaused = [...currentPaused, varietyName];
+    }
+
+    await db.collection('productos').updateOne(
+      { _id: queryId as any },
+      {
+        $set: {
+          pausedVarieties: updatedPaused,
+          updatedAt: new Date()
+        }
+      }
+    );
+
+    revalidatePath('/');
+    revalidatePath('/admin');
+
+    const isNowPaused = updatedPaused.includes(varietyName);
+    return {
+      success: true,
+      pausedVarieties: updatedPaused,
+      message: isNowPaused
+        ? `Variedad "${varietyName}" marcada como agotada.`
+        : `Variedad "${varietyName}" reactivada con éxito.`
+    };
+  } catch (error: any) {
+    console.error('Error al cambiar estado de la variedad:', error);
+    return { success: false, error: getFriendlyError(error, 'Error al actualizar la disponibilidad de la variedad.') };
   }
 }

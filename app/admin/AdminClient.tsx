@@ -17,7 +17,8 @@ import {
   recoverPasswordAction,
   updateSecurityConfigAction,
   updateAutoLockAction,
-  toggleProductStatusAction
+  toggleProductStatusAction,
+  toggleProductVarietyStatusAction
 } from './adminActions';
 
 // Interfaces locales coincidentes con Catalog.tsx
@@ -37,6 +38,7 @@ export interface Product {
   offerPrice?: number;
   isOffer?: boolean;
   status?: 'active' | 'paused';
+  pausedVarieties?: string[];
 }
 
 export interface Stats {
@@ -270,6 +272,7 @@ export default function AdminClient({
   // Estados de edición de productos
   const [editingProductId, setEditingProductId] = useState<string | null>(null);
   const [existingImages, setExistingImages] = useState<string[]>([]);
+  const [editPausedVarieties, setEditPausedVarieties] = useState<string[]>([]);
   const [compressing, setCompressing] = useState<boolean>(false);
 
   // Estados del mapa
@@ -578,6 +581,7 @@ export default function AdminClient({
     setIsOffer(product.isOffer || false);
     setOfferPrice(product.offerPrice ? product.offerPrice.toString() : '');
     setExistingImages(product.images || []);
+    setEditPausedVarieties(product.pausedVarieties || []);
     
     // Limpiar archivos locales recién seleccionados para evitar mezclas involuntarias
     setSelectedFiles([]);
@@ -602,6 +606,7 @@ export default function AdminClient({
     setIsOffer(false);
     setOfferPrice('');
     setExistingImages([]);
+    setEditPausedVarieties([]);
     setSelectedFiles([]);
     setPreviewUrls([]);
     if (fileInputRef.current) fileInputRef.current.value = '';
@@ -649,6 +654,7 @@ export default function AdminClient({
     
     if (editingProductId) {
       formData.append('existingImages', JSON.stringify(existingImages));
+      formData.append('pausedVarieties', JSON.stringify(editPausedVarieties));
     }
 
     selectedFiles.forEach((file) => {
@@ -678,6 +684,7 @@ export default function AdminClient({
         setSelectedFiles([]);
         setPreviewUrls([]);
         setExistingImages([]);
+        setEditPausedVarieties([]);
         setEditingProductId(null);
         if (fileInputRef.current) fileInputRef.current.value = '';
         router.refresh(); // Sincroniza con el servidor
@@ -771,7 +778,7 @@ export default function AdminClient({
     }
   };
 
-  // Pausar / Reanudar Publicación de Producto (Control de Stock)
+  // Pausar / Reanudar Publicación de Producto (Control de Stock General)
   const handleToggleProductStatus = async (productId: string, newStatus: 'active' | 'paused') => {
     // Actualización optimista local
     setProducts((prev) =>
@@ -794,6 +801,54 @@ export default function AdminClient({
       alert('Error de conexión al cambiar el estado');
       setProducts((prev) =>
         prev.map((p) => (p._id === productId ? { ...p, status: newStatus === 'paused' ? 'active' : 'paused' } : p))
+      );
+    }
+  };
+
+  // Pausar / Reanudar Stock por Variedad / Color Individual
+  const handleToggleVarietyStatus = async (productId: string, varietyName: string) => {
+    // Actualización optimista local
+    setProducts((prev) =>
+      prev.map((p) => {
+        if (p._id !== productId) return p;
+        const currentPaused = p.pausedVarieties || [];
+        const nextPaused = currentPaused.includes(varietyName)
+          ? currentPaused.filter((v) => v !== varietyName)
+          : [...currentPaused, varietyName];
+        return { ...p, pausedVarieties: nextPaused };
+      })
+    );
+
+    try {
+      const res = await toggleProductVarietyStatusAction(productId, varietyName);
+      if (!res.success) {
+        alert(res.error || 'Error al actualizar la variedad');
+        // Revertir
+        setProducts((prev) =>
+          prev.map((p) => {
+            if (p._id !== productId) return p;
+            const currentPaused = p.pausedVarieties || [];
+            const revertedPaused = currentPaused.includes(varietyName)
+              ? currentPaused.filter((v) => v !== varietyName)
+              : [...currentPaused, varietyName];
+            return { ...p, pausedVarieties: revertedPaused };
+          })
+        );
+      } else {
+        router.refresh();
+      }
+    } catch (err) {
+      console.error('Error al actualizar disponibilidad de variedad:', err);
+      alert('Error de conexión al actualizar la variedad');
+      setProducts((prev) =>
+        prev.map((p) => {
+          if (p._id !== productId) return p;
+          const currentPaused = p.pausedVarieties || [];
+          const revertedPaused = currentPaused.includes(varietyName)
+            ? currentPaused.filter((v) => v !== varietyName)
+            : [...currentPaused, varietyName];
+          return { ...p, pausedVarieties: revertedPaused };
+        })
       );
     }
   };
@@ -1381,6 +1436,42 @@ export default function AdminClient({
                       className="w-full min-h-[44px] px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 hover:border-zinc-300 rounded-xl focus:bg-white focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-zinc-900 placeholder-zinc-400 focus:outline-none transition-all text-sm font-medium shadow-xs"
                       required
                     />
+                    {/* Control rápido de disponibilidad para las variedades actuales al editar */}
+                    {(() => {
+                      const list = varieties.split(',').map(v => v.trim()).filter(v => v.length > 0);
+                      if (list.length <= 1 && (list[0]?.toLowerCase() === 'estándar' || list.length === 0)) return null;
+                      return (
+                        <div className="mt-1 flex flex-wrap items-center gap-1.5 pt-1">
+                          <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
+                            Disponibilidad:
+                          </span>
+                          {list.map((vName, idx) => {
+                            const isPaused = editPausedVarieties.includes(vName);
+                            return (
+                              <button
+                                key={idx}
+                                type="button"
+                                onClick={() => {
+                                  setEditPausedVarieties(prev =>
+                                    prev.includes(vName) ? prev.filter(x => x !== vName) : [...prev, vName]
+                                  );
+                                }}
+                                title={isPaused ? `Toca para activar ${vName}` : `Toca para marcar ${vName} como agotado`}
+                                className={`text-[10px] font-semibold px-2 py-0.5 rounded-lg border transition-all cursor-pointer flex items-center gap-1 select-none active:scale-95 ${
+                                  isPaused
+                                    ? 'bg-amber-50 text-amber-800 border-amber-300 line-through opacity-85'
+                                    : 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100'
+                                }`}
+                              >
+                                <span className={`w-1.5 h-1.5 rounded-full ${isPaused ? 'bg-amber-500' : 'bg-emerald-500'}`} />
+                                <span>{vName}</span>
+                                {isPaused && <span className="text-[8px] no-underline uppercase font-extrabold text-amber-700 bg-amber-100 px-1 rounded ml-0.5">Agotado</span>}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      );
+                    })()}
                   </div>
                 </div>
 
@@ -1896,6 +1987,41 @@ export default function AdminClient({
                             </div>
                           </div>
                         </div>
+
+                        {/* Pastillas de Control de Stock por Variedad / Color */}
+                        {prod.varieties && prod.varieties.length > 0 && !(prod.varieties.length === 1 && prod.varieties[0].toLowerCase() === 'estándar') && (
+                          <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+                            <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider select-none">
+                              Stock / Colores:
+                            </span>
+                            <div className="flex flex-wrap gap-1.5 items-center">
+                              {prod.varieties.map((varName, vIdx) => {
+                                const isVarPaused = (prod.pausedVarieties || []).includes(varName);
+                                return (
+                                  <button
+                                    key={vIdx}
+                                    type="button"
+                                    onClick={() => handleToggleVarietyStatus(prod._id, varName)}
+                                    title={isVarPaused ? `Toca para reactivar stock de "${varName}"` : `Toca para marcar "${varName}" como agotado`}
+                                    className={`text-[11px] font-bold px-2.5 py-1 rounded-lg border transition-all active:scale-95 cursor-pointer flex items-center gap-1.5 select-none shadow-2xs ${
+                                      isVarPaused
+                                        ? 'bg-amber-50 text-amber-800 border-amber-300 line-through opacity-85 hover:opacity-100 hover:bg-amber-100'
+                                        : 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100 hover:border-emerald-400'
+                                    }`}
+                                  >
+                                    <span className={`w-2 h-2 rounded-full shrink-0 ${isVarPaused ? 'bg-amber-500' : 'bg-emerald-500'}`} />
+                                    <span>{varName}</span>
+                                    {isVarPaused && (
+                                      <span className="text-[9px] no-underline font-extrabold uppercase tracking-wider text-amber-700 bg-amber-100/90 px-1 py-0.2 rounded ml-0.5">
+                                        Agotado
+                                      </span>
+                                    )}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
 
                         {/* Controles de Precio In-line */}
                         <div className="mt-3 flex flex-wrap gap-4 items-center">

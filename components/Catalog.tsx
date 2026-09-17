@@ -20,6 +20,7 @@ export interface Product {
   offerPrice?: number;
   isOffer?: boolean;
   status?: 'active' | 'paused';
+  pausedVarieties?: string[];
 }
 
 export interface Category {
@@ -82,6 +83,7 @@ export function buildProductWhatsAppMessage({
   varietyIndex = 0,
   imageUrl,
   origin,
+  isVarietyPaused = false,
 }: {
   productName: string;
   variety?: string;
@@ -95,6 +97,7 @@ export function buildProductWhatsAppMessage({
   varietyIndex?: number;
   imageUrl?: string;
   origin?: string;
+  isVarietyPaused?: boolean;
 }): string {
   const isOfferActive = !!(isOffer && offerPrice && offerPrice > 0);
   const photoUrl = getAbsolutePhotoUrl(imageUrl, productId, varietyIndex, origin);
@@ -102,7 +105,15 @@ export function buildProductWhatsAppMessage({
 
   const lines: string[] = [];
 
-  if (isOfferActive) {
+  if (isVarietyPaused) {
+    lines.push('¡Hola Tío Willy! 👋');
+    lines.push('Deseo consultar por este producto del catálogo (Color/Variedad actualmente agotado):');
+    lines.push('');
+    lines.push(`📌 *${productName}*`);
+    if (variety) lines.push(`▫️ *Variedad solicitada:* ${variety} ⚠️ *(Agotado temporalmente)*`);
+    lines.push(`🏷️ *Precio Detal:* ${symbol}${priceDetal.toFixed(2)}`);
+    lines.push(`📦 *Precio al Mayor:* ${symbol}${priceMayor.toFixed(2)} (A partir de ${minMayor} uds.)`);
+  } else if (isOfferActive) {
     lines.push('¡Hola Tío Willy! 👋');
     lines.push('Deseo consultar por la *OFERTA ESPECIAL* del catálogo:');
     lines.push('');
@@ -133,7 +144,11 @@ export function buildProductWhatsAppMessage({
   }
 
   lines.push('');
-  lines.push('¿Tienen disponibilidad para entrega o despacho? ¡Muchas gracias!');
+  if (isVarietyPaused) {
+    lines.push('¿Tienen fecha estimada de reposición para este color o qué opciones similares tienen disponibles? ¡Muchas gracias!');
+  } else {
+    lines.push('¿Tienen disponibilidad para entrega o despacho? ¡Muchas gracias!');
+  }
 
   return lines.join('\n');
 }
@@ -196,7 +211,23 @@ function LogoTioWilly({ className = '' }: { className?: string }) {
 
 // Subcomponente para cada Tarjeta de Producto (Exportado para vista previa en admin)
 export function ProductCard({ product, categoryName, currency = 'USD' }: { product: Product; categoryName?: string; currency?: string }) {
-  const [activeIdx, setActiveIdx] = useState(0);
+  const pausedVars = useMemo(() => product.pausedVarieties || [], [product.pausedVarieties]);
+  const initialAvailableIdx = useMemo(() => {
+    const idx = product.varieties.findIndex(v => !pausedVars.includes(v));
+    return idx !== -1 ? idx : 0;
+  }, [product.varieties, pausedVars]);
+
+  const [activeIdx, setActiveIdx] = useState(initialAvailableIdx);
+
+  // Si la variedad actualmente seleccionada queda pausada pero existe otra con stock disponible, seleccionarla
+  useEffect(() => {
+    if (pausedVars.includes(product.varieties[activeIdx])) {
+      const nextAvail = product.varieties.findIndex(v => !pausedVars.includes(v));
+      if (nextAvail !== -1) {
+        setActiveIdx(nextAvail);
+      }
+    }
+  }, [pausedVars, product.varieties, activeIdx]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -241,6 +272,7 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
 
   const currentImage = product.images[activeIdx] || '/images/chair_red.jpg';
   const currentVariety = product.varieties[activeIdx] || product.varieties[0];
+  const isCurrentVarietyPaused = pausedVars.includes(currentVariety);
 
   const symbol = currency === 'EUR' ? '€' : '$';
   const isOfferActive = !!(product.isOffer && product.offerPrice && product.offerPrice > 0);
@@ -270,6 +302,7 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
       varietyIndex: activeIdx,
       imageUrl: currentImage,
       origin: originToUse,
+      isVarietyPaused: isCurrentVarietyPaused,
     });
     return buildWhatsAppLink(phone, whatsappMessage);
   };
@@ -358,6 +391,14 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
           </span>
         </div>
 
+        {/* Badge de Variedad Agotada en Imagen */}
+        {isCurrentVarietyPaused && (
+          <div className="absolute top-11 left-3 z-10 bg-zinc-950/85 backdrop-blur-md border border-amber-500/60 text-amber-300 font-extrabold text-[9px] sm:text-[10px] tracking-wider px-2 py-0.5 rounded-full uppercase shadow-md flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+            <span>{currentVariety} Agotado</span>
+          </div>
+        )}
+
         {/* Badge de Oferta Especial */}
         {isOfferActive && (
           <div className="absolute top-3 right-3 z-10 bg-red-600 border border-red-400 text-white font-black text-[10px] sm:text-xs tracking-wider px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full uppercase shadow-md flex items-center gap-1 backdrop-blur-xs">
@@ -384,24 +425,44 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
         {/* Selección Rápida de Variedades por Texto/Color */}
         {product.varieties.length > 1 && (
           <div className="mt-2.5">
-            <span className="text-[10px] sm:text-xs text-zinc-500 block mb-1 uppercase font-bold tracking-wider">Variedad:</span>
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[10px] sm:text-xs text-zinc-500 block uppercase font-bold tracking-wider">Variedad:</span>
+              {isCurrentVarietyPaused && (
+                <span className="text-[9px] font-bold text-amber-800 bg-amber-100 border border-amber-300 px-1.5 py-0.2 rounded uppercase">
+                  Agotado
+                </span>
+              )}
+            </div>
             <div className="flex flex-wrap gap-1">
-              {product.varieties.map((varName: string, idx: number) => (
-                <button
-                  key={idx}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setActiveIdx(idx);
-                  }}
-                  className={`text-[11px] sm:text-xs px-2 py-0.5 sm:px-2.5 sm:py-0.5 rounded-lg border transition-all duration-200 ${
-                    idx === activeIdx
-                      ? 'bg-red-50 text-red-600 border-red-400 font-semibold shadow-2xs'
-                      : 'bg-zinc-100 text-zinc-700 border-zinc-200 hover:border-zinc-400 hover:text-zinc-900'
-                  }`}
-                >
-                  {varName}
-                </button>
-              ))}
+              {product.varieties.map((varName: string, idx: number) => {
+                const isVarPaused = pausedVars.includes(varName);
+                const isSelected = idx === activeIdx;
+                return (
+                  <button
+                    key={idx}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveIdx(idx);
+                    }}
+                    className={`text-[11px] sm:text-xs px-2 py-0.5 sm:px-2.5 sm:py-0.5 rounded-lg border transition-all duration-200 flex items-center gap-1 ${
+                      isVarPaused
+                        ? isSelected
+                          ? 'bg-amber-50 text-amber-900 border-amber-400 font-bold line-through shadow-2xs'
+                          : 'bg-zinc-100/70 text-zinc-400 border-zinc-200 line-through opacity-75 hover:opacity-100'
+                        : isSelected
+                          ? 'bg-red-50 text-red-600 border-red-400 font-semibold shadow-2xs'
+                          : 'bg-zinc-100 text-zinc-700 border-zinc-200 hover:border-zinc-400 hover:text-zinc-900'
+                    }`}
+                  >
+                    <span>{varName}</span>
+                    {isVarPaused && (
+                      <span className="text-[8px] no-underline font-extrabold text-amber-700 bg-amber-100/90 px-1 rounded ml-0.5">
+                        Agotado
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}
@@ -448,13 +509,19 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
           target="_blank"
           rel="noopener noreferrer"
           onClick={handleWhatsAppAction}
-          className="mt-3 w-full py-2.5 px-3.5 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all duration-200 shadow-sm hover:shadow-md hover:shadow-red-600/20 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-red-500/50"
+          className={`mt-3 w-full py-2.5 px-3.5 text-white rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all duration-200 shadow-sm active:scale-[0.98] focus:outline-none focus:ring-2 ${
+            isCurrentVarietyPaused
+              ? 'bg-amber-600 hover:bg-amber-500 active:bg-amber-700 hover:shadow-md hover:shadow-amber-600/20 focus:ring-amber-500/50'
+              : 'bg-red-600 hover:bg-red-500 active:bg-red-700 hover:shadow-md hover:shadow-red-600/20 focus:ring-red-500/50'
+          }`}
         >
           {/* WhatsApp Icon */}
           <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
             <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.835-9.977c.311.089.822.112 1.134.112.31 0 .82-.112 1.131-.492.311-.38.82-1.993.899-2.15.079-.156.13-.339.028-.553-.102-.213-.822-1.994-.822-1.994-.127-.278-.261-.318-.466-.318-.17 0-.368-.012-.566-.012-.397 0-.907.146-1.22.492-.311.38-1.189 1.163-1.189 2.833 0 1.67 1.218 3.282 1.388 3.507.17.225 2.4 3.665 5.811 5.138.81.35 1.442.56 1.933.717.813.259 1.554.223 2.14.136.652-.097 1.993-.815 2.276-1.602.283-.787.283-1.46.198-1.602-.085-.142-.311-.225-.652-.393-.34-.168-1.993-.984-2.276-1.085-.283-.101-.49-.152-.697.152-.207.304-.803 1.085-.984 1.288-.18.203-.362.228-.703.06-.34-.168-1.436-.53-2.735-1.688-1.01-.902-1.693-2.016-1.892-2.355-.198-.339-.021-.523.149-.692.153-.152.34-.393.51-.59.17-.197.226-.338.339-.564.113-.225.056-.422-.028-.59-.084-.168-.703-1.692-1.01-2.434-.298-.718-.604-.621-.822-.631-.212-.01-.453-.012-.694-.012-.24 0-.631.09-.962.45-.33.36-1.26 1.23-1.26 3.003 0 1.77 1.29 3.48 1.47 3.73.18.25 2.54 3.88 6.16 5.45.86.37 1.53.59 2.06.76.87.28 1.66.24 2.28.15.69-.1 2.12-.87 2.42-1.71.3-.84.3-1.56.21-1.71-.09-.15-.33-.24-.72-.43z"/>
           </svg>
-          <span>Pedir por WhatsApp</span>
+          <span>
+            {isCurrentVarietyPaused ? `Consultar Reposición (${currentVariety})` : 'Pedir por WhatsApp'}
+          </span>
         </a>
       </div>
 
@@ -477,7 +544,7 @@ export function ProductDetailModal({
   product,
   categoryName,
   currency = 'USD',
-  initialActiveIdx = 0,
+  initialActiveIdx,
   onClose,
 }: {
   product: Product;
@@ -486,13 +553,26 @@ export function ProductDetailModal({
   initialActiveIdx?: number;
   onClose: () => void;
 }) {
-  const [modalActiveIdx, setModalActiveIdx] = useState(initialActiveIdx);
+  const pausedVars = useMemo(() => product.pausedVarieties || [], [product.pausedVarieties]);
+  const firstAvailableIdx = useMemo(() => {
+    const idx = product.varieties.findIndex(v => !pausedVars.includes(v));
+    return idx !== -1 ? idx : 0;
+  }, [product.varieties, pausedVars]);
+
+  // Si se indicó un índice inicial específico (y existe), usarlo; de lo contrario el primer disponible en stock
+  const startingIdx = (initialActiveIdx !== undefined && initialActiveIdx < product.varieties.length)
+    ? initialActiveIdx
+    : firstAvailableIdx;
+
+  const [modalActiveIdx, setModalActiveIdx] = useState(startingIdx);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const minSwipeDistance = 50;
 
   const currentImage = product.images[modalActiveIdx] || product.images[0] || '/images/chair_red.jpg';
   const currentVariety = product.varieties[modalActiveIdx] || product.varieties[0] || 'Estándar';
+  const isCurrentVarietyPaused = pausedVars.includes(currentVariety);
+
   const symbol = currency === 'EUR' ? '€' : '$';
   const isOfferActive = !!(product.isOffer && product.offerPrice && product.offerPrice > 0);
   const discountPct = isOfferActive && product.priceDetal > (product.offerPrice || 0)
@@ -554,6 +634,7 @@ export function ProductDetailModal({
       varietyIndex: modalActiveIdx,
       imageUrl: currentImage,
       origin: originToUse,
+      isVarietyPaused: isCurrentVarietyPaused,
     });
     return buildWhatsAppLink(phone, whatsappMessage);
   };
@@ -623,6 +704,14 @@ export function ProductDetailModal({
                 className="w-full h-full object-cover transition-transform duration-300 group-hover/heroimg:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-40 pointer-events-none"></div>
+
+              {/* Badge si la foto corresponde a variedad agotada */}
+              {isCurrentVarietyPaused && (
+                <div className="absolute top-3 left-3 z-10 bg-zinc-950/85 backdrop-blur-md border border-amber-500/60 text-amber-300 font-extrabold text-[10px] sm:text-xs tracking-wider px-3 py-1 rounded-full uppercase shadow-md flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                  <span>Color {currentVariety} Agotado</span>
+                </div>
+              )}
 
               {/* Botones de navegación si hay más de 1 imagen */}
               {product.images.length > 1 && (
@@ -705,24 +794,44 @@ export function ProductDetailModal({
                     <span className="text-[10px] text-zinc-500 uppercase font-extrabold tracking-wider">
                       Variedades / Modelos:
                     </span>
-                    <span className="text-xs text-red-600 font-bold">
-                      {currentVariety}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className={`text-xs font-bold ${isCurrentVarietyPaused ? 'text-amber-700' : 'text-red-600'}`}>
+                        {currentVariety}
+                      </span>
+                      {isCurrentVarietyPaused && (
+                        <span className="text-[9px] font-extrabold uppercase tracking-wider text-amber-800 bg-amber-100 border border-amber-300 px-1.5 py-0.5 rounded">
+                          Agotado
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {product.varieties.map((varName: string, idx: number) => (
-                      <button
-                        key={idx}
-                        onClick={() => setModalActiveIdx(idx)}
-                        className={`text-xs px-3 py-1.5 rounded-xl border transition-all duration-200 font-semibold cursor-pointer ${
-                          idx === modalActiveIdx
-                            ? 'bg-red-50 text-red-600 border-red-500 shadow-sm'
-                            : 'bg-zinc-100 text-zinc-700 border-zinc-200 hover:border-zinc-400 hover:text-zinc-900'
-                        }`}
-                      >
-                        {varName}
-                      </button>
-                    ))}
+                    {product.varieties.map((varName: string, idx: number) => {
+                      const isVarPaused = pausedVars.includes(varName);
+                      const isSelected = idx === modalActiveIdx;
+                      return (
+                        <button
+                          key={idx}
+                          onClick={() => setModalActiveIdx(idx)}
+                          className={`text-xs px-3 py-1.5 rounded-xl border transition-all duration-200 font-semibold cursor-pointer flex items-center gap-1.5 ${
+                            isVarPaused
+                              ? isSelected
+                                ? 'bg-amber-50 text-amber-900 border-amber-400 font-bold shadow-xs'
+                                : 'bg-zinc-100/70 text-zinc-400 border-zinc-200 line-through opacity-75 hover:opacity-100'
+                              : isSelected
+                                ? 'bg-red-50 text-red-600 border-red-500 shadow-sm'
+                                : 'bg-zinc-100 text-zinc-700 border-zinc-200 hover:border-zinc-400 hover:text-zinc-900'
+                          }`}
+                        >
+                          <span>{varName}</span>
+                          {isVarPaused && (
+                            <span className="text-[8px] no-underline uppercase font-extrabold text-amber-700 bg-amber-100 px-1 rounded">
+                              Agotado
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -789,18 +898,37 @@ export function ProductDetailModal({
                 </div>
               </div>
 
-              {/* Botón WhatsApp de Compra Inmediata */}
+              {/* Aviso amigable si la variedad seleccionada está agotada */}
+              {isCurrentVarietyPaused && (
+                <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-xs flex items-start gap-2.5 shadow-xs">
+                  <span className="text-base leading-none">⚠️</span>
+                  <div className="leading-snug">
+                    <span className="font-bold block">Variedad "{currentVariety}" agotada temporalmente</span>
+                    <span className="text-[11px] text-amber-800/90 block mt-0.5">
+                      Puedes elegir cualquier otro color disponible o pulsar abajo para consultar con Tío Willy la fecha estimada de llegada.
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Botón WhatsApp de Compra Inmediata o Consulta de Stock */}
               <a
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={handleModalWhatsAppAction}
-                className="mt-4 w-full py-3 px-4 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all duration-200 shadow-md shadow-red-600/25 active:scale-[0.98] cursor-pointer uppercase tracking-wider"
+                className={`mt-4 w-full py-3 px-4 text-white rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all duration-200 shadow-md active:scale-[0.98] cursor-pointer uppercase tracking-wider ${
+                  isCurrentVarietyPaused
+                    ? 'bg-amber-600 hover:bg-amber-500 active:bg-amber-700 shadow-amber-600/25'
+                    : 'bg-red-600 hover:bg-red-500 active:bg-red-700 shadow-red-600/25'
+                }`}
               >
                 <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
                   <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.835-9.977c.311.089.822.112 1.134.112.31 0 .82-.112 1.131-.492.311-.38.82-1.993.899-2.15.079-.156.13-.339.028-.553-.102-.213-.822-1.994-.822-1.994-.127-.278-.261-.318-.466-.318-.17 0-.368-.012-.566-.012-.397 0-.907.146-1.22.492-.311.38-1.189 1.163-1.189 2.833 0 1.67 1.218 3.282 1.388 3.507.17.225 2.4 3.665 5.811 5.138.81.35 1.442.56 1.933.717.813.259 1.554.223 2.14.136.652-.097 1.993-.815 2.276-1.602.283-.787.283-1.46.198-1.602-.085-.142-.311-.225-.652-.393-.34-.168-1.993-.984-2.276-1.085-.283-.101-.49-.152-.697.152-.207.304-.803 1.085-.984 1.288-.18.203-.362.228-.703.06-.34-.168-1.436-.53-2.735-1.688-1.01-.902-1.693-2.016-1.892-2.355-.198-.339-.021-.523.149-.692.153-.152.34-.393.51-.59.17-.197.226-.338.339-.564.113-.225.056-.422-.028-.59-.084-.168-.703-1.692-1.01-2.434-.298-.718-.604-.621-.822-.631-.212-.01-.453-.012-.694-.012-.24 0-.631.09-.962.45-.33.36-1.26 1.23-1.26 3.003 0 1.77 1.29 3.48 1.47 3.73.18.25 2.54 3.88 6.16 5.45.86.37 1.53.59 2.06.76.87.28 1.66.24 2.28.15.69-.1 2.12-.87 2.42-1.71.3-.84.3-1.56.21-1.71-.09-.15-.33-.24-.72-.43z"/>
                 </svg>
-                <span>Pedir por WhatsApp</span>
+                <span>
+                  {isCurrentVarietyPaused ? `Consultar reposición (${currentVariety})` : 'Pedir por WhatsApp'}
+                </span>
               </a>
             </div>
 
