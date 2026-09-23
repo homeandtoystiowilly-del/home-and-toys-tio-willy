@@ -480,6 +480,82 @@ export async function deleteCategoryAction(id: string) {
   }
 }
 
+// Acción para crear una subcategoría dentro de una categoría
+export async function createSubcategoryAction(categoryId: string, subcategoryName: string) {
+  try {
+    const cookieStore = await cookies();
+    const session = cookieStore.get('admin_session')?.value;
+    if (!verifySessionToken(session)) {
+      return { success: false, error: 'No autorizado. Inicie sesión nuevamente.' };
+    }
+
+    const trimmedName = subcategoryName ? subcategoryName.trim() : '';
+    if (!trimmedName) {
+      return { success: false, error: 'El nombre de la subcategoría no puede estar vacío.' };
+    }
+
+    if (!categoryId) {
+      return { success: false, error: 'ID de categoría no especificado.' };
+    }
+
+    const client = await clientPromise;
+    const db = client.db('tio_willy_db');
+
+    // Añadir al conjunto de subcategorías sin duplicados
+    await (db.collection('categorias') as any).updateOne(
+      { _id: categoryId },
+      { $addToSet: { subcategories: trimmedName } }
+    );
+
+    revalidatePath('/');
+    revalidatePath('/admin');
+
+    return { success: true, message: `Subcategoría "${trimmedName}" agregada con éxito.` };
+  } catch (error: any) {
+    console.error('Error al crear subcategoría:', error);
+    return { success: false, error: getFriendlyError(error, 'Error al guardar la subcategoría.') };
+  }
+}
+
+// Acción para eliminar una subcategoría de una categoría
+export async function deleteSubcategoryAction(categoryId: string, subcategoryName: string) {
+  try {
+    const cookieStore = await cookies();
+    const session = cookieStore.get('admin_session')?.value;
+    if (!verifySessionToken(session)) {
+      return { success: false, error: 'No autorizado. Inicie sesión nuevamente.' };
+    }
+
+    const trimmedName = subcategoryName ? subcategoryName.trim() : '';
+    if (!trimmedName || !categoryId) {
+      return { success: false, error: 'Parámetros inválidos para eliminar la subcategoría.' };
+    }
+
+    const client = await clientPromise;
+    const db = client.db('tio_willy_db');
+
+    // Remover la subcategoría de la categoría
+    await (db.collection('categorias') as any).updateOne(
+      { _id: categoryId },
+      { $pull: { subcategories: trimmedName } }
+    );
+
+    // Desvincular de los productos asociados a esta categoría y subcategoría
+    await db.collection('productos').updateMany(
+      { category: categoryId, subcategory: trimmedName },
+      { $unset: { subcategory: '' } }
+    );
+
+    revalidatePath('/');
+    revalidatePath('/admin');
+
+    return { success: true, message: `Subcategoría "${trimmedName}" eliminada con éxito.` };
+  } catch (error: any) {
+    console.error('Error al eliminar subcategoría:', error);
+    return { success: false, error: getFriendlyError(error, 'Error al eliminar la subcategoría.') };
+  }
+}
+
 // Acción para eliminar un producto
 export async function deleteProductAction(id: string) {
   try {

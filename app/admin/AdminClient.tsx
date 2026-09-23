@@ -8,6 +8,8 @@ import {
   createProductAction,
   createCategoryAction,
   deleteCategoryAction,
+  createSubcategoryAction,
+  deleteSubcategoryAction,
   deleteProductAction,
   updateProductPricesAction,
   updateProductAction,
@@ -49,6 +51,7 @@ export interface Stats {
 export interface Category {
   _id: string;
   name: string;
+  subcategories?: string[];
 }
 // Función de compresión de imágenes en el cliente usando Canvas
 const compressImage = (file: File): Promise<File> => {
@@ -259,6 +262,12 @@ export default function AdminClient({
 
   // Estado del Formulario de Categoría
   const [categoryInput, setCategoryInput] = useState('');
+
+  // Estados para subcategorías manuales
+  const [newSubcatInputs, setNewSubcatInputs] = useState<{ [categoryId: string]: string }>({});
+  const [showQuickSubcat, setShowQuickSubcat] = useState(false);
+  const [quickSubcatInput, setQuickSubcatInput] = useState('');
+  const [quickSubcatLoading, setQuickSubcatLoading] = useState(false);
 
   // Estados de carga e indicaciones
   const [submitLoading, setSubmitLoading] = useState(false);
@@ -733,6 +742,106 @@ export default function AdminClient({
     } catch (err) {
       console.error(err);
       alert('Error de red al eliminar la categoría');
+    }
+  };
+
+  // Agregar subcategoría manual a una categoría
+  const handleAddSubcategory = async (categoryId: string) => {
+    const rawName = (newSubcatInputs[categoryId] || '').trim();
+    if (!rawName) return;
+
+    try {
+      const res = await createSubcategoryAction(categoryId, rawName);
+      if (res.success) {
+        setCategories((prev) =>
+          prev.map((c) => {
+            if (c._id === categoryId) {
+              const currentSubs = c.subcategories || [];
+              if (!currentSubs.includes(rawName)) {
+                return { ...c, subcategories: [...currentSubs, rawName] };
+              }
+            }
+            return c;
+          })
+        );
+        setNewSubcatInputs((prev) => ({ ...prev, [categoryId]: '' }));
+        router.refresh();
+      } else {
+        alert(res.error || 'Error al agregar la subcategoría');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error de red al agregar la subcategoría');
+    }
+  };
+
+  // Eliminar subcategoría de una categoría
+  const handleDeleteSubcategory = async (categoryId: string, subcategoryName: string) => {
+    if (!confirm(`¿Estás seguro de eliminar la subcategoría "${subcategoryName}"? Los productos asignados pasarán a la categoría general.`)) return;
+
+    try {
+      const res = await deleteSubcategoryAction(categoryId, subcategoryName);
+      if (res.success) {
+        setCategories((prev) =>
+          prev.map((c) => {
+            if (c._id === categoryId) {
+              return {
+                ...c,
+                subcategories: (c.subcategories || []).filter((s) => s !== subcategoryName)
+              };
+            }
+            return c;
+          })
+        );
+        if (subcategory === subcategoryName) {
+          setSubcategory('');
+        }
+        router.refresh();
+      } else {
+        alert(res.error || 'Error al eliminar la subcategoría');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error de red al eliminar la subcategoría');
+    }
+  };
+
+  // Creación rápida de subcategoría desde el formulario de producto
+  const handleQuickCreateSubcategory = async () => {
+    const rawName = quickSubcatInput.trim();
+    if (!rawName) return;
+    if (!category) {
+      alert('Por favor selecciona primero una categoría en el formulario.');
+      return;
+    }
+
+    setQuickSubcatLoading(true);
+    try {
+      const res = await createSubcategoryAction(category, rawName);
+      if (res.success) {
+        setCategories((prev) =>
+          prev.map((c) => {
+            if (c._id === category) {
+              const currentSubs = c.subcategories || [];
+              if (!currentSubs.includes(rawName)) {
+                return { ...c, subcategories: [...currentSubs, rawName] };
+              }
+            }
+            return c;
+          })
+        );
+        setSubcategory(rawName);
+        setQuickSubcatInput('');
+        setShowQuickSubcat(false);
+        router.refresh();
+      } else {
+        alert(res.error || 'Error al crear la subcategoría');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error de red al crear la subcategoría');
+    } finally {
+      setQuickSubcatLoading(false);
     }
   };
 
@@ -1480,7 +1589,14 @@ export default function AdminClient({
                   <label className="text-xs font-bold text-zinc-700 uppercase tracking-wide">Categoría</label>
                   <select
                     value={category}
-                    onChange={(e) => setCategory(e.target.value)}
+                    onChange={(e) => {
+                      const newCat = e.target.value;
+                      setCategory(newCat);
+                      const targetCat = categories.find((c) => c._id === newCat);
+                      if (subcategory && !targetCat?.subcategories?.includes(subcategory)) {
+                        setSubcategory('');
+                      }
+                    }}
                     className="w-full min-h-[44px] px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 hover:border-zinc-300 rounded-xl focus:bg-white focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-zinc-900 focus:outline-none transition-all text-sm font-medium cursor-pointer shadow-xs"
                     required
                   >
@@ -1494,19 +1610,77 @@ export default function AdminClient({
                 </div>
 
                 {/* Subcategoría Manual */}
-                <div className="flex flex-col gap-1.5">
-                  <div className="flex justify-between items-baseline">
-                    <label className="text-xs font-bold text-zinc-700 uppercase tracking-wide">Subcategoría (Opcional)</label>
-                    <span className="text-[11px] text-zinc-500 italic">Ej: Rin 12, Rin 16, Audio</span>
-                  </div>
-                  <input
-                    type="text"
-                    placeholder="Dejar en blanco para autodetectar"
-                    value={subcategory}
-                    onChange={(e) => setSubcategory(e.target.value)}
-                    className="w-full min-h-[44px] px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 hover:border-zinc-300 rounded-xl focus:bg-white focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-zinc-900 placeholder-zinc-400 focus:outline-none transition-all text-sm font-medium shadow-xs"
-                  />
-                </div>
+                {(() => {
+                  const currentCategoryObj = categories.find((c) => c._id === category);
+                  const officialSubs = currentCategoryObj?.subcategories || [];
+                  const availableSubs = Array.from(new Set([
+                    ...officialSubs,
+                    ...(subcategory ? [subcategory] : [])
+                  ]));
+
+                  return (
+                    <div className="flex flex-col gap-1.5">
+                      <div className="flex justify-between items-center">
+                        <label className="text-xs font-bold text-zinc-700 uppercase tracking-wide">Subcategoría (Opcional)</label>
+                        {category && (
+                          <button
+                            type="button"
+                            onClick={() => setShowQuickSubcat(!showQuickSubcat)}
+                            className="text-[11px] text-red-600 hover:text-red-700 font-bold transition-colors cursor-pointer flex items-center gap-1"
+                          >
+                            <span>{showQuickSubcat ? 'Cerrar' : '+ Nueva Subcategoría'}</span>
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Creador rápido inline si se activó */}
+                      {showQuickSubcat && (
+                        <div className="flex items-center gap-2 p-2 rounded-xl bg-red-50/70 border border-red-200">
+                          <input
+                            type="text"
+                            placeholder="Ej: Rin 16, Coches para bebé, Robots..."
+                            value={quickSubcatInput}
+                            onChange={(e) => setQuickSubcatInput(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                handleQuickCreateSubcategory();
+                              }
+                            }}
+                            className="flex-1 min-h-[34px] px-3 py-1 bg-white border border-red-200 rounded-lg text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-red-500 font-medium"
+                          />
+                          <button
+                            type="button"
+                            onClick={handleQuickCreateSubcategory}
+                            disabled={quickSubcatLoading || !quickSubcatInput.trim()}
+                            className="px-3 min-h-[34px] bg-red-600 hover:bg-red-500 text-white rounded-lg text-xs font-bold transition-all disabled:opacity-50 cursor-pointer"
+                          >
+                            {quickSubcatLoading ? 'Creando...' : 'Crear'}
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Menú desplegable selector de subcategorías */}
+                      <select
+                        value={subcategory}
+                        onChange={(e) => setSubcategory(e.target.value)}
+                        className="w-full min-h-[44px] px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 hover:border-zinc-300 rounded-xl focus:bg-white focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-zinc-900 focus:outline-none transition-all text-sm font-medium cursor-pointer shadow-xs"
+                      >
+                        <option value="">Sin subcategoría (General)</option>
+                        {availableSubs.map((sub) => (
+                          <option key={sub} value={sub}>
+                            {sub}
+                          </option>
+                        ))}
+                      </select>
+                      <span className="text-[11px] text-zinc-400">
+                        {availableSubs.length === 0
+                          ? 'Esta categoría no tiene subcategorías aún. Pulsa "+ Nueva Subcategoría" para crear la primera.'
+                          : 'Selecciona una subcategoría de la lista o crea una nueva pulsando el botón superior.'}
+                      </span>
+                    </div>
+                  );
+                })()}
 
                 {/* Descripción */}
                 <div className="flex flex-col gap-1.5">
@@ -1564,14 +1738,17 @@ export default function AdminClient({
             {/* 2. Categorías Management Card */}
             <div className="p-6 rounded-3xl bg-white border border-zinc-200/90 shadow-xl shadow-zinc-200/50 flex flex-col gap-5">
               <div>
-                <h2 className="text-lg font-black tracking-wide text-zinc-950">Categorías</h2>
-                <p className="text-zinc-500 text-xs mt-1">Crea y administra las categorías del catálogo.</p>
+                <h2 className="text-lg font-black tracking-wide text-zinc-950">Categorías y Subcategorías</h2>
+                <p className="text-zinc-500 text-xs mt-1">
+                  Crea tus categorías y subcategorías personalizadas. Control 100% manual sin autodetección.
+                </p>
               </div>
 
+              {/* Formulario para Crear Categoría Principal */}
               <form onSubmit={handleCreateCategory} className="flex gap-2">
                 <input
                   type="text"
-                  placeholder="Ej. Electrodomésticos"
+                  placeholder="Ej. Bicicletas, Juguetes, Muebles..."
                   value={categoryInput}
                   onChange={(e) => setCategoryInput(e.target.value)}
                   className="flex-1 min-h-[44px] px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 hover:border-zinc-300 rounded-xl focus:bg-white focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-zinc-900 placeholder-zinc-400 focus:outline-none transition-all text-sm font-medium shadow-xs"
@@ -1581,34 +1758,99 @@ export default function AdminClient({
                 <button
                   type="submit"
                   disabled={categoryLoading}
-                  className="min-h-[44px] px-4 py-2.5 bg-red-600 hover:bg-red-500 active:bg-red-700 active:scale-95 text-white rounded-xl transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center shadow-md shadow-red-500/25"
+                  className="min-h-[44px] px-4 py-2.5 bg-red-600 hover:bg-red-500 active:bg-red-700 active:scale-95 text-white rounded-xl transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center shadow-md shadow-red-500/25 font-bold text-xs gap-1.5"
                   aria-label="Agregar categoría"
                   title="Agregar categoría"
                 >
-                  <svg className="w-4.5 h-4.5 fill-current" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
                     <path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58.55 0 1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41 0-.55-.23-1.06-.59-1.42zM5.5 8.25c-.97 0-1.75-.78-1.75-1.75s.78-1.75 1.75-1.75 1.75.78 1.75 1.75-.78 1.75-1.75 1.75z" />
                   </svg>
+                  <span>Nueva</span>
                 </button>
               </form>
 
-              {/* Lista de Categorías */}
-              <div className="flex flex-wrap gap-2">
+              {/* Lista de Categorías y sus Subcategorías */}
+              <div className="flex flex-col gap-3">
                 {categories.map((cat) => (
                   <div 
                     key={cat._id}
-                    className="flex items-center gap-1.5 pl-3.5 pr-2 py-1.5 rounded-full bg-zinc-100 border border-zinc-200 text-zinc-800 hover:bg-zinc-200/80 text-xs font-bold transition-all shadow-xs"
+                    className="p-3.5 rounded-2xl bg-zinc-50 border border-zinc-200/90 flex flex-col gap-2.5 transition-all hover:border-zinc-300"
                   >
-                    <span>{cat.name}</span>
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteCategory(cat._id)}
-                      className="w-5 h-5 rounded-full bg-zinc-200 hover:bg-red-100 text-zinc-600 hover:text-red-600 flex items-center justify-center transition-colors focus:outline-none cursor-pointer"
-                      title="Eliminar categoría"
-                    >
-                      <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
+                    {/* Encabezado de la Categoría */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-red-600" />
+                        <span className="text-xs font-black text-zinc-950 uppercase tracking-wide">
+                          {cat.name}
+                        </span>
+                        <span className="text-[10px] text-zinc-400 font-medium">
+                          ({(cat.subcategories || []).length} subcategorías)
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteCategory(cat._id)}
+                        className="w-6 h-6 rounded-lg bg-zinc-200/60 hover:bg-red-100 text-zinc-500 hover:text-red-600 flex items-center justify-center transition-colors cursor-pointer"
+                        title={`Eliminar categoría ${cat.name}`}
+                      >
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
+
+                    {/* Subcategorías de esta categoría */}
+                    <div className="flex flex-wrap items-center gap-1.5 min-h-[26px]">
+                      {cat.subcategories && cat.subcategories.length > 0 ? (
+                        cat.subcategories.map((sub) => (
+                          <span
+                            key={sub}
+                            className="inline-flex items-center gap-1.5 pl-2.5 pr-1.5 py-1 rounded-lg bg-white border border-zinc-200 text-zinc-800 text-xs font-semibold shadow-2xs group"
+                          >
+                            <span>{sub}</span>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteSubcategory(cat._id, sub)}
+                              className="w-4 h-4 rounded-full text-zinc-400 hover:text-red-600 hover:bg-red-50 flex items-center justify-center transition-colors cursor-pointer"
+                              title={`Eliminar subcategoría ${sub}`}
+                            >
+                              ✕
+                            </button>
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-[11px] text-zinc-400 italic">
+                          Sin subcategorías creadas aún
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Input rápido para agregar subcategoría a esta categoría */}
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      <input
+                        type="text"
+                        placeholder={`+ Agregar subcategoría a ${cat.name}...`}
+                        value={newSubcatInputs[cat._id] || ''}
+                        onChange={(e) =>
+                          setNewSubcatInputs((prev) => ({ ...prev, [cat._id]: e.target.value }))
+                        }
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleAddSubcategory(cat._id);
+                          }
+                        }}
+                        className="flex-1 min-h-[34px] px-3 py-1 bg-white border border-zinc-200 hover:border-zinc-300 rounded-lg text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/20 font-medium"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleAddSubcategory(cat._id)}
+                        disabled={!newSubcatInputs[cat._id]?.trim()}
+                        className="px-3 min-h-[34px] bg-zinc-900 hover:bg-zinc-800 active:scale-95 text-white rounded-lg text-xs font-bold transition-all disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed"
+                      >
+                        + Agregar
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>

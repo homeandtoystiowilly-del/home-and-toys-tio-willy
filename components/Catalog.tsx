@@ -26,6 +26,7 @@ export interface Product {
 export interface Category {
   _id: string;
   name: string;
+  subcategories?: string[];
 }
 
 // Helper para construir enlaces de WhatsApp universales y 100% compatibles, evitando el error 4xx de Cloudflare
@@ -940,120 +941,39 @@ export function ProductDetailModal({
   );
 }
 
-// Función auxiliar para extraer subcategorías de forma dinámica
-function getSubcategoriesForCategory(productsInCategory: Product[], categoriesList: Category[]) {
+// Función auxiliar para extraer subcategorías creadas manualmente por el administrador
+function getSubcategoriesForCategory(
+  productsInCategory: Product[],
+  categoriesList: Category[],
+  currentCategoryId: string
+): string[] {
   const subcats = new Set<string>();
-  
-  productsInCategory.forEach(product => {
-    // 0. Priorizar la subcategoría manual si existe
+
+  // 1. Obtener las subcategorías oficiales configuradas en la categoría
+  const categoryObj = categoriesList.find((c) => c._id === currentCategoryId);
+  if (categoryObj && Array.isArray(categoryObj.subcategories)) {
+    categoryObj.subcategories.forEach((s) => {
+      if (s && typeof s === 'string' && s.trim().length > 0) {
+        subcats.add(s.trim());
+      }
+    });
+  }
+
+  // 2. Incluir también subcategorías manuales asignadas a productos activos de esta categoría
+  productsInCategory.forEach((product) => {
     if (product.subcategory && product.subcategory.trim().length > 0) {
       subcats.add(product.subcategory.trim());
-      return;
     }
-
-    const nameLower = product.name.toLowerCase();
-    
-    // 1. Tamaños de Rin (Bicicletas y Juguetes con ruedas)
-    const rinMatch = product.name.match(/Rin\s*\d+/i);
-    if (rinMatch) {
-      const normalized = rinMatch[0].replace(/\s+/g, ' ').toUpperCase(); // "RIN 16"
-      subcats.add(normalized);
-      return;
-    }
-    
-    // 2. Coincidencias de Rin implícitas
-    if (nameLower.includes('rin 12')) { subcats.add('Rin 12'); return; }
-    if (nameLower.includes('rin 16')) { subcats.add('Rin 16'); return; }
-    if (nameLower.includes('rin 20')) { subcats.add('Rin 20'); return; }
-    if (nameLower.includes('rin 24')) { subcats.add('Rin 24'); return; }
-    if (nameLower.includes('rin 26')) { subcats.add('Rin 26'); return; }
-    if (nameLower.includes('rin 29')) { subcats.add('Rin 29'); return; }
-
-    // 3. Agrupaciones de Tecnología
-    if (nameLower.includes('auricular') || nameLower.includes('audifono') || nameLower.includes('headphone') || nameLower.includes('cornetas bluetooth') || nameLower.includes('audífonos')) {
-      subcats.add('Audio');
-      return;
-    }
-    if (nameLower.includes('teclado') || nameLower.includes('keyboard')) {
-      subcats.add('Teclados');
-      return;
-    }
-    if (nameLower.includes('mouse') || nameLower.includes('raton') || nameLower.includes('ratón')) {
-      subcats.add('Mouses');
-      return;
-    }
-    if (nameLower.includes('cargador') || nameLower.includes('powerbank') || nameLower.includes('bateria') || nameLower.includes('batería')) {
-      subcats.add('Cargadores');
-      return;
-    }
-    if (nameLower.includes('reloj') || nameLower.includes('smartwatch') || nameLower.includes('pulsera')) {
-      subcats.add('Relojes');
-      return;
-    }
-
-    // 4. Agrupaciones de Juguetes
-    if (nameLower.includes('robot') || nameLower.includes('interactivo')) {
-      subcats.add('Robots y Tech');
-      return;
-    }
-    if (nameLower.includes('muñec') || nameLower.includes('barbie') || nameLower.includes('lol')) {
-      subcats.add('Muñecas');
-      return;
-    }
-    if (nameLower.includes('carro') || nameLower.includes('pista') || nameLower.includes('auto') || nameLower.includes('camion') || nameLower.includes('camión')) {
-      subcats.add('Vehículos');
-      return;
-    }
-    if (nameLower.includes('juego de mesa') || nameLower.includes('monopoly') || nameLower.includes('ludo') || nameLower.includes('rompecabezas') || nameLower.includes('puzzle')) {
-      subcats.add('Juegos de Mesa');
-      return;
-    }
-    if (nameLower.includes('lego') || nameLower.includes('bloques') || nameLower.includes('armar')) {
-      subcats.add('Construcción');
-      return;
-    }
-
-    // 5. Agrupaciones de Hogar
-    if (nameLower.includes('silla') || nameLower.includes('sillon') || nameLower.includes('sillón') || nameLower.includes('mueble') || nameLower.includes('escritorio')) {
-      subcats.add('Muebles');
-      return;
-    }
-    if (nameLower.includes('lampara') || nameLower.includes('lámpara') || nameLower.includes('led') || nameLower.includes('luz')) {
-      subcats.add('Iluminación');
-      return;
-    }
-    if (nameLower.includes('organizador') || nameLower.includes('estante') || nameLower.includes('repisa') || nameLower.includes('caja')) {
-      subcats.add('Organizadores');
-      return;
-    }
-    if (nameLower.includes('cocina') || nameLower.includes('licuadora') || nameLower.includes('sarten') || nameLower.includes('olla') || nameLower.includes('vaso')) {
-      subcats.add('Cocina');
-      return;
-    }
-
-    // Fallback: usar la primera palabra del nombre si califica como término válido
-    const words = product.name.trim().split(/\s+/);
-    if (words.length > 0) {
-      const firstWord = words[0];
-      const capitalized = firstWord.charAt(0).toUpperCase() + firstWord.slice(1).toLowerCase();
-      if (capitalized.length > 2 && !['con', 'del', 'para', 'los', 'las', 'uno', 'una'].includes(capitalized.toLowerCase())) {
-        subcats.add(capitalized);
-        return;
-      }
-    }
-    
-    subcats.add('Otros');
   });
 
   return Array.from(subcats).sort((a, b) => {
-    // Si contiene "Rin", ordenar numéricamente
-    const aRin = a.match(/\d+/);
-    const bRin = b.match(/\d+/);
-    if (aRin && bRin) {
-      return parseInt(aRin[0]) - parseInt(bRin[0]);
+    // Si contiene números (ej: Rin 12, Rin 16, Rin 20), ordenar numéricamente
+    const aNum = a.match(/\d+/);
+    const bNum = b.match(/\d+/);
+    if (aNum && bNum) {
+      const diff = parseInt(aNum[0], 10) - parseInt(bNum[0], 10);
+      if (diff !== 0) return diff;
     }
-    if (a === 'Otros') return 1;
-    if (b === 'Otros') return -1;
     return a.localeCompare(b);
   });
 }
@@ -1212,7 +1132,7 @@ export default function Catalog({
   const subcategories = useMemo(() => {
     if (selectedCategory === 'todos') return [];
     const productsInCategory = activeProducts.filter((p) => p.category === selectedCategory);
-    return getSubcategoriesForCategory(productsInCategory, initialCategorias);
+    return getSubcategoriesForCategory(productsInCategory, initialCategorias, selectedCategory);
   }, [selectedCategory, activeProducts, initialCategorias]);
 
   // Helper to load an image URL and convert it to Base64
@@ -1693,67 +1613,8 @@ export default function Catalog({
     // 2. Filtrar por subcategoría si hay una seleccionada y no es 'todos'
     if (selectedCategory !== 'todos' && selectedSubcategory !== 'todos') {
       list = list.filter((p) => {
-        // Criterio 0: Prioridad a la subcategoría manual si existe
-        if (p.subcategory && p.subcategory.trim().length > 0) {
-          return p.subcategory.trim().toLowerCase() === selectedSubcategory.toLowerCase();
-        }
-
-        const nameLower = p.name.toLowerCase();
-        const subcatLower = selectedSubcategory.toLowerCase();
-
-        // Criterio 1: Rin (ej: Rin 16)
-        if (subcatLower.startsWith('rin')) {
-          const cleanSub = subcatLower.replace(/\s+/g, '');
-          const cleanName = nameLower.replace(/\s+/g, '');
-          return cleanName.includes(cleanSub);
-        }
-
-        // Criterio 2: Coincidencia de etiquetas/clasificaciones preestablecidas
-        if (selectedSubcategory === 'Audio') {
-          return nameLower.includes('auricular') || nameLower.includes('audifono') || nameLower.includes('headphone') || nameLower.includes('cornetas bluetooth') || nameLower.includes('audífonos');
-        }
-        if (selectedSubcategory === 'Teclados') {
-          return nameLower.includes('teclado') || nameLower.includes('keyboard');
-        }
-        if (selectedSubcategory === 'Mouses') {
-          return nameLower.includes('mouse') || nameLower.includes('raton') || nameLower.includes('ratón');
-        }
-        if (selectedSubcategory === 'Cargadores') {
-          return nameLower.includes('cargador') || nameLower.includes('powerbank') || nameLower.includes('bateria') || nameLower.includes('batería');
-        }
-        if (selectedSubcategory === 'Relojes') {
-          return nameLower.includes('reloj') || nameLower.includes('smartwatch') || nameLower.includes('pulsera');
-        }
-        if (selectedSubcategory === 'Robots y Tech') {
-          return nameLower.includes('robot') || nameLower.includes('interactivo');
-        }
-        if (selectedSubcategory === 'Muñecas') {
-          return nameLower.includes('muñec') || nameLower.includes('barbie') || nameLower.includes('lol');
-        }
-        if (selectedSubcategory === 'Vehículos') {
-          return nameLower.includes('carro') || nameLower.includes('pista') || nameLower.includes('auto') || nameLower.includes('camion') || nameLower.includes('camión');
-        }
-        if (selectedSubcategory === 'Juegos de Mesa') {
-          return nameLower.includes('juego de mesa') || nameLower.includes('monopoly') || nameLower.includes('ludo') || nameLower.includes('rompecabezas') || nameLower.includes('puzzle');
-        }
-        if (selectedSubcategory === 'Construcción') {
-          return nameLower.includes('lego') || nameLower.includes('bloques') || nameLower.includes('armar');
-        }
-        if (selectedSubcategory === 'Muebles') {
-          return nameLower.includes('silla') || nameLower.includes('sillon') || nameLower.includes('sillón') || nameLower.includes('mueble') || nameLower.includes('escritorio');
-        }
-        if (selectedSubcategory === 'Iluminación') {
-          return nameLower.includes('lampara') || nameLower.includes('lámpara') || nameLower.includes('led') || nameLower.includes('luz');
-        }
-        if (selectedSubcategory === 'Organizadores') {
-          return nameLower.includes('organizador') || nameLower.includes('estante') || nameLower.includes('repisa') || nameLower.includes('caja');
-        }
-        if (selectedSubcategory === 'Cocina') {
-          return nameLower.includes('cocina') || nameLower.includes('licuadora') || nameLower.includes('sarten') || nameLower.includes('olla') || nameLower.includes('vaso');
-        }
-
-        // Fallback: coincidencia general por texto
-        return nameLower.includes(subcatLower);
+        if (!p.subcategory || !p.subcategory.trim()) return false;
+        return p.subcategory.trim().toLowerCase() === selectedSubcategory.trim().toLowerCase();
       });
     }
 
@@ -2696,7 +2557,7 @@ export default function Catalog({
               <div className="w-full bg-white border border-zinc-200 rounded-3xl p-5 shadow-sm flex flex-col gap-3">
                 <div className="flex justify-between items-center">
                   <span className="text-[10px] text-zinc-500 font-extrabold uppercase tracking-wider">
-                    Filtros de tamaño / tipo
+                    Subcategorías / Colecciones
                   </span>
                   {selectedSubcategory !== 'todos' && (
                     <button
