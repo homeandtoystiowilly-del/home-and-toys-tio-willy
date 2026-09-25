@@ -1960,6 +1960,18 @@ export default function Catalog({
                 </svg>
                 <span className="hidden xs:inline">Actualizar</span>
               </button>
+
+              {/* Acceso discreto adicional en barra superior */}
+              <a
+                href="/admin"
+                className="flex items-center justify-center w-6 h-6 rounded-md bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-white transition-colors cursor-pointer shrink-0"
+                aria-label="Acceso"
+                title="Acceso"
+              >
+                <svg className="w-3.5 h-3.5 text-zinc-400 hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </a>
             </div>
           </div>
         </div>
@@ -2098,24 +2110,12 @@ export default function Catalog({
               </a>
             </div>
 
-            {/* Botón de Acceso Discreto (Ícono de Perfil/Cuenta) - Visible en móvil y desktop */}
-            <a
-              href="/admin"
-              className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center transition-all active:scale-95 shadow-sm group shrink-0 cursor-pointer"
-              aria-label="Acceso"
-              title="Acceso"
-            >
-              <svg className="w-4.5 h-4.5 text-zinc-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-            </a>
-
             {/* Botón WhatsApp de Alto Impacto */}
             <a 
               href="https://api.whatsapp.com/send?phone=584244576086"
               target="_blank"
               rel="noopener noreferrer"
-              className="h-10 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white text-xs font-black transition-all uppercase tracking-wider shadow-md shadow-emerald-950/40 flex items-center gap-2 active:scale-95"
+              className="h-10 px-3 sm:px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white text-xs font-black transition-all uppercase tracking-wider shadow-md shadow-emerald-950/40 flex items-center gap-1.5 sm:gap-2 active:scale-95 shrink-0"
             >
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-300 opacity-75"></span>
@@ -2127,10 +2127,22 @@ export default function Catalog({
               <span>WhatsApp</span>
             </a>
 
+            {/* Botón de Acceso Discreto (Ícono de Perfil/Cuenta) - Ubicado entre WhatsApp y Menú */}
+            <a
+              href="/admin"
+              className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-700 hover:border-zinc-500 hover:bg-zinc-800 text-zinc-300 hover:text-white flex items-center justify-center transition-all active:scale-95 shadow-md group shrink-0 cursor-pointer"
+              aria-label="Acceso"
+              title="Acceso"
+            >
+              <svg className="w-5 h-5 text-zinc-300 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </a>
+
             {/* Botón Menú Móvil Hamburger */}
             <button
               onClick={() => setIsDrawerOpen(true)}
-              className="lg:hidden w-10 h-10 flex items-center justify-center text-zinc-300 hover:text-white bg-zinc-900 hover:bg-zinc-800 active:scale-95 rounded-xl border border-zinc-800 transition-all focus:outline-none cursor-pointer"
+              className="lg:hidden w-10 h-10 flex items-center justify-center text-zinc-300 hover:text-white bg-zinc-900 hover:bg-zinc-800 active:scale-95 rounded-xl border border-zinc-800 transition-all focus:outline-none cursor-pointer shrink-0"
               aria-label="Abrir menú de navegación y categorías"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2241,6 +2253,18 @@ export default function Catalog({
               </>
             )}
           </button>
+
+          {/* Botón Acceso Administrador en el cuerpo del menú móvil */}
+          <a
+            href="/admin"
+            className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-200 hover:text-white border border-zinc-800 text-xs font-bold transition-all uppercase tracking-wider cursor-pointer shadow-sm active:scale-95"
+            onClick={() => setIsDrawerOpen(false)}
+          >
+            <svg className="w-4.5 h-4.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            <span>Acceso Administrador</span>
+          </a>
 
           {/* Buscador dentro del menú móvil */}
           <div className="flex flex-col gap-2">

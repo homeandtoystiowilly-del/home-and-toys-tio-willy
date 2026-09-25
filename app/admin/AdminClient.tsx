@@ -12,6 +12,7 @@ import {
   deleteSubcategoryAction,
   deleteProductAction,
   updateProductPricesAction,
+  updateProductSubcategoryAction,
   updateProductAction,
   updateMapUrlAction,
   updateGlobalCurrencyAction,
@@ -277,6 +278,8 @@ export default function AdminClient({
   
   // Estado para indicar si se está guardando algún cambio de precio en la lista
   const [priceSavingId, setPriceSavingId] = useState<string | null>(null);
+  // Estado para indicar si se está guardando cambio de subcategoría
+  const [subcatSavingId, setSubcatSavingId] = useState<string | null>(null);
 
   // Estados de edición de productos
   const [editingProductId, setEditingProductId] = useState<string | null>(null);
@@ -999,6 +1002,77 @@ export default function AdminClient({
     } finally {
       setTimeout(() => setPriceSavingId(null), 800); // Pequeña transición visual
     }
+  };
+
+  // Guardar subcategoría en vivo desde la tarjeta de producto
+  const handleSaveSubcategory = async (product: Product, newSubcat: string) => {
+    if (newSubcat === '__NEW__') {
+      const custom = window.prompt(`Crear y asignar nueva subcategoría para "${product.name}":`);
+      if (!custom || !custom.trim()) return;
+      const cleanCustom = custom.trim();
+
+      setSubcatSavingId(product._id);
+      try {
+        const targetCat = categories.find((c) => c._id === product.category || c.name.toLowerCase() === product.category.toLowerCase());
+        if (targetCat) {
+          await createSubcategoryAction(targetCat._id, cleanCustom);
+          setCategories((prev) =>
+            prev.map((c) =>
+              c._id === targetCat._id
+                ? { ...c, subcategories: Array.from(new Set([...(c.subcategories || []), cleanCustom])) }
+                : c
+            )
+          );
+        }
+
+        const res = await updateProductSubcategoryAction(product._id, cleanCustom);
+        if (res.success) {
+          setProducts((prev) =>
+            prev.map((p) => (p._id === product._id ? { ...p, subcategory: cleanCustom } : p))
+          );
+          router.refresh();
+        } else {
+          alert(res.error || 'Error al guardar subcategoría');
+        }
+      } catch (err) {
+        console.error('Error al crear/asignar subcategoría:', err);
+      } finally {
+        setSubcatSavingId(null);
+      }
+      return;
+    }
+
+    setSubcatSavingId(product._id);
+    // Actualización optimista inmediata en la UI
+    setProducts((prev) =>
+      prev.map((p) => (p._id === product._id ? { ...p, subcategory: newSubcat } : p))
+    );
+
+    try {
+      const res = await updateProductSubcategoryAction(product._id, newSubcat);
+      if (!res.success) {
+        console.error('Error al actualizar subcategoría:', res.error);
+        alert(res.error || 'Error al actualizar subcategoría');
+        router.refresh();
+      } else {
+        router.refresh();
+      }
+    } catch (err) {
+      console.error('Error de red al actualizar subcategoría:', err);
+    } finally {
+      setTimeout(() => setSubcatSavingId(null), 500);
+    }
+  };
+
+  // Renombrar o escribir subcategoría directamente con prompt
+  const handleRenameSubcategoryPrompt = async (product: Product) => {
+    const current = product.subcategory || '';
+    const renamed = window.prompt(
+      `Escribe o renombra la subcategoría para "${product.name}":`,
+      current
+    );
+    if (renamed === null) return;
+    await handleSaveSubcategory(product, renamed.trim());
   };
 
   // VISTA 1: LOGIN CARD
@@ -2215,10 +2289,27 @@ export default function AdminClient({
             {paginatedAdminProducts.length > 0 ? (
               <div className="flex flex-col gap-4">
                 {paginatedAdminProducts.map((prod) => {
-                  const prodCategory = categories.find((c) => c._id === prod.category)?.name || prod.category;
+                  const targetCat = categories.find((c) => c._id === prod.category || c.name.toLowerCase() === prod.category.toLowerCase());
+                  const prodCategory = targetCat?.name || prod.category;
                   const totalImages = prod.images.length;
                   const thumbnail = prod.images[0] || '/images/chair_red.jpg';
                   const isPaused = prod.status === 'paused';
+
+                  // Subcategorías de la categoría del producto (oficiales + usadas en productos)
+                  const currentCatSubs = Array.from(new Set([
+                    ...(targetCat?.subcategories || []),
+                    ...products
+                      .filter((p) => (p.category === targetCat?._id || p.category === prod.category) && p.subcategory && p.subcategory.trim())
+                      .map((p) => p.subcategory!.trim())
+                  ])).sort();
+
+                  // Todas las demás subcategorías existentes en el catálogo
+                  const otherSubs = Array.from(new Set([
+                    ...categories.flatMap((c) => (c._id !== targetCat?._id ? (c.subcategories || []) : [])),
+                    ...products
+                      .filter((p) => p.category !== targetCat?._id && p.category !== prod.category && p.subcategory && p.subcategory.trim())
+                      .map((p) => p.subcategory!.trim())
+                  ])).filter((sub) => !currentCatSubs.includes(sub)).sort();
 
                   return (
                     <div 
@@ -2286,17 +2377,66 @@ export default function AdminClient({
                                 {prodCategory}
                               </span>
 
-                              {/* Subcategoría / Colección Asignada */}
-                              {prod.subcategory && prod.subcategory.trim() ? (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-zinc-950 text-amber-300 border border-zinc-800 shadow-2xs">
-                                  <span className="text-amber-400">🔥</span>
-                                  <span>{prod.subcategory}</span>
-                                </span>
-                              ) : (
-                                <span className="text-[10px] text-zinc-400 font-medium italic">
-                                  (Sin subcategoría)
-                                </span>
-                              )}
+                              {/* Selector desplegable de Subcategoría en vivo */}
+                              <div className="inline-flex items-center gap-1.5">
+                                <div className="relative inline-flex items-center">
+                                  <select
+                                    value={prod.subcategory || ''}
+                                    disabled={subcatSavingId === prod._id}
+                                    onChange={(e) => handleSaveSubcategory(prod, e.target.value)}
+                                    className="appearance-none text-[10px] font-bold uppercase tracking-wider bg-zinc-950 hover:bg-zinc-900 text-amber-300 border border-zinc-800 hover:border-amber-400/60 rounded-md pl-5 pr-5 py-0.5 cursor-pointer transition-all focus:outline-none focus:ring-1 focus:ring-amber-400 shadow-2xs disabled:opacity-60"
+                                    title="Seleccionar o cambiar subcategoría de este producto"
+                                  >
+                                    <option value="" className="bg-zinc-900 text-zinc-400 font-normal">-- Sin subcategoría --</option>
+                                    
+                                    {currentCatSubs.length > 0 && (
+                                      <optgroup label={`Subcategorías de ${prodCategory}`} className="bg-zinc-900 text-amber-400 font-bold">
+                                        {currentCatSubs.map((sub) => (
+                                          <option key={sub} value={sub} className="bg-zinc-900 text-white font-medium">
+                                            🔥 {sub}
+                                          </option>
+                                        ))}
+                                      </optgroup>
+                                    )}
+
+                                    {otherSubs.length > 0 && (
+                                      <optgroup label="Otras subcategorías existentes" className="bg-zinc-900 text-zinc-400 font-bold">
+                                        {otherSubs.map((sub) => (
+                                          <option key={sub} value={sub} className="bg-zinc-900 text-white font-medium">
+                                            🏷️ {sub}
+                                          </option>
+                                        ))}
+                                      </optgroup>
+                                    )}
+
+                                    <optgroup label="Opciones" className="bg-zinc-900 text-red-400 font-bold">
+                                      <option value="__NEW__" className="bg-zinc-900 text-amber-300 font-bold">
+                                        ✨ + Nueva subcategoría...
+                                      </option>
+                                    </optgroup>
+                                  </select>
+                                  <span className="absolute left-1.5 pointer-events-none text-[9px]">
+                                    {subcatSavingId === prod._id ? '⏳' : '🔥'}
+                                  </span>
+                                  <span className="absolute right-1.5 pointer-events-none text-[7px] text-zinc-400">
+                                    ▼
+                                  </span>
+                                </div>
+
+                                <button
+                                  type="button"
+                                  onClick={() => handleRenameSubcategoryPrompt(prod)}
+                                  disabled={subcatSavingId === prod._id}
+                                  title="Escribir o renombrar subcategoría personalizada"
+                                  className="px-1.5 py-0.5 text-zinc-400 hover:text-amber-400 hover:bg-zinc-100 rounded text-[11px] transition-colors cursor-pointer border border-zinc-200"
+                                >
+                                  ✏️
+                                </button>
+
+                                {subcatSavingId === prod._id && (
+                                  <span className="text-[9px] text-amber-600 font-semibold animate-pulse">Guardando...</span>
+                                )}
+                              </div>
 
                               {isPaused && (
                                 <span className="text-[9px] bg-amber-100 border border-amber-300 text-amber-800 font-bold px-1.5 py-0.5 rounded uppercase tracking-wider flex items-center gap-1 shadow-xs">

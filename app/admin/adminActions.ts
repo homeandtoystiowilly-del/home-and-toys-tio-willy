@@ -630,6 +630,39 @@ export async function updateProductPricesAction(id: string, priceDetal: number, 
   }
 }
 
+// Acción para actualizar la subcategoría de un producto directamente
+export async function updateProductSubcategoryAction(id: string, subcategory: string) {
+  try {
+    const cookieStore = await cookies();
+    const session = cookieStore.get('admin_session')?.value;
+    if (!verifySessionToken(session)) {
+      return { success: false, error: 'No autorizado.' };
+    }
+
+    const client = await clientPromise;
+    const db = client.db('tio_willy_db');
+
+    const cleanSubcat = (subcategory || '').trim();
+    const queryId = ObjectId.isValid(id) && id.length === 24 ? new ObjectId(id) : id;
+    await db.collection('productos').updateOne(
+      { _id: queryId as any },
+      { 
+        $set: { 
+          subcategory: cleanSubcat
+        } 
+      }
+    );
+
+    revalidatePath('/');
+    revalidatePath('/admin');
+
+    return { success: true, message: 'Subcategoría actualizada.' };
+  } catch (error: any) {
+    console.error('Error al actualizar subcategoría:', error);
+    return { success: false, error: getFriendlyError(error, 'Error al actualizar subcategoría.') };
+  }
+}
+
 // Acción para actualizar un producto existente
 export async function updateProductAction(productId: string, formData: FormData) {
   try {
