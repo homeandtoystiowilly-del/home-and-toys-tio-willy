@@ -1939,14 +1939,14 @@ export default function Catalog({
               </div>
 
               <span className="hidden md:inline text-[10px] text-zinc-400 bg-zinc-900 border border-zinc-800 px-2 py-0.5 rounded-full font-medium">
-                Valor {formatBcvDate(bcvRates.usdDate)}
+                Valor {formatBcvDate(bcvRates.dateText || bcvRates.usdDate)}
               </span>
             </div>
 
             {/* Derecha: Botón de Actualizar y Fuente */}
             <div className="flex items-center gap-2 shrink-0">
-              <span className="text-[10px] text-zinc-500 hidden sm:inline">
-                Sincronizado vía DolarApi • BCV
+              <span className="text-[10px] text-zinc-400 hidden sm:inline">
+                Oficial Banco Central de Venezuela
               </span>
               <button
                 type="button"
@@ -2201,7 +2201,7 @@ export default function Catalog({
               </div>
             </div>
             <span className="text-[9px] text-zinc-400 block text-center mt-2 font-medium">
-              Valor {formatBcvDate(bcvRates.usdDate)} • Banco Central de Venezuela
+              Valor {formatBcvDate(bcvRates.dateText || bcvRates.usdDate)} • Banco Central de Venezuela
             </span>
           </div>
 
@@ -2634,7 +2634,7 @@ export default function Catalog({
                     Tasas Oficiales Banco Central de Venezuela (BCV)
                   </span>
                   <span className="text-[10px] bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded-full border border-zinc-700 font-bold hidden sm:inline">
-                    Valor {formatBcvDate(bcvRates.usdDate)}
+                    Valor {formatBcvDate(bcvRates.dateText || bcvRates.usdDate)}
                   </span>
                 </div>
                 <div className="flex flex-wrap items-baseline justify-center sm:justify-start gap-4 sm:gap-6 mt-1 font-mono">
@@ -2659,7 +2659,7 @@ export default function Catalog({
             <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end border-t md:border-t-0 pt-3 md:pt-0 border-zinc-800/80">
               <div className="text-[11px] text-zinc-400 text-left md:text-right">
                 <span className="hidden lg:block text-zinc-300 font-medium">Pagos aceptados a tasa oficial del día</span>
-                <span className="text-[10px] text-emerald-400/90 font-medium">Sincronizado vía DolarApi • BCV</span>
+                <span className="text-[10px] text-emerald-400/90 font-medium">Oficial Banco Central de Venezuela</span>
               </div>
               <button
                 type="button"

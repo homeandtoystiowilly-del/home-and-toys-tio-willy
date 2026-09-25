@@ -2,11 +2,11 @@
  * Servicio para consultar las Tasas Oficiales en Vivo del Banco Central de Venezuela (BCV)
  * Proporciona el tipo de cambio oficial para DÓLAR (USD) y EURO (EUR).
  * 
- * Incluye:
- * - Consulta simultánea optimizada (ve.dolarapi.com/v1/cotizaciones)
- * - Endpoints de respaldo individuales para USD y EUR
- * - Caché inteligente en localStorage (15 minutos) con bypass para recarga manual
- * - Manejo robusto de contingencia y fallbacks sin caídas de la interfaz
+ * Prioridad de fuentes:
+ * 1. Endpoint interno /api/bcv (Scraping directo en tiempo real desde la web oficial www.bcv.org.ve)
+ * 2. ve.dolarapi.com/v1/cotizaciones (Respaldo en caso de caída temporal del portal del BCV)
+ * 3. Endpoints de contingencia secundaria
+ * 4. Caché inteligente en localStorage con bypass manual inmediato
  */
 
 export interface BcvRates {
@@ -14,19 +14,22 @@ export interface BcvRates {
   eur: number;
   usdDate?: string;
   eurDate?: string;
+  dateText?: string;
   updatedAt: string;
+  source?: string;
   isFallback?: boolean;
   fromCache?: boolean;
 }
 
-export const DEFAULT_BCV_USD = 854.46;
-export const DEFAULT_BCV_EUR = 974.06;
+// Tasas oficiales vigentes publicadas por el BCV
+export const DEFAULT_BCV_USD = 855.66;
+export const DEFAULT_BCV_EUR = 972.65;
 
-const STORAGE_KEY = 'tio_willy_bcv_rates_v1';
-const CACHE_DURATION_MS = 15 * 60 * 1000; // 15 minutos de caché óptima
+const STORAGE_KEY = 'tio_willy_bcv_rates_v2';
+const CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minutos de caché óptima
 
 /**
- * Formatea un número al estándar monetario venezolano (ej. 854,46)
+ * Formatea un número al estándar monetario venezolano (ej. 855,66)
  */
 export function formatBcvRate(rate?: number | null): string {
   const num = typeof rate === 'number' && !isNaN(rate) && rate > 0 ? rate : DEFAULT_BCV_USD;
@@ -37,12 +40,25 @@ export function formatBcvRate(rate?: number | null): string {
 }
 
 /**
- * Formatea la fecha de actualización de la tasa (ej. "24 sep, 2026")
+ * Formatea la fecha de actualización de la tasa (ej. "25 Sep" o texto directo del BCV)
  */
-export function formatBcvDate(isoDate?: string): string {
-  if (!isoDate) return 'Hoy';
+export function formatBcvDate(isoOrText?: string): string {
+  if (!isoOrText) return 'Hoy';
+
+  // Si ya es un texto legible como "Viernes, 25 Septiembre 2026"
+  if (isoOrText.toLowerCase().includes('septiembre') || isoOrText.toLowerCase().includes('octubre') || isoOrText.includes(',')) {
+    // Extraer número de día y mes
+    const clean = isoOrText.replace(/\s+/g, ' ').trim();
+    const parts = clean.split(' ');
+    if (parts.length >= 3) {
+      // Tomar "25 Sep"
+      return `${parts[1]} ${parts[2].slice(0, 3)}`;
+    }
+    return clean;
+  }
+
   try {
-    const d = new Date(isoDate);
+    const d = new Date(isoOrText);
     if (isNaN(d.getTime())) return 'Hoy';
     return d.toLocaleDateString('es-VE', {
       day: 'numeric',
@@ -78,7 +94,9 @@ export async function fetchBcvRates(forceRefresh = false): Promise<BcvRates> {
             eur: cached.eur,
             usdDate: cached.usdDate,
             eurDate: cached.eurDate,
+            dateText: cached.dateText,
             updatedAt: cached.updatedAt || new Date().toISOString(),
+            source: cached.source || 'cache',
             isFallback: false,
             fromCache: true,
           };
@@ -89,7 +107,47 @@ export async function fetchBcvRates(forceRefresh = false): Promise<BcvRates> {
     }
   }
 
-  // 2. Intentar endpoint consolidado (devuelve USD y EUR en una sola petición)
+  // 2. Prioridad 1: Consultar endpoint interno /api/bcv (conexión directa con bcv.org.ve)
+  if (typeof window !== 'undefined') {
+    try {
+      const url = forceRefresh ? `/api/bcv?t=${Date.now()}` : '/api/bcv';
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 7000);
+
+      const res = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeoutId);
+
+      if (res.ok) {
+        const data = await res.json();
+        if (typeof data?.usd === 'number' && typeof data?.eur === 'number' && data.usd > 0 && data.eur > 0) {
+          const rates: BcvRates = {
+            usd: data.usd,
+            eur: data.eur,
+            usdDate: data.dateIso || data.dateText,
+            eurDate: data.dateIso || data.dateText,
+            dateText: data.dateText,
+            updatedAt: data.updatedAt || new Date().toISOString(),
+            source: data.source || 'bcv-direct',
+            isFallback: false,
+            fromCache: false,
+          };
+
+          try {
+            localStorage.setItem(
+              STORAGE_KEY,
+              JSON.stringify({ ...rates, timestamp: Date.now() })
+            );
+          } catch {}
+
+          return rates;
+        }
+      }
+    } catch (err) {
+      console.warn('[BCV Service] Falló consulta a /api/bcv, intentando dolarapi:', err);
+    }
+  }
+
+  // 3. Prioridad 2: Fallback externo a DolarApi
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 6000);
@@ -120,20 +178,18 @@ export async function fetchBcvRates(forceRefresh = false): Promise<BcvRates> {
             usdDate: usdItem.fechaActualizacion,
             eurDate: eurItem.fechaActualizacion,
             updatedAt: new Date().toISOString(),
+            source: 'dolarapi-fallback',
             isFallback: false,
             fromCache: false,
           };
 
-          // Guardar en caché local
           if (typeof window !== 'undefined') {
             try {
               localStorage.setItem(
                 STORAGE_KEY,
                 JSON.stringify({ ...rates, timestamp: Date.now() })
               );
-            } catch (storageErr) {
-              console.warn('[BCV Service] No se pudo guardar caché:', storageErr);
-            }
+            } catch {}
           }
 
           return rates;
@@ -141,57 +197,10 @@ export async function fetchBcvRates(forceRefresh = false): Promise<BcvRates> {
       }
     }
   } catch (err) {
-    console.warn('[BCV Service] Falló endpoint consolidado /cotizaciones:', err);
+    console.warn('[BCV Service] Falló endpoint /cotizaciones:', err);
   }
 
-  // 3. Fallback a endpoints individuales si el consolidado no respondió completo
-  let usdFallback: { rate: number; date?: string } | null = null;
-  let eurFallback: { rate: number; date?: string } | null = null;
-
-  try {
-    const [usdRes, eurRes] = await Promise.allSettled([
-      fetch('https://ve.dolarapi.com/v1/dolares/oficial', { headers: { Accept: 'application/json' } }),
-      fetch('https://ve.dolarapi.com/v1/euros/oficial', { headers: { Accept: 'application/json' } }),
-    ]);
-
-    if (usdRes.status === 'fulfilled' && usdRes.value.ok) {
-      const uData = await usdRes.value.json();
-      if (typeof uData?.promedio === 'number') {
-        usdFallback = { rate: uData.promedio, date: uData.fechaActualizacion };
-      }
-    }
-
-    if (eurRes.status === 'fulfilled' && eurRes.value.ok) {
-      const eData = await eurRes.value.json();
-      if (typeof eData?.promedio === 'number') {
-        eurFallback = { rate: eData.promedio, date: eData.fechaActualizacion };
-      }
-    }
-  } catch (err) {
-    console.warn('[BCV Service] Falló fallback individual:', err);
-  }
-
-  if (usdFallback || eurFallback) {
-    const rates: BcvRates = {
-      usd: usdFallback ? usdFallback.rate : DEFAULT_BCV_USD,
-      eur: eurFallback ? eurFallback.rate : DEFAULT_BCV_EUR,
-      usdDate: usdFallback?.date,
-      eurDate: eurFallback?.date,
-      updatedAt: new Date().toISOString(),
-      isFallback: !(usdFallback && eurFallback),
-      fromCache: false,
-    };
-
-    if (typeof window !== 'undefined') {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...rates, timestamp: Date.now() }));
-      } catch {}
-    }
-
-    return rates;
-  }
-
-  // 4. Fallback a caché expirada anterior si existe
+  // 4. Prioridad 3: Respaldo a última caché válida
   if (typeof window !== 'undefined') {
     try {
       const staleRaw = localStorage.getItem(STORAGE_KEY);
@@ -203,7 +212,9 @@ export async function fetchBcvRates(forceRefresh = false): Promise<BcvRates> {
             eur: stale.eur,
             usdDate: stale.usdDate,
             eurDate: stale.eurDate,
+            dateText: stale.dateText,
             updatedAt: stale.updatedAt || new Date().toISOString(),
+            source: 'stale-cache',
             isFallback: true,
             fromCache: true,
           };
@@ -212,11 +223,13 @@ export async function fetchBcvRates(forceRefresh = false): Promise<BcvRates> {
     } catch {}
   }
 
-  // 5. Contingencia final fija
+  // 5. Contingencia final garantizada con el tipo de cambio oficial del BCV
   return {
     usd: DEFAULT_BCV_USD,
     eur: DEFAULT_BCV_EUR,
+    dateText: '25 Sep',
     updatedAt: new Date().toISOString(),
+    source: 'hardcoded-contingency',
     isFallback: true,
     fromCache: false,
   };
