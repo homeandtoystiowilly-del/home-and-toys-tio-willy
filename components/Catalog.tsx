@@ -3,6 +3,15 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { trackEventAction } from '../app/admin/adminActions';
+import {
+  fetchBcvRates,
+  formatBcvRate,
+  formatBcvDate,
+  calculateBs,
+  BcvRates,
+  DEFAULT_BCV_USD,
+  DEFAULT_BCV_EUR,
+} from '../lib/bcvService';
 
 // Interfaces para TypeScript
 export interface Product {
@@ -212,7 +221,17 @@ function LogoTioWilly({ className = '' }: { className?: string }) {
 }
 
 // Subcomponente para cada Tarjeta de Producto (Exportado para vista previa en admin)
-export function ProductCard({ product, categoryName, currency = 'USD' }: { product: Product; categoryName?: string; currency?: string }) {
+export function ProductCard({ 
+  product, 
+  categoryName, 
+  currency = 'USD',
+  bcvRate
+}: { 
+  product: Product; 
+  categoryName?: string; 
+  currency?: string;
+  bcvRate?: number;
+}) {
   const pausedVars = useMemo(() => product.pausedVarieties || [], [product.pausedVarieties]);
   const initialAvailableIdx = useMemo(() => {
     const idx = product.varieties.findIndex(v => !pausedVars.includes(v));
@@ -541,14 +560,28 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
                   <span>🔥 Oferta Detal:</span>
                 </span>
               </div>
-              <span className="text-xl sm:text-2xl font-black text-red-600 font-mono">
-                {symbol}{product.offerPrice!.toFixed(2)}
-              </span>
+              <div className="flex flex-col items-end">
+                <span className="text-xl sm:text-2xl font-black text-red-600 font-mono">
+                  {symbol}{product.offerPrice!.toFixed(2)}
+                </span>
+                {bcvRate && bcvRate > 0 && (
+                  <span className="text-[10px] text-zinc-500 font-mono font-semibold">
+                    ≈ Bs. {calculateBs(product.offerPrice!, bcvRate)}
+                  </span>
+                )}
+              </div>
             </div>
           ) : (
             <div className="flex justify-between items-baseline">
               <span className="text-[11px] text-zinc-500 font-bold uppercase tracking-wide">Precio Detal:</span>
-              <span className="text-xl sm:text-2xl font-black text-zinc-900 font-mono">{symbol}{product.priceDetal.toFixed(2)}</span>
+              <div className="flex flex-col items-end">
+                <span className="text-xl sm:text-2xl font-black text-zinc-900 font-mono">{symbol}{product.priceDetal.toFixed(2)}</span>
+                {bcvRate && bcvRate > 0 && (
+                  <span className="text-[10px] text-zinc-500 font-mono font-semibold">
+                    ≈ Bs. {calculateBs(product.priceDetal, bcvRate)}
+                  </span>
+                )}
+              </div>
             </div>
           )}
           
@@ -562,7 +595,14 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
               </span>
               <span className="text-[9px] text-zinc-500 font-medium">A partir de {product.minMayor} unidades</span>
             </div>
-            <span className="text-base sm:text-lg font-black text-red-600 font-mono">{symbol}{product.priceMayor.toFixed(2)}</span>
+            <div className="flex flex-col items-end">
+              <span className="text-base sm:text-lg font-black text-red-600 font-mono">{symbol}{product.priceMayor.toFixed(2)}</span>
+              {bcvRate && bcvRate > 0 && (
+                <span className="text-[9px] text-red-700/80 font-mono font-bold">
+                  ≈ Bs. {calculateBs(product.priceMayor, bcvRate)}
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
@@ -615,6 +655,7 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
           categoryName={categoryName}
           currency={currency}
           initialActiveIdx={activeIdx}
+          bcvRate={bcvRate}
           onClose={() => setIsModalOpen(false)}
         />
       )}
@@ -629,12 +670,14 @@ export function ProductDetailModal({
   currency = 'USD',
   initialActiveIdx,
   onClose,
+  bcvRate,
 }: {
   product: Product;
   categoryName?: string;
   currency?: string;
   initialActiveIdx?: number;
   onClose: () => void;
+  bcvRate?: number;
 }) {
   const pausedVars = useMemo(() => product.pausedVarieties || [], [product.pausedVarieties]);
   const firstAvailableIdx = useMemo(() => {
@@ -968,15 +1011,29 @@ export function ProductDetailModal({
                       <span className="text-xs text-red-600 font-extrabold uppercase tracking-wide flex items-center gap-1">
                         <span>🔥 Precio Oferta:</span>
                       </span>
-                      <span className="text-2xl sm:text-3xl font-black text-red-600 font-mono">
-                        {symbol}{product.offerPrice!.toFixed(2)}
-                      </span>
+                      <div className="flex flex-col items-end">
+                        <span className="text-2xl sm:text-3xl font-black text-red-600 font-mono">
+                          {symbol}{product.offerPrice!.toFixed(2)}
+                        </span>
+                        {bcvRate && bcvRate > 0 && (
+                          <span className="text-xs font-bold text-zinc-500 font-mono">
+                            ≈ Bs. {calculateBs(product.offerPrice!, bcvRate)}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ) : (
                   <div className="flex items-baseline justify-between gap-2">
                     <span className="text-xs text-zinc-500 font-bold uppercase tracking-wider">Precio Detal:</span>
-                    <span className="text-2xl sm:text-3xl font-black text-zinc-950 font-mono">{symbol}{product.priceDetal.toFixed(2)}</span>
+                    <div className="flex flex-col items-end">
+                      <span className="text-2xl sm:text-3xl font-black text-zinc-950 font-mono">{symbol}{product.priceDetal.toFixed(2)}</span>
+                      {bcvRate && bcvRate > 0 && (
+                        <span className="text-xs font-bold text-zinc-500 font-mono">
+                          ≈ Bs. {calculateBs(product.priceDetal, bcvRate)}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 )}
 
@@ -989,10 +1046,30 @@ export function ProductDetailModal({
                     <span className="text-xs text-red-600 font-bold uppercase tracking-wider">Precio al Mayor:</span>
                     <span className="text-[10px] text-zinc-500">A partir de {product.minMayor} unidades</span>
                   </div>
-                  <span className="text-xl sm:text-2xl font-black text-red-600 font-mono">
-                    {symbol}{product.priceMayor.toFixed(2)}
-                  </span>
+                  <div className="flex flex-col items-end">
+                    <span className="text-xl sm:text-2xl font-black text-red-600 font-mono">
+                      {symbol}{product.priceMayor.toFixed(2)}
+                    </span>
+                    {bcvRate && bcvRate > 0 && (
+                      <span className="text-xs font-bold text-red-700/80 font-mono">
+                        ≈ Bs. {calculateBs(product.priceMayor, bcvRate)}
+                      </span>
+                    )}
+                  </div>
                 </div>
+
+                {/* Resumen Oficial de Conversión BCV */}
+                {bcvRate && bcvRate > 0 && (
+                  <div className="pt-2 border-t border-zinc-200/80 flex items-center justify-between text-[11px] text-zinc-500">
+                    <span className="flex items-center gap-1.5 font-medium">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                      <span>Tasa Oficial BCV:</span>
+                    </span>
+                    <span className="font-mono font-bold text-zinc-800">
+                      Bs. {formatBcvRate(bcvRate)} / {currency === 'EUR' ? 'EUR' : 'USD'}
+                    </span>
+                  </div>
+                )}
               </div>
 
               {/* Aviso amigable si la variedad seleccionada está agotada */}
@@ -1146,6 +1223,44 @@ export default function Catalog({
       setCatalogOrigin(window.location.origin);
     }
   }, []);
+
+  // Estados para Tasas Oficiales en Vivo del BCV (Dólar y Euro)
+  const [bcvRates, setBcvRates] = useState<BcvRates>({
+    usd: DEFAULT_BCV_USD,
+    eur: DEFAULT_BCV_EUR,
+    updatedAt: new Date().toISOString(),
+  });
+  const [isBcvLoading, setIsBcvLoading] = useState<boolean>(false);
+  const [isBcvRotating, setIsBcvRotating] = useState<boolean>(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    const loadRates = async () => {
+      try {
+        const rates = await fetchBcvRates();
+        if (isMounted) setBcvRates(rates);
+      } catch (err) {
+        console.error('Error al consultar tasas del BCV:', err);
+      }
+    };
+    loadRates();
+    return () => { isMounted = false; };
+  }, []);
+
+  const handleManualRefreshBcv = async (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    setIsBcvRotating(true);
+    setIsBcvLoading(true);
+    try {
+      const freshRates = await fetchBcvRates(true);
+      setBcvRates(freshRates);
+    } catch (err) {
+      console.error('Error al refrescar tasas del BCV:', err);
+    } finally {
+      setIsBcvLoading(false);
+      setTimeout(() => setIsBcvRotating(false), 800);
+    }
+  };
 
   // Detección de producto enlazado por URL (?p=ID&v=INDEX) para abrir automáticamente la vista detallada
   useEffect(() => {
@@ -1790,8 +1905,67 @@ export default function Catalog({
           </div>
         </div>
       )}
-      {/* Sticky Top Navbar de Alta Gama en Cristal Ahumado Oscuro */}
-      <nav className="sticky top-0 z-30 w-full bg-zinc-950/90 border-b border-zinc-800/80 backdrop-blur-xl transition-all shadow-2xl">
+      {/* Contenedor Superior Sticky (Franja Oficial BCV + Navbar Principal) */}
+      <div className="sticky top-0 z-30 w-full shadow-2xl">
+        {/* Franja Superior Oficial BCV en Vivo (Dólar y Euro) */}
+        <div className="w-full bg-[#050507] border-b border-zinc-850 text-zinc-300 py-1.5 px-3 sm:px-6 select-none transition-colors">
+          <div className="max-w-7xl mx-auto flex items-center justify-between gap-2 text-[11px] sm:text-xs">
+            {/* Izquierda: Indicador en vivo y Tasas Oficiales */}
+            <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+              <div className="flex items-center gap-1.5 text-emerald-400 font-bold shrink-0">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                <span className="text-[10px] sm:text-[11px] uppercase tracking-wider font-extrabold text-emerald-400">
+                  Tasa Oficial BCV
+                </span>
+              </div>
+
+              <div className="h-3 w-px bg-zinc-800 hidden xs:block"></div>
+
+              {/* Dólar BCV */}
+              <div className="inline-flex items-center gap-1 font-mono">
+                <span className="text-zinc-400 font-medium">USD:</span>
+                <span className="font-black text-white">Bs. {formatBcvRate(bcvRates.usd)}</span>
+              </div>
+
+              <span className="text-zinc-600">•</span>
+
+              {/* Euro BCV */}
+              <div className="inline-flex items-center gap-1 font-mono">
+                <span className="text-zinc-400 font-medium">EUR:</span>
+                <span className="font-black text-white">Bs. {formatBcvRate(bcvRates.eur)}</span>
+              </div>
+
+              <span className="hidden md:inline text-[10px] text-zinc-400 bg-zinc-900 border border-zinc-800 px-2 py-0.5 rounded-full font-medium">
+                Valor {formatBcvDate(bcvRates.usdDate)}
+              </span>
+            </div>
+
+            {/* Derecha: Botón de Actualizar y Fuente */}
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="text-[10px] text-zinc-500 hidden sm:inline">
+                Sincronizado vía DolarApi • BCV
+              </span>
+              <button
+                type="button"
+                onClick={handleManualRefreshBcv}
+                disabled={isBcvLoading || isBcvRotating}
+                className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-[10px] sm:text-[11px] font-bold text-zinc-300 hover:text-white transition-colors cursor-pointer"
+                title="Actualizar tasas oficiales con el BCV"
+              >
+                <svg className={`w-3 h-3 text-emerald-400 ${isBcvRotating || isBcvLoading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <span className="hidden xs:inline">Actualizar</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Sticky Top Navbar de Alta Gama en Cristal Ahumado Oscuro */}
+        <nav className="w-full bg-zinc-950/90 border-b border-zinc-800/80 backdrop-blur-xl transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-4">
           
           {/* 1. Logo Compacto de Alta Jerarquía */}
@@ -1869,6 +2043,32 @@ export default function Catalog({
           {/* 3. Grupo de Conversión y Redes Sociales */}
           <div className="flex items-center gap-2.5">
             
+            {/* Badge Dual BCV en Navbar Desktop */}
+            <div 
+              className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-200 text-xs font-bold shadow-inner select-none transition-all hover:border-zinc-700"
+              title={`Tasas Oficiales Banco Central de Venezuela. USD: Bs. ${formatBcvRate(bcvRates.usd)} | EUR: Bs. ${formatBcvRate(bcvRates.eur)}. Clic para actualizar.`}
+            >
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              <span className="text-[10px] font-black uppercase text-emerald-400">BCV:</span>
+              <span className="font-mono text-white text-[11px] font-bold">💵 {formatBcvRate(bcvRates.usd)}</span>
+              <span className="text-zinc-600 font-mono">|</span>
+              <span className="font-mono text-white text-[11px] font-bold">💶 {formatBcvRate(bcvRates.eur)}</span>
+              <button
+                type="button"
+                onClick={handleManualRefreshBcv}
+                disabled={isBcvLoading || isBcvRotating}
+                className="text-zinc-400 hover:text-white transition-colors cursor-pointer p-0.5"
+                title="Sincronizar BCV"
+              >
+                <svg className={`w-3 h-3 ${isBcvRotating || isBcvLoading ? 'animate-spin text-emerald-400' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </button>
+            </div>
+
             {/* Redes Sociales Oficiales con Badges Circulares */}
             <div className="hidden sm:flex items-center gap-1.5 pr-1 border-r border-zinc-800">
               <a
@@ -1940,6 +2140,7 @@ export default function Catalog({
           </div>
         </div>
       </nav>
+      </div>
 
       {/* Mobile Drawer (Menu Lateral) */}
       <div className={`fixed inset-0 z-50 transition-all duration-300 ${isDrawerOpen ? 'visible' : 'invisible'}`}>
@@ -1963,6 +2164,45 @@ export default function Catalog({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
+          </div>
+
+          {/* Tarjeta de Tasas Oficiales BCV en Menú Móvil */}
+          <div className="p-3.5 rounded-2xl bg-zinc-900 border border-zinc-800 text-white shadow-md">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-1.5">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400">
+                  Tasa Oficial BCV
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={handleManualRefreshBcv}
+                disabled={isBcvLoading || isBcvRotating}
+                className="p-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white transition-colors cursor-pointer"
+                title="Actualizar tasas"
+              >
+                <svg className={`w-3.5 h-3.5 text-emerald-400 ${isBcvRotating || isBcvLoading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </button>
+            </div>
+            <div className="grid grid-cols-2 gap-2 text-center">
+              <div className="p-2 rounded-xl bg-zinc-800/80 border border-zinc-700/60">
+                <span className="text-[9px] uppercase tracking-wider text-zinc-400 font-bold block">Dólar BCV</span>
+                <span className="text-xs font-black font-mono text-white">Bs. {formatBcvRate(bcvRates.usd)}</span>
+              </div>
+              <div className="p-2 rounded-xl bg-zinc-800/80 border border-zinc-700/60">
+                <span className="text-[9px] uppercase tracking-wider text-zinc-400 font-bold block">Euro BCV</span>
+                <span className="text-xs font-black font-mono text-white">Bs. {formatBcvRate(bcvRates.eur)}</span>
+              </div>
+            </div>
+            <span className="text-[9px] text-zinc-400 block text-center mt-2 font-medium">
+              Valor {formatBcvDate(bcvRates.usdDate)} • Banco Central de Venezuela
+            </span>
           </div>
 
           {/* Botón Trabaja con nosotros Móvil */}
@@ -2371,6 +2611,72 @@ export default function Catalog({
       {/* Main Content Area */}
       <main id="catalogo" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         
+        {/* Banner Oficial de Tasas BCV en Vivo (USD y EUR - Estilo Creatik Adaptado) */}
+        <div className="w-full mb-8 sm:mb-12 p-4 sm:p-6 rounded-3xl bg-gradient-to-r from-zinc-950 via-zinc-900 to-black border border-zinc-800 shadow-2xl relative overflow-hidden text-white">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-red-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-5 text-center md:text-left">
+            {/* Izquierda: Icono + Tasas USD & EUR */}
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-emerald-400 shadow-inner shrink-0">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                </svg>
+              </div>
+              <div>
+                <div className="flex items-center justify-center sm:justify-start gap-2">
+                  <span className="inline-flex items-center gap-1.5 text-xs font-black tracking-wide uppercase text-emerald-400">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    Tasas Oficiales Banco Central de Venezuela (BCV)
+                  </span>
+                  <span className="text-[10px] bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded-full border border-zinc-700 font-bold hidden sm:inline">
+                    Valor {formatBcvDate(bcvRates.usdDate)}
+                  </span>
+                </div>
+                <div className="flex flex-wrap items-baseline justify-center sm:justify-start gap-4 sm:gap-6 mt-1 font-mono">
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-xl sm:text-2xl font-black text-white">
+                      Bs. {formatBcvRate(bcvRates.usd)}
+                    </span>
+                    <span className="text-xs font-bold text-zinc-400">/ Dólar (USD)</span>
+                  </div>
+                  <span className="text-zinc-600 hidden sm:inline">|</span>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-xl sm:text-2xl font-black text-white">
+                      Bs. {formatBcvRate(bcvRates.eur)}
+                    </span>
+                    <span className="text-xs font-bold text-zinc-400">/ Euro (EUR)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Derecha: Nota informativa y Botón Actualizar */}
+            <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end border-t md:border-t-0 pt-3 md:pt-0 border-zinc-800/80">
+              <div className="text-[11px] text-zinc-400 text-left md:text-right">
+                <span className="hidden lg:block text-zinc-300 font-medium">Pagos aceptados a tasa oficial del día</span>
+                <span className="text-[10px] text-emerald-400/90 font-medium">Sincronizado vía DolarApi • BCV</span>
+              </div>
+              <button
+                type="button"
+                onClick={handleManualRefreshBcv}
+                disabled={isBcvLoading || isBcvRotating}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-750 active:scale-95 border border-zinc-700 text-xs font-bold text-white transition-all shadow-sm cursor-pointer shrink-0"
+                title="Sincronizar tasas con el BCV"
+              >
+                <svg className={`w-3.5 h-3.5 text-emerald-400 ${isBcvRotating || isBcvLoading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <span className="text-[11px]">Actualizar</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
         {/* Franja de Super Ofertas Destacadas (Si existen productos con isOffer) */}
         {offerProducts.length > 0 && (
           <section id="seccion-ofertas" className="mb-12 sm:mb-16 p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-zinc-950 via-zinc-900 to-black border border-red-500/30 shadow-2xl shadow-zinc-950/20 relative overflow-hidden text-white bg-brand-lines">
@@ -2761,6 +3067,7 @@ export default function Catalog({
                       product={prod} 
                       categoryName={categoryName} 
                       currency={currency}
+                      bcvRate={currency === 'EUR' ? bcvRates.eur : bcvRates.usd}
                     />
                   );
                 })}
@@ -3078,6 +3385,7 @@ export default function Catalog({
             selectedOfferProduct.category
           }
           currency={currency}
+          bcvRate={currency === 'EUR' ? bcvRates.eur : bcvRates.usd}
           onClose={() => setSelectedOfferProduct(null)}
         />
       )}
@@ -3092,6 +3400,7 @@ export default function Catalog({
           }
           currency={currency}
           initialActiveIdx={selectedUrlVarietyIdx}
+          bcvRate={currency === 'EUR' ? bcvRates.eur : bcvRates.usd}
           onClose={() => setSelectedUrlProduct(null)}
         />
       )}
