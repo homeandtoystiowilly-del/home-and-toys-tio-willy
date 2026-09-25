@@ -1283,6 +1283,32 @@ export default function Catalog({
     }
   }, [initialProductos]);
 
+  // Bloqueo estricto del scroll y gestos de la página de fondo al abrir el menú móvil/centrado
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    if (isDrawerOpen) {
+      const originalOverflow = document.body.style.overflow;
+      const originalTouchAction = document.body.style.touchAction;
+
+      // Bloquea totalmente el desplazamiento de la landing page detrás del menú
+      document.body.style.overflow = 'hidden';
+      document.body.style.touchAction = 'none';
+
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          setIsDrawerOpen(false);
+        }
+      };
+      window.addEventListener('keydown', handleKeyDown);
+
+      return () => {
+        document.body.style.overflow = originalOverflow;
+        document.body.style.touchAction = originalTouchAction;
+        window.removeEventListener('keydown', handleKeyDown);
+      };
+    }
+  }, [isDrawerOpen]);
+
   // Estados del Carrusel de la Cabecera (Hero Slider)
   const [currentHeroSlide, setCurrentHeroSlide] = useState<number>(0);
   const [isHeroPaused, setIsHeroPaused] = useState<boolean>(false);
@@ -1905,77 +1931,8 @@ export default function Catalog({
           </div>
         </div>
       )}
-      {/* Contenedor Superior Sticky (Franja Oficial BCV + Navbar Principal) */}
+      {/* Contenedor Superior Sticky (Navbar Principal) */}
       <div className="sticky top-0 z-30 w-full shadow-2xl">
-        {/* Franja Superior Oficial BCV en Vivo (Dólar y Euro) */}
-        <div className="w-full bg-[#050507] border-b border-zinc-850 text-zinc-300 py-1.5 px-3 sm:px-6 select-none transition-colors">
-          <div className="max-w-7xl mx-auto flex items-center justify-between gap-2 text-[11px] sm:text-xs">
-            {/* Izquierda: Indicador en vivo y Tasas Oficiales */}
-            <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-              <div className="flex items-center gap-1.5 text-emerald-400 font-bold shrink-0">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                </span>
-                <span className="text-[10px] sm:text-[11px] uppercase tracking-wider font-extrabold text-emerald-400">
-                  Tasa Oficial BCV
-                </span>
-              </div>
-
-              <div className="h-3 w-px bg-zinc-800 hidden xs:block"></div>
-
-              {/* Dólar BCV */}
-              <div className="inline-flex items-center gap-1 font-mono">
-                <span className="text-zinc-400 font-medium">USD:</span>
-                <span className="font-black text-white">Bs. {formatBcvRate(bcvRates.usd)}</span>
-              </div>
-
-              <span className="text-zinc-600">•</span>
-
-              {/* Euro BCV */}
-              <div className="inline-flex items-center gap-1 font-mono">
-                <span className="text-zinc-400 font-medium">EUR:</span>
-                <span className="font-black text-white">Bs. {formatBcvRate(bcvRates.eur)}</span>
-              </div>
-
-              <span className="hidden md:inline text-[10px] text-zinc-400 bg-zinc-900 border border-zinc-800 px-2 py-0.5 rounded-full font-medium">
-                Valor {formatBcvDate(bcvRates.dateText || bcvRates.usdDate)}
-              </span>
-            </div>
-
-            {/* Derecha: Botón de Actualizar y Fuente */}
-            <div className="flex items-center gap-2 shrink-0">
-              <span className="text-[10px] text-zinc-400 hidden sm:inline">
-                Oficial Banco Central de Venezuela
-              </span>
-              <button
-                type="button"
-                onClick={handleManualRefreshBcv}
-                disabled={isBcvLoading || isBcvRotating}
-                className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-[10px] sm:text-[11px] font-bold text-zinc-300 hover:text-white transition-colors cursor-pointer"
-                title="Actualizar tasas oficiales con el BCV"
-              >
-                <svg className={`w-3 h-3 text-emerald-400 ${isBcvRotating || isBcvLoading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-                <span className="hidden xs:inline">Actualizar</span>
-              </button>
-
-              {/* Acceso discreto adicional en barra superior */}
-              <a
-                href="/admin"
-                className="flex items-center justify-center w-6 h-6 rounded-md bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-white transition-colors cursor-pointer shrink-0"
-                aria-label="Acceso"
-                title="Acceso"
-              >
-                <svg className="w-3.5 h-3.5 text-zinc-400 hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-              </a>
-            </div>
-          </div>
-        </div>
-
         {/* Sticky Top Navbar de Alta Gama en Cristal Ahumado Oscuro */}
         <nav className="w-full bg-zinc-950/90 border-b border-zinc-800/80 backdrop-blur-xl transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-4">
@@ -2052,35 +2009,8 @@ export default function Catalog({
             </button>
           </div>
 
-          {/* 3. Grupo de Conversión y Redes Sociales */}
+          {/* 3. Grupo de Redes Sociales y Accesos */}
           <div className="flex items-center gap-2.5">
-            
-            {/* Badge Dual BCV en Navbar Desktop */}
-            <div 
-              className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-200 text-xs font-bold shadow-inner select-none transition-all hover:border-zinc-700"
-              title={`Tasas Oficiales Banco Central de Venezuela. USD: Bs. ${formatBcvRate(bcvRates.usd)} | EUR: Bs. ${formatBcvRate(bcvRates.eur)}. Clic para actualizar.`}
-            >
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-              </span>
-              <span className="text-[10px] font-black uppercase text-emerald-400">BCV:</span>
-              <span className="font-mono text-white text-[11px] font-bold">💵 {formatBcvRate(bcvRates.usd)}</span>
-              <span className="text-zinc-600 font-mono">|</span>
-              <span className="font-mono text-white text-[11px] font-bold">💶 {formatBcvRate(bcvRates.eur)}</span>
-              <button
-                type="button"
-                onClick={handleManualRefreshBcv}
-                disabled={isBcvLoading || isBcvRotating}
-                className="text-zinc-400 hover:text-white transition-colors cursor-pointer p-0.5"
-                title="Sincronizar BCV"
-              >
-                <svg className={`w-3 h-3 ${isBcvRotating || isBcvLoading ? 'animate-spin text-emerald-400' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-              </button>
-            </div>
-
             {/* Redes Sociales Oficiales con Badges Circulares */}
             <div className="hidden sm:flex items-center gap-1.5 pr-1 border-r border-zinc-800">
               <a
@@ -2154,201 +2084,228 @@ export default function Catalog({
       </nav>
       </div>
 
-      {/* Mobile Drawer (Menu Lateral) */}
-      <div className={`fixed inset-0 z-50 transition-all duration-300 ${isDrawerOpen ? 'visible' : 'invisible'}`}>
-        {/* Backdrop (fondo oscuro semitransparente) */}
+      {/* Menú Centrado & Navegación (Diseño Centrado de Alta Fidelidad para Móviles y Desktop) */}
+      <div 
+        className={`fixed inset-0 z-50 flex items-center justify-center p-3.5 sm:p-6 transition-all duration-300 ${
+          isDrawerOpen ? 'visible opacity-100 pointer-events-auto' : 'invisible opacity-0 pointer-events-none'
+        }`}
+        aria-modal="true"
+        role="dialog"
+      >
+        {/* Backdrop con desenfoque profundo que bloquea e independiza totalmente la página trasera */}
         <div 
           onClick={() => setIsDrawerOpen(false)}
-          className={`absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${isDrawerOpen ? 'opacity-100' : 'opacity-0'}`}
-        ></div>
+          className={`absolute inset-0 bg-black/75 backdrop-blur-md transition-opacity duration-300 ${
+            isDrawerOpen ? 'opacity-100' : 'opacity-0'
+          }`}
+          aria-hidden="true"
+        />
 
-        {/* Panel lateral */}
-        <div className={`absolute inset-y-0 right-0 w-80 max-w-[85%] bg-white border-l border-zinc-200 p-6 flex flex-col gap-6 shadow-2xl transition-transform duration-300 transform ${isDrawerOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-          {/* Cabecera del menú */}
-          <div className="flex items-center justify-between">
-            <span className="font-extrabold tracking-widest text-[10px] uppercase text-zinc-500">Navegación / Filtros</span>
-            <div className="flex items-center gap-1.5">
-              {/* Botón de Acceso Discreto en Menú Móvil */}
-              <a
-                href="/admin"
-                className="w-9 h-9 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-500 hover:text-zinc-900 flex items-center justify-center transition-colors cursor-pointer"
-                aria-label="Acceso"
-                title="Acceso"
-              >
-                <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        {/* Diálogo Centrado con scroll interno aislado y bordes redondeados */}
+        <div 
+          className={`relative w-full max-w-md max-h-[88vh] bg-white rounded-3xl shadow-2xl border border-zinc-200 flex flex-col overflow-hidden transition-all duration-300 transform ${
+            isDrawerOpen ? 'scale-100 translate-y-0' : 'scale-95 translate-y-4'
+          }`}
+          style={{ overscrollBehavior: 'contain' }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Cabecera Centrada y Elegante */}
+          <div className="px-5 py-4 bg-zinc-950 text-white flex items-center justify-between border-b border-zinc-800 shrink-0 select-none">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-red-600/20 border border-red-500/40 flex items-center justify-center text-red-500">
+                <svg className="w-4 h-4" viewBox="0 0 100 100" fill="none">
+                  <path d="M50 85C42 77 15 54 15 37C15 17 31 5 50 5C69 5 85 17 85 37C85 54 58 77 50 85Z" stroke="#FF2D2D" strokeWidth="8"/>
+                  <path d="M38 48V62H62V48M32 48L50 32L68 48" stroke="#FF2D2D" strokeWidth="6"/>
                 </svg>
-              </a>
-              <button
-                onClick={() => setIsDrawerOpen(false)}
-                className="p-2 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 rounded-xl transition-colors cursor-pointer"
-                aria-label="Cerrar menú móvil"
-              >
-                <svg className="w-5.5 h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          {/* Tarjeta de Tasas Oficiales BCV en Menú Móvil */}
-          <div className="p-3.5 rounded-2xl bg-zinc-900 border border-zinc-800 text-white shadow-md">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-1.5">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                </span>
-                <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400">
-                  Tasa Oficial BCV
+              </div>
+              <div>
+                <h3 className="text-xs font-black tracking-widest uppercase text-white leading-none">
+                  TÍO WILLY
+                </h3>
+                <span className="text-[9px] uppercase tracking-wider text-red-400 font-bold">
+                  Menú & Navegación
                 </span>
               </div>
-              <button
-                type="button"
-                onClick={handleManualRefreshBcv}
-                disabled={isBcvLoading || isBcvRotating}
-                className="p-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white transition-colors cursor-pointer"
-                title="Actualizar tasas"
-              >
-                <svg className={`w-3.5 h-3.5 text-emerald-400 ${isBcvRotating || isBcvLoading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-              </button>
             </div>
-            <div className="grid grid-cols-2 gap-2 text-center">
-              <div className="p-2 rounded-xl bg-zinc-800/80 border border-zinc-700/60">
-                <span className="text-[9px] uppercase tracking-wider text-zinc-400 font-bold block">Dólar BCV</span>
-                <span className="text-xs font-black font-mono text-white">Bs. {formatBcvRate(bcvRates.usd)}</span>
-              </div>
-              <div className="p-2 rounded-xl bg-zinc-800/80 border border-zinc-700/60">
-                <span className="text-[9px] uppercase tracking-wider text-zinc-400 font-bold block">Euro BCV</span>
-                <span className="text-xs font-black font-mono text-white">Bs. {formatBcvRate(bcvRates.eur)}</span>
-              </div>
-            </div>
-            <span className="text-[9px] text-zinc-400 block text-center mt-2 font-medium">
-              Valor {formatBcvDate(bcvRates.dateText || bcvRates.usdDate)} • Banco Central de Venezuela
-            </span>
-          </div>
 
-          {/* Botón Trabaja con nosotros Móvil */}
-          <button
-            onClick={() => {
-              handleGenerateCatalogPDF();
-              setIsDrawerOpen(false);
-            }}
-            disabled={pdfLoading}
-            className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-800 border border-zinc-200 text-xs font-bold transition-all uppercase tracking-wider cursor-pointer disabled:opacity-50"
-          >
-            {pdfLoading ? (
-              <>
-                <span className="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
-                <span>Generando Catálogo PDF...</span>
-              </>
-            ) : (
-              <>
-                <svg className="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                <span>Descargar Catálogo (PDF)</span>
-              </>
-            )}
-          </button>
-
-          {/* Botón Acceso Administrador en el cuerpo del menú móvil */}
-          <a
-            href="/admin"
-            className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-200 hover:text-white border border-zinc-800 text-xs font-bold transition-all uppercase tracking-wider cursor-pointer shadow-sm active:scale-95"
-            onClick={() => setIsDrawerOpen(false)}
-          >
-            <svg className="w-4.5 h-4.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-            <span>Acceso Administrador</span>
-          </a>
-
-          {/* Buscador dentro del menú móvil */}
-          <div className="flex flex-col gap-2">
-            <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Búsqueda rápida</h4>
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Buscar productos..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl focus:border-red-500 text-zinc-900 placeholder-zinc-400 focus:outline-none transition-all text-xs"
-              />
-              <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-          </div>
-
-          {/* Categorías dentro del menú móvil */}
-          <div className="flex flex-col gap-2">
-            <span className="text-xs font-bold text-zinc-600 uppercase tracking-wider">Categorías</span>
-            <div className="flex flex-col gap-1 overflow-y-auto max-h-[45vh] pr-1">
-              <button
-                onClick={() => { setSelectedCategory('todos'); setIsDrawerOpen(false); document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' }); }}
-                className={`w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold transition-all text-xs ${
-                  selectedCategory === 'todos'
-                    ? 'bg-red-600 text-white shadow-lg shadow-red-600/20'
-                    : 'bg-zinc-50 text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900 border border-zinc-200/60'
-                }`}
-              >
-                <span>Todos los productos</span>
-                <span className={`text-[10px] px-2 py-0.5 rounded-full ${selectedCategory === 'todos' ? 'bg-red-700 text-white' : 'bg-zinc-200 text-zinc-700 font-bold'}`}>
-                  {categoryCounts.todos}
-                </span>
-              </button>
-
-              {initialCategorias.map((cat: Category) => {
-                const isActive = selectedCategory === cat._id;
-                const count = categoryCounts[cat._id] || 0;
-                return (
-                  <button
-                    key={cat._id}
-                    onClick={() => { setSelectedCategory(cat._id); setIsDrawerOpen(false); document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' }); }}
-                    className={`w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold transition-all text-xs ${
-                      isActive
-                        ? 'bg-red-600 text-white shadow-lg shadow-red-600/20'
-                        : 'bg-zinc-50 text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900 border border-zinc-200/60'
-                    }`}
-                  >
-                    <span>{cat.name}</span>
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full ${isActive ? 'bg-red-700 text-white' : 'bg-zinc-200 text-zinc-700 font-bold'}`}>
-                      {count}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="h-[1px] bg-zinc-200"></div>
-
-          {/* Información de contacto y Redes Sociales */}
-          <div className="mt-auto flex flex-col gap-3">
-            <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest block text-center">Atención al Cliente</span>
-            <a
-              href="https://api.whatsapp.com/send?phone=584244576086"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full min-h-[44px] py-3 bg-red-600 hover:bg-red-500 border border-red-500/30 text-white rounded-xl font-bold text-center text-xs transition-colors flex items-center justify-center gap-2 shadow-md shadow-red-600/30"
+            {/* Botón de Cierre Cómodo y Táctil */}
+            <button
+              type="button"
+              onClick={() => setIsDrawerOpen(false)}
+              className="w-8 h-8 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
+              aria-label="Cerrar menú"
             >
-              <span>📞 +58 424 457 6086</span>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Cuerpo Desplazable Aislado */}
+          <div className="p-4 sm:p-5 flex flex-col gap-4 overflow-y-auto overscroll-contain flex-1">
+            {/* 1. Tarjeta Destacada de Acceso Administrador */}
+            <a
+              href="/admin"
+              onClick={() => setIsDrawerOpen(false)}
+              className="group flex items-center justify-between p-3.5 rounded-2xl bg-gradient-to-r from-zinc-900 to-zinc-950 border border-zinc-800 hover:border-red-500/50 text-white transition-all shadow-md active:scale-98 cursor-pointer"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-red-600/20 border border-red-500/40 text-red-400 flex items-center justify-center group-hover:bg-red-600 group-hover:text-white transition-colors">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+                <div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs font-black uppercase tracking-wider text-white">Panel Administrador</span>
+                    <span className="text-[9px] bg-red-600 text-white font-black px-1.5 py-0.2 rounded uppercase">Admin</span>
+                  </div>
+                  <span className="text-[10px] text-zinc-400 block">Gestión de productos, precios y tienda</span>
+                </div>
+              </div>
+              <svg className="w-4 h-4 text-zinc-400 group-hover:text-white group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
+              </svg>
             </a>
 
-            {/* Redes Sociales Drawer */}
-            <div className="pt-2 border-t border-zinc-200 flex flex-col gap-2">
-              <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest block text-center">Síguenos Oficial</span>
-              <div className="grid grid-cols-2 gap-2">
+            {/* 2. Buscador Rápido de Productos */}
+            <div className="flex flex-col gap-1.5">
+              <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">
+                Búsqueda Rápida
+              </span>
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Buscar en el catálogo..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-9 pr-8 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl focus:bg-white focus:border-red-500 text-zinc-900 placeholder-zinc-400 focus:outline-none transition-all text-xs font-medium"
+                />
+                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-zinc-400 hover:text-zinc-600 p-1"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* 3. Categorías del Catálogo */}
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">
+                  Categorías
+                </span>
+                <span className="text-[10px] text-zinc-400 font-bold">
+                  {initialCategorias.length} secciones
+                </span>
+              </div>
+              
+              <div className="flex flex-col gap-1 max-h-[34vh] overflow-y-auto pr-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedCategory('todos');
+                    setIsDrawerOpen(false);
+                    document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-bold transition-all text-xs cursor-pointer ${
+                    selectedCategory === 'todos'
+                      ? 'bg-red-600 text-white shadow-md shadow-red-600/30'
+                      : 'bg-zinc-50 text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900 border border-zinc-200/70'
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <span>📦</span>
+                    <span>Todos los productos</span>
+                  </span>
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                    selectedCategory === 'todos' ? 'bg-red-700 text-white' : 'bg-zinc-200 text-zinc-700'
+                  }`}>
+                    {categoryCounts.todos}
+                  </span>
+                </button>
+
+                {initialCategorias.map((cat: Category) => {
+                  const isActive = selectedCategory === cat._id;
+                  const count = categoryCounts[cat._id] || 0;
+                  return (
+                    <button
+                      key={cat._id}
+                      type="button"
+                      onClick={() => {
+                        setSelectedCategory(cat._id);
+                        setIsDrawerOpen(false);
+                        document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' });
+                      }}
+                      className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-bold transition-all text-xs cursor-pointer ${
+                        isActive
+                          ? 'bg-red-600 text-white shadow-md shadow-red-600/30'
+                          : 'bg-zinc-50 text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900 border border-zinc-200/70'
+                      }`}
+                    >
+                      <span className="truncate pr-2">{cat.name}</span>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold shrink-0 ${
+                        isActive ? 'bg-red-700 text-white' : 'bg-zinc-200 text-zinc-700'
+                      }`}>
+                        {count}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* 4. Descargar Catálogo PDF */}
+            <button
+              type="button"
+              onClick={() => {
+                handleGenerateCatalogPDF();
+                setIsDrawerOpen(false);
+              }}
+              disabled={pdfLoading}
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-800 border border-zinc-200 text-xs font-bold transition-all uppercase tracking-wider cursor-pointer disabled:opacity-50 active:scale-98"
+            >
+              {pdfLoading ? (
+                <>
+                  <span className="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+                  <span>Generando Catálogo PDF...</span>
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <span>Descargar Catálogo (PDF)</span>
+                </>
+              )}
+            </button>
+
+            {/* 5. Contacto & Redes Sociales */}
+            <div className="pt-2 border-t border-zinc-100 flex flex-col gap-2">
+              <a
+                href="https://api.whatsapp.com/send?phone=584244576086"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-md shadow-emerald-600/25 active:scale-98 transition-all"
+              >
+                <span>💬 Contactar por WhatsApp</span>
+              </a>
+
+              <div className="grid grid-cols-2 gap-2 mt-0.5">
                 <a
                   href="https://www.tiktok.com/@hogaryjuguetestiowilly"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="min-h-[44px] px-3 py-2.5 rounded-xl bg-zinc-100 border border-zinc-200 hover:border-zinc-300 text-zinc-800 hover:text-black flex items-center justify-center gap-2 text-xs font-bold transition-all active:scale-95"
+                  className="py-2 px-3 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-[11px] font-bold flex items-center justify-center gap-1.5 transition-all"
                 >
-                  <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
+                  <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
                     <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.24 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/>
                   </svg>
                   <span>TikTok</span>
@@ -2357,33 +2314,18 @@ export default function Catalog({
                   href="https://www.instagram.com/hogaryjuguetestiowilly"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="min-h-[44px] px-3 py-2.5 rounded-xl bg-zinc-100 border border-zinc-200 hover:border-pink-300 text-zinc-800 hover:text-pink-600 flex items-center justify-center gap-2 text-xs font-bold transition-all active:scale-95"
+                  className="py-2 px-3 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-[11px] font-bold flex items-center justify-center gap-1.5 transition-all"
                 >
-                  <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
+                  <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
                     <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                  </svg>
-                  <span>Instagram</span>
-                </a>
-              </div>
-            </div>
-
-            {/* Acceso al panel */}
-            <div className="pt-2 flex justify-center">
-              <a
-                href="/admin"
-                className="w-full py-2.5 px-3 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-500 hover:text-zinc-800 flex items-center justify-center gap-2 text-xs font-bold transition-colors cursor-pointer"
-                aria-label="Acceso Administrador"
-                title="Acceso Administrador"
-              >
-                <svg className="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
-                <span>Acceso Administrador</span>
+                <span>Instagram</span>
               </a>
             </div>
           </div>
         </div>
       </div>
+    </div>
 
       {/* Header / Hero Carousel Slider */}
       <header 
