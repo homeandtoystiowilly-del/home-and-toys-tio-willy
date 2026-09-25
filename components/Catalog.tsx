@@ -322,11 +322,11 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
   return (
     <div 
       onClick={() => setIsModalOpen(true)}
-      className="group relative flex flex-col rounded-2xl sm:rounded-3xl bg-white border border-zinc-200/90 hover:border-red-500/60 transition-all duration-300 overflow-hidden shadow-xs hover:shadow-xl hover:shadow-red-950/10 cursor-pointer"
+      className="group relative flex flex-col rounded-3xl bg-white border border-zinc-200/90 hover:border-red-500/50 transition-all duration-300 overflow-hidden shadow-xs hover:shadow-xl hover:shadow-red-950/10 hover:-translate-y-1 cursor-pointer"
     >
-      {/* Carrusel de Imágenes con soporte híbrido de gestos swipe */}
+      {/* Product Image Container (Padded Canvas with object-contain for Full Visibility) */}
       <div 
-        className="relative aspect-square w-full bg-zinc-100 overflow-hidden cursor-grab active:cursor-grabbing select-none"
+        className="relative bg-zinc-50/90 p-4 sm:p-5 flex items-center justify-center h-64 sm:h-72 w-full overflow-hidden border-b border-zinc-100 cursor-grab active:cursor-grabbing select-none"
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
@@ -336,30 +336,83 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
           alt={`${product.name} - ${currentVariety}`}
           loading="lazy"
           decoding="async"
-          className="w-full h-full object-cover transition-all duration-700 scale-100 group-hover:scale-105"
+          className="w-full h-full object-contain object-center transition-all duration-500 scale-100 group-hover:scale-105"
         />
-        
-        {/* Sombreado de degradado */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-40"></div>
 
-        {/* Flechas de navegación (visibles en hover o móviles siempre) */}
+        {/* Hover overlay hint */}
+        <div className="absolute inset-0 bg-zinc-950/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+          <span className="bg-white/95 text-zinc-900 text-xs font-black px-3.5 py-1.5 rounded-xl shadow-lg backdrop-blur-sm flex items-center gap-1.5">
+            <svg className="w-3.5 h-3.5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+            <span>Ver Ficha Técnica</span>
+          </span>
+        </div>
+
+        {/* Top Left Stack: Subcategory / Collection, Category & Variety Pause Badges */}
+        <div className="absolute top-3 left-3 flex flex-col gap-1.5 items-start z-10 pointer-events-none max-w-[70%]">
+          {product.subcategory && (
+            <span className="px-2.5 py-0.5 rounded-xl text-[10px] font-black tracking-wide uppercase bg-zinc-950/95 backdrop-blur-md text-amber-300 shadow-md border border-zinc-800 flex items-center gap-1">
+              <span className="text-amber-400">🔥</span>
+              <span className="truncate">{product.subcategory}</span>
+            </span>
+          )}
+
+          <span className="px-2.5 py-0.5 rounded-xl text-[10px] font-extrabold tracking-wider uppercase bg-white/95 backdrop-blur-md text-zinc-800 shadow-xs border border-zinc-200/80">
+            {categoryName || product.category}
+          </span>
+
+          {isCurrentVarietyPaused && (
+            <span className="bg-zinc-950/90 backdrop-blur-md border border-amber-500/60 text-amber-300 font-extrabold text-[9px] sm:text-[10px] tracking-wider px-2 py-0.5 rounded-xl uppercase shadow-md flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+              <span>{currentVariety} Agotado</span>
+            </span>
+          )}
+        </div>
+
+        {/* Top Right: Offer Badge */}
+        {isOfferActive && (
+          <div className="absolute top-3 right-3 z-10 bg-gradient-to-r from-red-600 to-rose-600 text-white font-black text-[10px] sm:text-xs tracking-wider px-2.5 py-1 rounded-xl uppercase shadow-md flex items-center gap-1 backdrop-blur-xs">
+            <span>🔥 OFERTA</span>
+            {product.priceDetal > (product.offerPrice || 0) && (
+              <span className="bg-zinc-950/80 text-white px-1.5 py-0.2 rounded text-[9px] sm:text-[10px] font-mono font-bold">
+                -{Math.round(((product.priceDetal - (product.offerPrice || 0)) / product.priceDetal) * 100)}%
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* Bottom Right: Multi-Image Photo Counter Badge */}
+        {product.images.length > 1 && (
+          <div className="absolute bottom-3 right-3 bg-zinc-950/85 backdrop-blur-md text-white text-[10px] font-bold px-2 py-0.5 rounded-lg flex items-center gap-1 shadow-sm z-10 pointer-events-none">
+            <svg className="w-3 h-3 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <span>{product.images.length} fotos</span>
+          </div>
+        )}
+
+        {/* Flechas de navegación para carrusel */}
         {product.images.length > 1 && (
           <>
             <button 
+              type="button"
               onClick={handlePrev}
-              className="absolute left-2.5 top-1/2 -translate-y-1/2 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/90 hover:bg-red-600 active:scale-95 text-zinc-800 hover:text-white flex items-center justify-center transition-all duration-200 backdrop-blur-md opacity-0 group-hover:opacity-100 focus:opacity-100 focus:outline-none shadow-md border border-zinc-200"
+              className="absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 hover:bg-red-600 active:scale-95 text-zinc-800 hover:text-white flex items-center justify-center transition-all duration-200 backdrop-blur-md opacity-0 group-hover:opacity-100 focus:opacity-100 focus:outline-none shadow-md border border-zinc-200 z-10 cursor-pointer"
               aria-label="Imagen anterior"
             >
-              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
               </svg>
             </button>
             <button 
+              type="button"
               onClick={handleNext}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/90 hover:bg-red-600 active:scale-95 text-zinc-800 hover:text-white flex items-center justify-center transition-all duration-200 backdrop-blur-md opacity-0 group-hover:opacity-100 focus:opacity-100 focus:outline-none shadow-md border border-zinc-200"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 hover:bg-red-600 active:scale-95 text-zinc-800 hover:text-white flex items-center justify-center transition-all duration-200 backdrop-blur-md opacity-0 group-hover:opacity-100 focus:opacity-100 focus:outline-none shadow-md border border-zinc-200 z-10 cursor-pointer"
               aria-label="Siguiente imagen"
             >
-              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
               </svg>
             </button>
@@ -368,54 +421,48 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
 
         {/* Indicadores de variedad / dots */}
         {product.images.length > 1 && (
-          <div className="absolute bottom-2.5 sm:bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-10">
+          <div className="absolute bottom-2.5 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-10">
             {product.images.map((_, idx: number) => (
               <button
                 key={idx}
+                type="button"
                 onClick={(e) => {
                   e.stopPropagation();
                   setActiveIdx(idx);
                 }}
-                className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full transition-all duration-300 ${
-                  idx === activeIdx ? 'bg-red-500 w-3.5 sm:w-4' : 'bg-white/70 hover:bg-white'
+                className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                  idx === activeIdx ? 'bg-red-600 w-4' : 'bg-zinc-400/80 hover:bg-zinc-600 w-1.5'
                 }`}
                 aria-label={`Ver variedad ${idx + 1}`}
               />
             ))}
           </div>
         )}
-
-        {/* Categoría Badge */}
-        <div className="absolute top-3 left-3">
-          <span className="px-2.5 py-0.5 sm:px-3 sm:py-1 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-red-600 bg-white/95 border border-red-200/80 rounded-full backdrop-blur-md shadow-xs">
-            {categoryName || product.category}
-          </span>
-        </div>
-
-        {/* Badge de Variedad Agotada en Imagen */}
-        {isCurrentVarietyPaused && (
-          <div className="absolute top-11 left-3 z-10 bg-zinc-950/85 backdrop-blur-md border border-amber-500/60 text-amber-300 font-extrabold text-[9px] sm:text-[10px] tracking-wider px-2 py-0.5 rounded-full uppercase shadow-md flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
-            <span>{currentVariety} Agotado</span>
-          </div>
-        )}
-
-        {/* Badge de Oferta Especial */}
-        {isOfferActive && (
-          <div className="absolute top-3 right-3 z-10 bg-red-600 border border-red-400 text-white font-black text-[10px] sm:text-xs tracking-wider px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full uppercase shadow-md flex items-center gap-1 backdrop-blur-xs">
-            <span>🔥 OFERTA</span>
-            {product.priceDetal > (product.offerPrice || 0) && (
-              <span className="bg-zinc-900/80 text-white px-1.5 py-0.2 rounded text-[9px] sm:text-[10px] font-mono font-bold">
-                -{Math.round(((product.priceDetal - (product.offerPrice || 0)) / product.priceDetal) * 100)}%
-              </span>
-            )}
-          </div>
-        )}
       </div>
 
       {/* Cuerpo de la Tarjeta */}
       <div className="flex flex-col flex-1 p-4 sm:p-5">
-        <h3 className="text-sm sm:text-base font-bold text-zinc-900 tracking-tight group-hover:text-red-600 transition-colors duration-200 min-h-[40px] sm:min-h-[48px] line-clamp-2 leading-snug">
+        {/* Header row: Subcategoría o Categoría + Badge secundario */}
+        <div className="flex items-center justify-between gap-2 mb-1.5">
+          <span className="text-[11px] font-extrabold text-red-600 uppercase tracking-wide flex items-center gap-1 truncate">
+            {product.subcategory ? (
+              <>
+                <span className="text-amber-500">🔥</span>
+                <span className="truncate">{product.subcategory}</span>
+              </>
+            ) : (
+              <>
+                <span className="text-red-500">🏷️</span>
+                <span className="truncate">{categoryName || product.category}</span>
+              </>
+            )}
+          </span>
+          <span className="text-[10px] font-bold text-zinc-500 bg-zinc-100 px-2 py-0.5 rounded-md shrink-0 uppercase">
+            {categoryName || product.category}
+          </span>
+        </div>
+
+        <h3 className="text-sm sm:text-base font-bold text-zinc-900 tracking-tight group-hover:text-red-600 transition-colors duration-200 min-h-[40px] sm:min-h-[44px] line-clamp-2 leading-snug">
           {product.name}
         </h3>
         
@@ -429,7 +476,7 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
             <div className="flex items-center justify-between mb-1">
               <span className="text-[10px] sm:text-xs text-zinc-500 block uppercase font-bold tracking-wider">Variedad:</span>
               {isCurrentVarietyPaused && (
-                <span className="text-[9px] font-bold text-amber-800 bg-amber-100 border border-amber-300 px-1.5 py-0.2 rounded uppercase">
+                <span className="text-[9px] font-bold text-amber-800 bg-amber-100 border border-amber-300 px-1.5 py-0.2 rounded-md uppercase">
                   Agotado
                 </span>
               )}
@@ -441,18 +488,19 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
                 return (
                   <button
                     key={idx}
+                    type="button"
                     onClick={(e) => {
                       e.stopPropagation();
                       setActiveIdx(idx);
                     }}
-                    className={`text-[11px] sm:text-xs px-2 py-0.5 sm:px-2.5 sm:py-0.5 rounded-lg border transition-all duration-200 flex items-center gap-1 ${
+                    className={`text-[11px] sm:text-xs px-2.5 py-0.5 sm:px-2.5 sm:py-0.5 rounded-xl border transition-all duration-200 flex items-center gap-1 cursor-pointer select-none ${
                       isVarPaused
                         ? isSelected
-                          ? 'bg-amber-50 text-amber-900 border-amber-400 font-bold line-through shadow-2xs'
+                          ? 'bg-amber-50 text-amber-900 border-amber-400 font-bold line-through shadow-xs ring-1 ring-amber-400/40'
                           : 'bg-zinc-100/70 text-zinc-400 border-zinc-200 line-through opacity-75 hover:opacity-100'
                         : isSelected
-                          ? 'bg-red-50 text-red-600 border-red-400 font-semibold shadow-2xs'
-                          : 'bg-zinc-100 text-zinc-700 border-zinc-200 hover:border-zinc-400 hover:text-zinc-900'
+                          ? 'bg-red-50 text-red-600 border-red-500 font-bold shadow-xs ring-1 ring-red-500/30'
+                          : 'bg-zinc-100 text-zinc-700 border-zinc-200 hover:border-zinc-300 hover:text-zinc-900'
                     }`}
                   >
                     <span>{varName}</span>
@@ -471,59 +519,83 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
         {/* Espaciador */}
         <div className="flex-1 min-h-[14px]"></div>
 
-        {/* Precios */}
-        <div className="mt-2.5 p-3 sm:p-3.5 rounded-xl bg-zinc-50 border border-zinc-200/80 flex flex-col gap-2">
+        {/* Bloque Estructurado de Precios Escalonados */}
+        <div className="mt-2.5 p-3 sm:p-3.5 rounded-2xl bg-zinc-50 border border-zinc-200/80 space-y-2">
           {isOfferActive ? (
             <div className="flex justify-between items-baseline">
               <div className="flex flex-col">
                 <span className="text-[10px] text-zinc-400 line-through font-mono">
                   Antes: {symbol}{product.priceDetal.toFixed(2)}
                 </span>
-                <span className="text-[11px] text-red-600 font-bold uppercase tracking-wide flex items-center gap-1">
-                  <span>🔥 Oferta:</span>
+                <span className="text-[11px] text-red-600 font-black uppercase tracking-wide flex items-center gap-1">
+                  <span>🔥 Oferta Detal:</span>
                 </span>
               </div>
-              <span className="text-lg sm:text-xl font-black text-red-600 font-mono">
+              <span className="text-xl sm:text-2xl font-black text-red-600 font-mono">
                 {symbol}{product.offerPrice!.toFixed(2)}
               </span>
             </div>
           ) : (
             <div className="flex justify-between items-baseline">
-              <span className="text-[11px] text-zinc-500 font-medium uppercase tracking-wide">Precio Detal:</span>
-              <span className="text-lg sm:text-xl font-black text-zinc-900 font-mono">{symbol}{product.priceDetal.toFixed(2)}</span>
+              <span className="text-[11px] text-zinc-500 font-bold uppercase tracking-wide">Precio Detal:</span>
+              <span className="text-xl sm:text-2xl font-black text-zinc-900 font-mono">{symbol}{product.priceDetal.toFixed(2)}</span>
             </div>
           )}
           
           <div className="h-[1px] bg-zinc-200/80"></div>
-          <div className="flex justify-between items-baseline">
+          
+          {/* Bloque Destacado de Tarifa Mayorista */}
+          <div className="flex items-center justify-between bg-red-50/70 p-2 sm:p-2.5 rounded-xl border border-red-200/70">
             <div className="flex flex-col">
-              <span className="text-[11px] text-red-600 font-bold uppercase tracking-wide">Precio Mayor:</span>
-              <span className="text-[9px] text-zinc-500 italic">Mín. {product.minMayor} unidades</span>
+              <span className="text-[11px] font-black text-red-700 uppercase tracking-wide flex items-center gap-1">
+                <span>🏷️ Precio Mayor:</span>
+              </span>
+              <span className="text-[9px] text-zinc-500 font-medium">A partir de {product.minMayor} unidades</span>
             </div>
             <span className="text-base sm:text-lg font-black text-red-600 font-mono">{symbol}{product.priceMayor.toFixed(2)}</span>
           </div>
         </div>
 
-        {/* Botón WhatsApp de proporción equilibrada y moderna */}
-        <a
-          href={whatsappUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={handleWhatsAppAction}
-          className={`mt-3 w-full py-2.5 px-3.5 text-white rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all duration-200 shadow-sm active:scale-[0.98] focus:outline-none focus:ring-2 ${
-            isCurrentVarietyPaused
-              ? 'bg-amber-600 hover:bg-amber-500 active:bg-amber-700 hover:shadow-md hover:shadow-amber-600/20 focus:ring-amber-500/50'
-              : 'bg-red-600 hover:bg-red-500 active:bg-red-700 hover:shadow-md hover:shadow-red-600/20 focus:ring-red-500/50'
-          }`}
-        >
-          {/* WhatsApp Icon */}
-          <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
-            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.835-9.977c.311.089.822.112 1.134.112.31 0 .82-.112 1.131-.492.311-.38.82-1.993.899-2.15.079-.156.13-.339.028-.553-.102-.213-.822-1.994-.822-1.994-.127-.278-.261-.318-.466-.318-.17 0-.368-.012-.566-.012-.397 0-.907.146-1.22.492-.311.38-1.189 1.163-1.189 2.833 0 1.67 1.218 3.282 1.388 3.507.17.225 2.4 3.665 5.811 5.138.81.35 1.442.56 1.933.717.813.259 1.554.223 2.14.136.652-.097 1.993-.815 2.276-1.602.283-.787.283-1.46.198-1.602-.085-.142-.311-.225-.652-.393-.34-.168-1.993-.984-2.276-1.085-.283-.101-.49-.152-.697.152-.207.304-.803 1.085-.984 1.288-.18.203-.362.228-.703.06-.34-.168-1.436-.53-2.735-1.688-1.01-.902-1.693-2.016-1.892-2.355-.198-.339-.021-.523.149-.692.153-.152.34-.393.51-.59.17-.197.226-.338.339-.564.113-.225.056-.422-.028-.59-.084-.168-.703-1.692-1.01-2.434-.298-.718-.604-.621-.822-.631-.212-.01-.453-.012-.694-.012-.24 0-.631.09-.962.45-.33.36-1.26 1.23-1.26 3.003 0 1.77 1.29 3.48 1.47 3.73.18.25 2.54 3.88 6.16 5.45.86.37 1.53.59 2.06.76.87.28 1.66.24 2.28.15.69-.1 2.12-.87 2.42-1.71.3-.84.3-1.56.21-1.71-.09-.15-.33-.24-.72-.43z"/>
-          </svg>
-          <span>
-            {isCurrentVarietyPaused ? `Consultar Reposición (${currentVariety})` : 'Pedir por WhatsApp'}
-          </span>
-        </a>
+        {/* Fila de Botones de Acción Dual (WhatsApp + Eye) */}
+        <div className="flex items-stretch gap-2 pt-3">
+          <a
+            href={whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={handleWhatsAppAction}
+            className={`flex-1 py-3 px-3.5 text-white rounded-2xl text-xs sm:text-sm font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all duration-200 shadow-md active:scale-[0.98] cursor-pointer ${
+              isCurrentVarietyPaused
+                ? 'bg-amber-600 hover:bg-amber-500 active:bg-amber-700 shadow-amber-600/20'
+                : 'bg-red-600 hover:bg-red-500 active:bg-red-700 shadow-red-600/25 hover:shadow-lg hover:shadow-red-600/30'
+            }`}
+            title={isCurrentVarietyPaused ? 'Consultar reposición de variedad agotada' : 'Pedir directamente por WhatsApp'}
+          >
+            {/* WhatsApp Icon */}
+            <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
+              <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.835-9.977c.311.089.822.112 1.134.112.31 0 .82-.112 1.131-.492.311-.38.82-1.993.899-2.15.079-.156.13-.339.028-.553-.102-.213-.822-1.994-.822-1.994-.127-.278-.261-.318-.466-.318-.17 0-.368-.012-.566-.012-.397 0-.907.146-1.22.492-.311.38-1.189 1.163-1.189 2.833 0 1.67 1.218 3.282 1.388 3.507.17.225 2.4 3.665 5.811 5.138.81.35 1.442.56 1.933.717.813.259 1.554.223 2.14.136.652-.097 1.993-.815 2.276-1.602.283-.787.283-1.46.198-1.602-.085-.142-.311-.225-.652-.393-.34-.168-1.993-.984-2.276-1.085-.283-.101-.49-.152-.697.152-.207.304-.803 1.085-.984 1.288-.18.203-.362.228-.703.06-.34-.168-1.436-.53-2.735-1.688-1.01-.902-1.693-2.016-1.892-2.355-.198-.339-.021-.523.149-.692.153-.152.34-.393.51-.59.17-.197.226-.338.339-.564.113-.225.056-.422-.028-.59-.084-.168-.703-1.692-1.01-2.434-.298-.718-.604-.621-.822-.631-.212-.01-.453-.012-.694-.012-.24 0-.631.09-.962.45-.33.36-1.26 1.23-1.26 3.003 0 1.77 1.29 3.48 1.47 3.73.18.25 2.54 3.88 6.16 5.45.86.37 1.53.59 2.06.76.87.28 1.66.24 2.28.15.69-.1 2.12-.87 2.42-1.71.3-.84.3-1.56.21-1.71-.09-.15-.33-.24-.72-.43z"/>
+            </svg>
+            <span className="truncate">
+              {isCurrentVarietyPaused ? `Consultar (${currentVariety})` : 'Pedir por WhatsApp'}
+            </span>
+          </a>
+
+          {/* Botón de Ojo para abrir Modal de Ficha Técnica */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsModalOpen(true);
+            }}
+            className="px-3.5 py-3 rounded-2xl bg-zinc-100 hover:bg-zinc-200 text-zinc-700 hover:text-zinc-950 transition-colors flex items-center justify-center cursor-pointer flex-shrink-0 border border-zinc-200"
+            title="Ver fotos en alta resolución y ficha completa"
+            aria-label="Ver ficha técnica del producto"
+          >
+            <svg className="w-4 h-4 text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       {/* Modal flotante de información completa del producto */}
@@ -1128,9 +1200,25 @@ export default function Catalog({
     setCurrentPage(1);
   }, [searchQuery]);
 
-  // Obtener las subcategorías dinámicas para la categoría seleccionada (solo activos)
+  // Obtener las subcategorías dinámicas para la categoría seleccionada o todas si está en 'todos'
   const subcategories = useMemo(() => {
-    if (selectedCategory === 'todos') return [];
+    if (selectedCategory === 'todos') {
+      const allSubcats = new Set<string>();
+      activeProducts.forEach((p) => {
+        if (p.subcategory && p.subcategory.trim().length > 0) {
+          allSubcats.add(p.subcategory.trim());
+        }
+      });
+      return Array.from(allSubcats).sort((a, b) => {
+        const aNum = a.match(/\d+/);
+        const bNum = b.match(/\d+/);
+        if (aNum && bNum) {
+          const diff = parseInt(aNum[0], 10) - parseInt(bNum[0], 10);
+          if (diff !== 0) return diff;
+        }
+        return a.localeCompare(b);
+      });
+    }
     const productsInCategory = activeProducts.filter((p) => p.category === selectedCategory);
     return getSubcategoriesForCategory(productsInCategory, initialCategorias, selectedCategory);
   }, [selectedCategory, activeProducts, initialCategorias]);
@@ -1611,7 +1699,7 @@ export default function Catalog({
     }
 
     // 2. Filtrar por subcategoría si hay una seleccionada y no es 'todos'
-    if (selectedCategory !== 'todos' && selectedSubcategory !== 'todos') {
+    if (selectedSubcategory !== 'todos') {
       list = list.filter((p) => {
         if (!p.subcategory || !p.subcategory.trim()) return false;
         return p.subcategory.trim().toLowerCase() === selectedSubcategory.trim().toLowerCase();
@@ -2578,51 +2666,57 @@ export default function Catalog({
               </div>
             </div>
 
-            {/* Filtro de Subcategorías / Variantes por Categoría */}
-            {selectedCategory !== 'todos' && subcategories.length > 0 && (
-              <div className="w-full bg-white border border-zinc-200 rounded-3xl p-5 shadow-sm flex flex-col gap-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-[10px] text-zinc-500 font-extrabold uppercase tracking-wider">
-                    Subcategorías / Colecciones
+            {/* Filtro de Colecciones & Temáticas (Estilo creative landing page adaptado a Tío Willy) */}
+            {subcategories.length > 0 && (
+              <div className="w-full bg-white border border-zinc-200/90 rounded-3xl p-3.5 sm:p-4 shadow-sm flex flex-col gap-2.5">
+                <div className="flex justify-between items-center px-1">
+                  <span className="text-[11px] font-extrabold uppercase tracking-wider text-zinc-500 flex items-center gap-1.5">
+                    <span className="text-amber-500">🔥</span>
+                    <span>Colecciones & Temáticas:</span>
                   </span>
                   {selectedSubcategory !== 'todos' && (
                     <button
                       onClick={() => setSelectedSubcategory('todos')}
-                      className="text-[10px] text-red-600 hover:text-red-500 font-bold uppercase tracking-wider transition-colors cursor-pointer"
+                      className="text-[11px] font-bold text-red-600 hover:text-red-700 flex items-center gap-1 transition-colors cursor-pointer"
                     >
-                      Limpiar Filtro
+                      Ver todas
                     </button>
                   )}
                 </div>
                 
-                {/* Contenedor con Scroll Lateral Suave */}
-                <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-zinc-300 scrollbar-track-transparent">
+                {/* Contenedor con Scroll Lateral Suave y píldoras interactivas */}
+                <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none no-scrollbar">
                   {/* Botón Ver Todo */}
                   <button
                     onClick={() => setSelectedSubcategory('todos')}
-                    className={`flex-shrink-0 text-xs px-3.5 py-2 rounded-xl font-bold transition-all duration-300 cursor-pointer ${
+                    className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex-shrink-0 cursor-pointer ${
                       selectedSubcategory === 'todos'
-                        ? 'bg-red-600 text-white shadow-sm'
-                        : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-700 hover:text-zinc-950 border border-zinc-200'
+                        ? 'bg-red-600 text-white shadow-md shadow-red-600/30'
+                        : 'bg-zinc-50 text-zinc-700 hover:bg-zinc-100 border border-zinc-200/80'
                     }`}
                   >
-                    Ver Todo
+                    <span>✨</span>
+                    <span>Ver todas</span>
                   </button>
 
                   {/* Botones de subcategorías */}
-                  {subcategories.map((subcat) => (
-                    <button
-                      key={subcat}
-                      onClick={() => setSelectedSubcategory(subcat)}
-                      className={`flex-shrink-0 text-xs px-3.5 py-2 rounded-xl font-bold transition-all duration-300 cursor-pointer ${
-                        selectedSubcategory === subcat
-                          ? 'bg-red-600 text-white shadow-sm'
-                          : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-700 hover:text-zinc-950 border border-zinc-200'
-                      }`}
-                    >
-                      {subcat}
-                    </button>
-                  ))}
+                  {subcategories.map((subcat) => {
+                    const isActive = selectedSubcategory === subcat;
+                    return (
+                      <button
+                        key={subcat}
+                        onClick={() => setSelectedSubcategory(subcat)}
+                        className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex-shrink-0 cursor-pointer ${
+                          isActive
+                            ? 'bg-red-600 text-white shadow-md shadow-red-600/30'
+                            : 'bg-zinc-50 text-zinc-700 hover:bg-zinc-100 border border-zinc-200/80'
+                        }`}
+                      >
+                        <span className="text-amber-500">🔥</span>
+                        <span>{subcat}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
