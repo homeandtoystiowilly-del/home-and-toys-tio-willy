@@ -1935,7 +1935,7 @@ export default function Catalog({
       <div className="sticky top-0 z-30 w-full shadow-2xl">
         {/* Sticky Top Navbar de Alta Gama en Cristal Ahumado Oscuro */}
         <nav className="w-full bg-zinc-950/90 border-b border-zinc-800/80 backdrop-blur-xl transition-all">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-2 sm:gap-4">
           
           {/* 1. Logo Compacto de Alta Jerarquía */}
           <a href="#" className="flex items-center gap-2.5 group shrink-0">
@@ -2057,15 +2057,15 @@ export default function Catalog({
               <span>WhatsApp</span>
             </a>
 
-            {/* Botón de Acceso Discreto (Ícono de Perfil/Cuenta) - Ubicado entre WhatsApp y Menú */}
+            {/* Botón de Acceso Discreto (Ícono de Candado de Seguridad) - Ubicado entre WhatsApp y Menú */}
             <a
               href="/admin"
-              className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-700 hover:border-zinc-500 hover:bg-zinc-800 text-zinc-300 hover:text-white flex items-center justify-center transition-all active:scale-95 shadow-md group shrink-0 cursor-pointer"
-              aria-label="Acceso"
-              title="Acceso"
+              className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-750 hover:border-red-500/60 hover:bg-zinc-850 text-zinc-300 hover:text-red-400 flex items-center justify-center transition-all active:scale-95 shadow-md group shrink-0 cursor-pointer"
+              aria-label="Acceso Administrador"
+              title="Acceso Administrador"
             >
-              <svg className="w-5 h-5 text-zinc-300 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              <svg className="w-4.5 h-4.5 text-zinc-300 group-hover:text-red-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
             </a>
 
