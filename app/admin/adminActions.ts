@@ -535,14 +535,26 @@ export async function deleteSubcategoryAction(categoryId: string, subcategoryNam
     const db = client.db('tio_willy_db');
 
     // Remover la subcategoría de la categoría
-    await (db.collection('categorias') as any).updateOne(
-      { _id: categoryId },
-      { $pull: { subcategories: trimmedName } }
-    );
+    const catDoc = await (db.collection('categorias') as any).findOne({ _id: categoryId });
+    if (catDoc && Array.isArray(catDoc.subcategories)) {
+      const remaining = catDoc.subcategories.filter((s: string) => s && s.toLowerCase() !== trimmedName.toLowerCase());
+      await (db.collection('categorias') as any).updateOne(
+        { _id: categoryId },
+        { $set: { subcategories: remaining } }
+      );
+    } else {
+      await (db.collection('categorias') as any).updateOne(
+        { _id: categoryId },
+        { $pull: { subcategories: trimmedName } }
+      );
+    }
 
     // Desvincular de los productos asociados a esta categoría y subcategoría
     await db.collection('productos').updateMany(
-      { category: categoryId, subcategory: trimmedName },
+      { 
+        category: categoryId, 
+        subcategory: { $regex: new RegExp(`^${trimmedName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') } 
+      },
       { $unset: { subcategory: '' } }
     );
 

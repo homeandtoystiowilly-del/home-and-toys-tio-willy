@@ -787,13 +787,24 @@ export default function AdminClient({
             if (c._id === categoryId) {
               return {
                 ...c,
-                subcategories: (c.subcategories || []).filter((s) => s !== subcategoryName)
+                subcategories: (c.subcategories || []).filter((s) => s.toLowerCase() !== subcategoryName.toLowerCase())
               };
             }
             return c;
           })
         );
-        if (subcategory === subcategoryName) {
+        // Desvincular localmente en el listado de productos de forma inmediata
+        setProducts((prev) =>
+          prev.map((p) => {
+            if (p.category === categoryId && p.subcategory && p.subcategory.toLowerCase() === subcategoryName.toLowerCase()) {
+              const updated = { ...p };
+              delete updated.subcategory;
+              return updated;
+            }
+            return p;
+          })
+        );
+        if (subcategory.toLowerCase() === subcategoryName.toLowerCase()) {
           setSubcategory('');
         }
         router.refresh();
@@ -1157,6 +1168,7 @@ export default function AdminClient({
     return (
       prod.name.toLowerCase().includes(query) ||
       prod.description.toLowerCase().includes(query) ||
+      (prod.subcategory || '').toLowerCase().includes(query) ||
       (categories.find((c) => c._id === prod.category)?.name || '').toLowerCase().includes(query)
     );
   });
@@ -1613,10 +1625,15 @@ export default function AdminClient({
                 {(() => {
                   const currentCategoryObj = categories.find((c) => c._id === category);
                   const officialSubs = currentCategoryObj?.subcategories || [];
+                  const productSubs = products
+                    .filter((p) => p.category === category && p.subcategory && p.subcategory.trim())
+                    .map((p) => p.subcategory!.trim());
+
                   const availableSubs = Array.from(new Set([
                     ...officialSubs,
+                    ...productSubs,
                     ...(subcategory ? [subcategory] : [])
-                  ]));
+                  ])).sort();
 
                   return (
                     <div className="flex flex-col gap-1.5">
@@ -1673,10 +1690,52 @@ export default function AdminClient({
                           </option>
                         ))}
                       </select>
+
+                      {/* Píldoras de subcategorías con botón para eliminar directamente desde aquí */}
+                      {availableSubs.length > 0 && (
+                        <div className="mt-1 flex flex-col gap-1.5 p-3 rounded-2xl bg-zinc-50 border border-zinc-200">
+                          <span className="text-[10px] text-zinc-500 font-extrabold uppercase tracking-wider">
+                            Subcategorías existentes en esta categoría:
+                          </span>
+                          <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                            {availableSubs.map((sub) => (
+                              <span
+                                key={sub}
+                                className={`inline-flex items-center gap-1.5 pl-2.5 pr-1.5 py-1 rounded-xl text-xs font-bold border transition-all shadow-2xs ${
+                                  subcategory === sub
+                                    ? 'bg-red-50 text-red-700 border-red-300 ring-1 ring-red-400/30'
+                                    : 'bg-white text-zinc-800 border-zinc-200 hover:border-zinc-300'
+                                }`}
+                              >
+                                <button
+                                  type="button"
+                                  onClick={() => setSubcategory(sub)}
+                                  className="cursor-pointer hover:underline text-left"
+                                  title="Seleccionar esta subcategoría"
+                                >
+                                  {sub}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => category && handleDeleteSubcategory(category, sub)}
+                                  className="w-4 h-4 rounded-full text-zinc-400 hover:text-red-600 hover:bg-red-100 flex items-center justify-center transition-colors cursor-pointer ml-1"
+                                  title={`Eliminar subcategoría "${sub}" de la tienda`}
+                                >
+                                  ✕
+                                </button>
+                              </span>
+                            ))}
+                          </div>
+                          <span className="text-[10px] text-zinc-400 italic">
+                            Pulsa el botón ✕ en cualquier subcategoría para eliminarla permanentemente y desvincularla de todos los productos.
+                          </span>
+                        </div>
+                      )}
+
                       <span className="text-[11px] text-zinc-400">
                         {availableSubs.length === 0
                           ? 'Esta categoría no tiene subcategorías aún. Pulsa "+ Nueva Subcategoría" para crear la primera.'
-                          : 'Selecciona una subcategoría de la lista o crea una nueva pulsando el botón superior.'}
+                          : 'Selecciona una subcategoría de la lista o pulsa "+ Nueva Subcategoría" para crear otra.'}
                       </span>
                     </div>
                   );
@@ -1800,30 +1859,41 @@ export default function AdminClient({
                     </div>
 
                     {/* Subcategorías de esta categoría */}
-                    <div className="flex flex-wrap items-center gap-1.5 min-h-[26px]">
-                      {cat.subcategories && cat.subcategories.length > 0 ? (
-                        cat.subcategories.map((sub) => (
-                          <span
-                            key={sub}
-                            className="inline-flex items-center gap-1.5 pl-2.5 pr-1.5 py-1 rounded-lg bg-white border border-zinc-200 text-zinc-800 text-xs font-semibold shadow-2xs group"
-                          >
-                            <span>{sub}</span>
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteSubcategory(cat._id, sub)}
-                              className="w-4 h-4 rounded-full text-zinc-400 hover:text-red-600 hover:bg-red-50 flex items-center justify-center transition-colors cursor-pointer"
-                              title={`Eliminar subcategoría ${sub}`}
-                            >
-                              ✕
-                            </button>
-                          </span>
-                        ))
-                      ) : (
-                        <span className="text-[11px] text-zinc-400 italic">
-                          Sin subcategorías creadas aún
-                        </span>
-                      )}
-                    </div>
+                    {(() => {
+                      const allCatSubs = Array.from(new Set([
+                        ...(cat.subcategories || []),
+                        ...products
+                          .filter((p) => p.category === cat._id && p.subcategory && p.subcategory.trim())
+                          .map((p) => p.subcategory!.trim())
+                      ])).sort();
+
+                      return (
+                        <div className="flex flex-wrap items-center gap-1.5 min-h-[26px]">
+                          {allCatSubs.length > 0 ? (
+                            allCatSubs.map((sub) => (
+                              <span
+                                key={sub}
+                                className="inline-flex items-center gap-1.5 pl-2.5 pr-1.5 py-1 rounded-lg bg-white border border-zinc-200 text-zinc-800 text-xs font-semibold shadow-2xs group"
+                              >
+                                <span>{sub}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteSubcategory(cat._id, sub)}
+                                  className="w-4 h-4 rounded-full text-zinc-400 hover:text-red-600 hover:bg-red-50 flex items-center justify-center transition-colors cursor-pointer"
+                                  title={`Eliminar subcategoría "${sub}"`}
+                                >
+                                  ✕
+                                </button>
+                              </span>
+                            ))
+                          ) : (
+                            <span className="text-[11px] text-zinc-400 italic">
+                              Sin subcategorías creadas aún
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })()}
 
                     {/* Input rápido para agregar subcategoría a esta categoría */}
                     <div className="flex items-center gap-1.5 mt-0.5">
@@ -2215,6 +2285,19 @@ export default function AdminClient({
                               <span className="text-[10px] uppercase tracking-wider text-red-600 font-bold block">
                                 {prodCategory}
                               </span>
+
+                              {/* Subcategoría / Colección Asignada */}
+                              {prod.subcategory && prod.subcategory.trim() ? (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-zinc-950 text-amber-300 border border-zinc-800 shadow-2xs">
+                                  <span className="text-amber-400">🔥</span>
+                                  <span>{prod.subcategory}</span>
+                                </span>
+                              ) : (
+                                <span className="text-[10px] text-zinc-400 font-medium italic">
+                                  (Sin subcategoría)
+                                </span>
+                              )}
+
                               {isPaused && (
                                 <span className="text-[9px] bg-amber-100 border border-amber-300 text-amber-800 font-bold px-1.5 py-0.5 rounded uppercase tracking-wider flex items-center gap-1 shadow-xs">
                                   <span>⏸️ Pausado (Oculto en tienda)</span>
