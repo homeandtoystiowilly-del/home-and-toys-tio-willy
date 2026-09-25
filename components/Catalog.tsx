@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { trackEventAction } from '../app/admin/adminActions';
 
 // Interfaces para TypeScript
@@ -321,12 +322,15 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
 
   return (
     <div 
-      onClick={() => setIsModalOpen(true)}
-      className="group relative flex flex-col rounded-3xl bg-white border border-zinc-200/90 hover:border-red-500/50 transition-all duration-300 overflow-hidden shadow-xs hover:shadow-xl hover:shadow-red-950/10 hover:-translate-y-1 cursor-pointer"
+      className="group relative flex flex-col rounded-3xl bg-white border border-zinc-200/90 hover:border-red-500/50 transition-all duration-300 overflow-hidden shadow-xs hover:shadow-xl hover:shadow-red-950/10 hover:-translate-y-1"
     >
       {/* Product Image Container (Padded Canvas with object-contain for Full Visibility) */}
       <div 
-        className="relative bg-zinc-50/90 p-4 sm:p-5 flex items-center justify-center h-64 sm:h-72 w-full overflow-hidden border-b border-zinc-100 cursor-grab active:cursor-grabbing select-none"
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsModalOpen(true);
+        }}
+        className="relative bg-zinc-50/90 p-4 sm:p-5 flex items-center justify-center h-64 sm:h-72 w-full overflow-hidden border-b border-zinc-100 cursor-pointer select-none"
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
@@ -462,7 +466,13 @@ export function ProductCard({ product, categoryName, currency = 'USD' }: { produ
           </span>
         </div>
 
-        <h3 className="text-sm sm:text-base font-bold text-zinc-900 tracking-tight group-hover:text-red-600 transition-colors duration-200 min-h-[40px] sm:min-h-[44px] line-clamp-2 leading-snug">
+        <h3 
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsModalOpen(true);
+          }}
+          className="text-sm sm:text-base font-bold text-zinc-900 tracking-tight group-hover:text-red-600 transition-colors duration-200 min-h-[40px] sm:min-h-[44px] line-clamp-2 leading-snug cursor-pointer"
+        >
           {product.name}
         </h3>
         
@@ -723,10 +733,20 @@ export function ProductDetailModal({
     window.open(finalUrl, '_blank', 'noopener,noreferrer');
   };
 
-  return (
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onClose();
+  };
+
+  const modalContent = (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 md:p-6 bg-black/60 backdrop-blur-md transition-all duration-300 animate-fadeIn"
-      onClick={onClose}
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-5 md:p-6 bg-black/80 backdrop-blur-md transition-all duration-300 animate-fadeIn"
+      onClick={handleBackdropClick}
     >
       <div
         className="w-full max-w-lg md:max-w-4xl bg-white border border-zinc-200 rounded-3xl overflow-hidden shadow-2xl relative flex flex-col max-h-[92vh] animate-scaleUp"
@@ -749,7 +769,11 @@ export function ProductDetailModal({
           </div>
 
           <button
-            onClick={onClose}
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose();
+            }}
             className="w-9 h-9 rounded-full bg-zinc-100 hover:bg-red-600 active:scale-95 text-zinc-600 hover:text-white flex items-center justify-center transition-all duration-200 cursor-pointer focus:outline-none border border-zinc-200 shadow-sm shrink-0 ml-auto"
             aria-label="Cerrar modal"
           >
@@ -1011,6 +1035,10 @@ export function ProductDetailModal({
       </div>
     </div>
   );
+
+  if (!mounted || typeof document === 'undefined') return null;
+
+  return createPortal(modalContent, document.body);
 }
 
 // Función auxiliar para extraer subcategorías creadas manualmente por el administrador
