@@ -602,28 +602,51 @@ export async function updateProductPricesAction(id: string, priceDetal: number, 
       return { success: false, error: 'No autorizado.' };
     }
 
-    if (isNaN(priceDetal) || isNaN(priceMayor)) {
-      return { success: false, error: 'Precios inválidos.' };
+    if (isNaN(priceDetal) || isNaN(priceMayor) || priceDetal < 0 || priceMayor < 0) {
+      return { success: false, error: 'Precios inválidos. Deben ser valores numéricos mayores o iguales a cero.' };
     }
 
     const client = await clientPromise;
     const db = client.db('tio_willy_db');
 
     const queryId = ObjectId.isValid(id) && id.length === 24 ? new ObjectId(id) : id;
-    await db.collection('productos').updateOne(
+    let res = await db.collection('productos').updateOne(
       { _id: queryId as any },
       { 
         $set: { 
-          priceDetal: priceDetal, 
-          priceMayor: priceMayor 
+          priceDetal: Number(priceDetal), 
+          priceMayor: Number(priceMayor),
+          updatedAt: new Date()
         } 
       }
     );
 
+    if (res.matchedCount === 0 && typeof queryId !== 'string') {
+      res = await db.collection('productos').updateOne(
+        { _id: id as any },
+        { 
+          $set: { 
+            priceDetal: Number(priceDetal), 
+            priceMayor: Number(priceMayor),
+            updatedAt: new Date()
+          } 
+        }
+      );
+    }
+
+    if (res.matchedCount === 0) {
+      return { success: false, error: 'Producto no encontrado en la base de datos.' };
+    }
+
     revalidatePath('/');
     revalidatePath('/admin');
 
-    return { success: true, message: 'Precios actualizados con éxito.' };
+    return { 
+      success: true, 
+      message: 'Precios actualizados con éxito.',
+      priceDetal: Number(priceDetal),
+      priceMayor: Number(priceMayor)
+    };
   } catch (error: any) {
     console.error('Error al actualizar precios:', error);
     return { success: false, error: getFriendlyError(error, 'Error al actualizar precios.') };

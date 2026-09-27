@@ -278,6 +278,9 @@ export default function AdminClient({
   
   // Estado para indicar si se está guardando algún cambio de precio en la lista
   const [priceSavingId, setPriceSavingId] = useState<string | null>(null);
+  const [priceSuccessId, setPriceSuccessId] = useState<string | null>(null);
+  const [priceErrorId, setPriceErrorId] = useState<string | null>(null);
+  const [priceInputs, setPriceInputs] = useState<{ [productId: string]: { priceDetal: string; priceMayor: string } }>({});
   // Estado para indicar si se está guardando cambio de subcategoría
   const [subcatSavingId, setSubcatSavingId] = useState<string | null>(null);
 
@@ -976,31 +979,66 @@ export default function AdminClient({
     }
   };
 
-  // Cambiar precios en la lista (Cambio local en inputs)
+  // Cambiar precios en la lista (Cambio local en inputs preservando escritura fluida)
   const handlePriceFieldChange = (productId: string, field: 'priceDetal' | 'priceMayor', valStr: string) => {
-    setProducts((prev) => 
-      prev.map((p) => {
-        if (p._id === productId) {
-          const num = parseFloat(valStr.replace(',', '.')) || 0;
-          return { ...p, [field]: num };
-        }
-        return p;
-      })
-    );
+    setPriceInputs((prev) => {
+      const prod = products.find((p) => p._id === productId);
+      const current = prev[productId] || {
+        priceDetal: prod?.priceDetal.toString() || '0',
+        priceMayor: prod?.priceMayor.toString() || '0',
+      };
+      return {
+        ...prev,
+        [productId]: {
+          ...current,
+          [field]: valStr,
+        },
+      };
+    });
   };
 
-  // Guardar precios en MongoDB al perder el foco (onBlur)
+  // Guardar precios en MongoDB al presionar el botón de actualizar o pulsar Enter
   const handleSavePrices = async (product: Product) => {
+    const inputState = priceInputs[product._id];
+    const detalStr = inputState?.priceDetal !== undefined ? inputState.priceDetal : product.priceDetal.toString();
+    const mayorStr = inputState?.priceMayor !== undefined ? inputState.priceMayor : product.priceMayor.toString();
+
+    const numDetal = parseFloat(detalStr.replace(',', '.')) || 0;
+    const numMayor = parseFloat(mayorStr.replace(',', '.')) || 0;
+
     setPriceSavingId(product._id);
+    setPriceSuccessId(null);
+    setPriceErrorId(null);
+
     try {
-      const res = await updateProductPricesAction(product._id, product.priceDetal, product.priceMayor);
-      if (!res.success) {
+      const res = await updateProductPricesAction(product._id, numDetal, numMayor);
+      if (res.success) {
+        setProducts((prev) =>
+          prev.map((p) =>
+            p._id === product._id
+              ? { ...p, priceDetal: numDetal, priceMayor: numMayor }
+              : p
+          )
+        );
+        // Limpiar el estado de edición local para este producto
+        setPriceInputs((prev) => {
+          const updated = { ...prev };
+          delete updated[product._id];
+          return updated;
+        });
+        setPriceSuccessId(product._id);
+        setTimeout(() => setPriceSuccessId(null), 3000);
+      } else {
         console.error('Error al guardar precios:', res.error);
+        setPriceErrorId(product._id);
+        setTimeout(() => setPriceErrorId(null), 3500);
       }
     } catch (err) {
       console.error('Error al actualizar precios en red', err);
+      setPriceErrorId(product._id);
+      setTimeout(() => setPriceErrorId(null), 3500);
     } finally {
-      setTimeout(() => setPriceSavingId(null), 800); // Pequeña transición visual
+      setPriceSavingId(null);
     }
   };
 
@@ -2488,34 +2526,137 @@ export default function AdminClient({
                           </div>
                         )}
 
-                        {/* Controles de Precio In-line */}
-                        <div className="mt-3 flex flex-wrap gap-4 items-center">
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-[10px] text-zinc-500 uppercase font-bold">Al detal:</span>
-                            <input
-                              type="text"
-                              value={prod.priceDetal}
-                              onChange={(e) => handlePriceFieldChange(prod._id, 'priceDetal', e.target.value)}
-                              onBlur={() => handleSavePrices(prod)}
-                              className="w-20 min-h-[32px] px-2 py-1 bg-zinc-50 border border-zinc-300 hover:border-zinc-400 rounded-lg text-xs text-zinc-950 font-mono font-bold focus:bg-white focus:border-red-500 focus:outline-none transition-colors text-center shadow-xs"
-                            />
-                          </div>
+                        {/* Controles de Precio In-line con Botón Dedicado de Actualizar Precio */}
+                        {(() => {
+                          const currentDetal = priceInputs[prod._id]?.priceDetal !== undefined 
+                            ? priceInputs[prod._id].priceDetal 
+                            : prod.priceDetal.toString();
 
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-[10px] text-zinc-500 uppercase font-bold">Al mayor:</span>
-                            <input
-                              type="text"
-                              value={prod.priceMayor}
-                              onChange={(e) => handlePriceFieldChange(prod._id, 'priceMayor', e.target.value)}
-                              onBlur={() => handleSavePrices(prod)}
-                              className="w-20 min-h-[32px] px-2 py-1 bg-zinc-50 border border-zinc-300 hover:border-zinc-400 rounded-lg text-xs text-zinc-950 font-mono font-bold focus:bg-white focus:border-red-500 focus:outline-none transition-colors text-center shadow-xs"
-                            />
-                          </div>
+                          const currentMayor = priceInputs[prod._id]?.priceMayor !== undefined 
+                            ? priceInputs[prod._id].priceMayor 
+                            : prod.priceMayor.toString();
 
-                          <div className="text-[10px] text-zinc-400 italic mt-0.5 select-none font-medium">
-                            Detal {globalCurrency === 'EUR' ? '€' : '$'}{prod.priceDetal.toFixed(2)} · Mayor {globalCurrency === 'EUR' ? '€' : '$'}{prod.priceMayor.toFixed(2)}
-                          </div>
-                        </div>
+                          const isSaving = priceSavingId === prod._id;
+                          const isSuccess = priceSuccessId === prod._id;
+                          const isError = priceErrorId === prod._id;
+                          const hasChanges = priceInputs[prod._id] !== undefined && (
+                            parseFloat(priceInputs[prod._id].priceDetal.replace(',', '.')) !== prod.priceDetal ||
+                            parseFloat(priceInputs[prod._id].priceMayor.replace(',', '.')) !== prod.priceMayor
+                          );
+
+                          const parsedDetal = parseFloat(currentDetal.replace(',', '.')) || prod.priceDetal;
+                          const parsedMayor = parseFloat(currentMayor.replace(',', '.')) || prod.priceMayor;
+
+                          return (
+                            <div className="mt-3 flex flex-wrap gap-2.5 sm:gap-3 items-center">
+                              {/* Campo Al Detal */}
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">Al detal:</span>
+                                <input
+                                  type="text"
+                                  inputMode="decimal"
+                                  value={currentDetal}
+                                  onChange={(e) => handlePriceFieldChange(prod._id, 'priceDetal', e.target.value)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                      e.preventDefault();
+                                      handleSavePrices(prod);
+                                    }
+                                  }}
+                                  className={`w-20 min-h-[32px] px-2 py-1 bg-zinc-50 border rounded-lg text-xs text-zinc-950 font-mono font-bold focus:bg-white focus:outline-none transition-all text-center shadow-xs ${
+                                    isSuccess 
+                                      ? 'border-emerald-500 ring-2 ring-emerald-500/25 bg-emerald-50/50 text-emerald-950' 
+                                      : isError 
+                                      ? 'border-red-500 ring-2 ring-red-500/25 bg-red-50/50' 
+                                      : hasChanges 
+                                      ? 'border-amber-400 bg-amber-50/40 focus:border-amber-500' 
+                                      : 'border-zinc-300 hover:border-zinc-400 focus:border-red-500'
+                                  }`}
+                                  placeholder="0.00"
+                                />
+                              </div>
+
+                              {/* Campo Al Mayor */}
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">Al mayor:</span>
+                                <input
+                                  type="text"
+                                  inputMode="decimal"
+                                  value={currentMayor}
+                                  onChange={(e) => handlePriceFieldChange(prod._id, 'priceMayor', e.target.value)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                      e.preventDefault();
+                                      handleSavePrices(prod);
+                                    }
+                                  }}
+                                  className={`w-20 min-h-[32px] px-2 py-1 bg-zinc-50 border rounded-lg text-xs text-zinc-950 font-mono font-bold focus:bg-white focus:outline-none transition-all text-center shadow-xs ${
+                                    isSuccess 
+                                      ? 'border-emerald-500 ring-2 ring-emerald-500/25 bg-emerald-50/50 text-emerald-950' 
+                                      : isError 
+                                      ? 'border-red-500 ring-2 ring-red-500/25 bg-red-50/50' 
+                                      : hasChanges 
+                                      ? 'border-amber-400 bg-amber-50/40 focus:border-amber-500' 
+                                      : 'border-zinc-300 hover:border-zinc-400 focus:border-red-500'
+                                  }`}
+                                  placeholder="0.00"
+                                />
+                              </div>
+
+                              {/* Botón Actualizar Precio */}
+                              <button
+                                type="button"
+                                onClick={() => handleSavePrices(prod)}
+                                disabled={isSaving}
+                                className={`min-h-[32px] px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer shadow-xs ${
+                                  isSuccess
+                                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/30'
+                                    : isError
+                                    ? 'bg-red-600 text-white shadow-red-600/30'
+                                    : isSaving
+                                    ? 'bg-zinc-200 text-zinc-500 cursor-not-allowed'
+                                    : hasChanges
+                                    ? 'bg-red-600 hover:bg-red-700 text-white shadow-md shadow-red-600/30 animate-pulse'
+                                    : 'bg-zinc-900 hover:bg-zinc-800 text-zinc-200 hover:text-white border border-zinc-750'
+                                }`}
+                                title="Guardar precios al detal y al mayor en la base de datos"
+                              >
+                                {isSaving ? (
+                                  <>
+                                    <span className="w-2.5 h-2.5 rounded-full border-2 border-white/30 border-t-white animate-spin"></span>
+                                    <span>Guardando...</span>
+                                  </>
+                                ) : isSuccess ? (
+                                  <>
+                                    <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    <span>¡Precio actualizado!</span>
+                                  </>
+                                ) : isError ? (
+                                  <>
+                                    <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                    <span>Error al guardar</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <svg className={`w-3.5 h-3.5 ${hasChanges ? 'text-white' : 'text-zinc-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                    </svg>
+                                    <span>Actualizar precio</span>
+                                  </>
+                                )}
+                              </button>
+
+                              {/* Formato y Moneda */}
+                              <div className="text-[10px] text-zinc-400 italic select-none font-medium basis-full sm:basis-auto mt-0.5 sm:mt-0">
+                                Detal {globalCurrency === 'EUR' ? '€' : '$'}{parsedDetal.toFixed(2)} · Mayor {globalCurrency === 'EUR' ? '€' : '$'}{parsedMayor.toFixed(2)}
+                              </div>
+                            </div>
+                          );
+                        })()}
                       </div>
 
                       {/* Botones de Acción */}
