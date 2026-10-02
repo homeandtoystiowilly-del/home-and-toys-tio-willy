@@ -2980,13 +2980,13 @@ export default function Catalog({
               </div>
             </div>
 
-            {/* Filtro de Colecciones & Temáticas (Estilo creative landing page adaptado a Tío Willy) */}
+            {/* Filtro de Tamaños y Rines (Filtro por subcategorías en catálogo) */}
             {subcategories.length > 0 && (
               <div className="w-full bg-white border border-zinc-200/90 rounded-3xl p-3.5 sm:p-4 shadow-sm flex flex-col gap-2.5">
                 <div className="flex justify-between items-center px-1">
                   <span className="text-[11px] font-extrabold uppercase tracking-wider text-zinc-500 flex items-center gap-1.5">
                     <span className="text-amber-500">🔥</span>
-                    <span>Colecciones & Temáticas:</span>
+                    <span>Tamaños y Rines:</span>
                   </span>
                   {selectedSubcategory !== 'todos' && (
                     <button
