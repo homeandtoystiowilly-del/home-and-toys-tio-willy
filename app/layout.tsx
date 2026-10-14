@@ -69,6 +69,25 @@ export default function RootLayout({
       lang="es"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.__pwaDeferredPrompt = null;
+              window.addEventListener('beforeinstallprompt', function(e) {
+                e.preventDefault();
+                window.__pwaDeferredPrompt = e;
+                window.dispatchEvent(new CustomEvent('pwa-prompt-ready'));
+                console.log('[PWA] Prompt de instalación listo.');
+              });
+              window.addEventListener('appinstalled', function() {
+                window.__pwaDeferredPrompt = null;
+                console.log('[PWA] Aplicación instalada exitosamente.');
+              });
+            `,
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col bg-zinc-950 text-zinc-100">
         <PwaRegister />
         <PwaInstallBanner />

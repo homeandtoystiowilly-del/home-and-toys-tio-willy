@@ -1,122 +1,138 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
-// Interfaz para el evento BeforeInstallPromptEvent
+// Declaración global para el evento capturado
+declare global {
+  interface Window {
+    __pwaDeferredPrompt?: BeforeInstallPromptEvent | null;
+  }
+}
+
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
 }
 
+type DeviceType = 'ios' | 'android' | 'desktop';
+
 export default function PwaInstallBanner() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isStandalone, setIsStandalone] = useState<boolean>(false);
-  const [isIOS, setIsIOS] = useState<boolean>(false);
-  const [showIOSModal, setShowIOSModal] = useState<boolean>(false);
-  const [isDismissed, setIsDismissed] = useState<boolean>(true); // Inicialmente oculto para evitar parpadeos
+  const [deviceType, setDeviceType] = useState<DeviceType>('desktop');
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [isDismissed, setIsDismissed] = useState<boolean>(true);
 
+  // Detectar dispositivo y modo de ejecución
   useEffect(() => {
-    // 1. Verificar si ya está instalada o ejecutándose en modo standalone
-    const checkStandalone = () => {
-      const isStandaloneMode =
-        window.matchMedia('(display-mode: standalone)').matches ||
-        (navigator as unknown as { standalone?: boolean }).standalone === true ||
-        document.referrer.includes('android-app://');
-      setIsStandalone(isStandaloneMode);
-      return isStandaloneMode;
+    // 1. Verificar si ya está instalada o abierta en modo standalone
+    const isStandaloneMode =
+      window.matchMedia('(display-mode: standalone)').matches ||
+      (navigator as unknown as { standalone?: boolean }).standalone === true ||
+      document.referrer.includes('android-app://');
+    
+    setIsStandalone(isStandaloneMode);
+    if (isStandaloneMode) return;
+
+    // 2. Detectar tipo de dispositivo
+    const ua = window.navigator.userAgent.toLowerCase();
+    if (/iphone|ipad|ipod/.test(ua)) {
+      setDeviceType('ios');
+    } else if (/android/.test(ua)) {
+      setDeviceType('android');
+    } else {
+      setDeviceType('desktop');
+    }
+
+    // 3. Revisar si hay un prompt ya capturado en window
+    if (window.__pwaDeferredPrompt) {
+      setDeferredPrompt(window.__pwaDeferredPrompt);
+    }
+
+    // 4. Escuchar evento 'pwa-prompt-ready' desde el script de head o listener local
+    const handlePromptReady = () => {
+      if (window.__pwaDeferredPrompt) {
+        setDeferredPrompt(window.__pwaDeferredPrompt);
+      }
     };
+    window.addEventListener('pwa-prompt-ready', handlePromptReady);
 
-    if (checkStandalone()) return;
+    const handleBeforeInstall = (e: Event) => {
+      e.preventDefault();
+      const p = e as BeforeInstallPromptEvent;
+      window.__pwaDeferredPrompt = p;
+      setDeferredPrompt(p);
+    };
+    window.addEventListener('beforeinstallprompt', handleBeforeInstall);
 
-    // 2. Detectar si es iOS
-    const userAgent = window.navigator.userAgent.toLowerCase();
-    const isIOSDevice = /iphone|ipad|ipod/.test(userAgent);
-    setIsIOS(isIOSDevice);
-
-    // 3. Revisar si el usuario lo descartó recientemente
+    // 5. Gestión del banner flotante
     const dismissedTime = localStorage.getItem('tio_willy_pwa_dismissed');
     if (dismissedTime) {
       const daysSinceDismissed = (Date.now() - parseInt(dismissedTime, 10)) / (1000 * 60 * 60 * 24);
-      if (daysSinceDismissed < 5) {
-        setIsDismissed(true);
-      } else {
+      if (daysSinceDismissed >= 5) {
         setIsDismissed(false);
       }
     } else {
-      // Mostrar tras 3 segundos de navegación para no saturar al usuario
       const timer = setTimeout(() => {
         setIsDismissed(false);
-      }, 3000);
+      }, 2500);
       return () => clearTimeout(timer);
     }
 
-    // 4. Capturar evento beforeinstallprompt (Android, Chrome, Edge)
-    const handleBeforeInstallPrompt = (e: Event) => {
-      e.preventDefault();
-      setDeferredPrompt(e as BeforeInstallPromptEvent);
-    };
-
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-
-    // 5. Escuchar evento custom de instalación disparado desde botones del drawer/footer
-    const handleTriggerInstall = () => {
-      if (isIOSDevice) {
-        setShowIOSModal(true);
-      } else if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then((choice) => {
-          if (choice.outcome === 'accepted') {
-            setDeferredPrompt(null);
-            setIsDismissed(true);
-          }
-        });
-      } else {
-        // En caso de que el navegador no soporte prompt directo
-        setShowIOSModal(true);
-      }
-    };
-
-    window.addEventListener('tio-willy-open-install', handleTriggerInstall);
-
     return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-      window.removeEventListener('tio-willy-open-install', handleTriggerInstall);
+      window.removeEventListener('pwa-prompt-ready', handlePromptReady);
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
     };
+  }, []);
+
+  // Función principal para instalar
+  const triggerInstallation = useCallback(async () => {
+    const prompt = window.__pwaDeferredPrompt || deferredPrompt;
+
+    if (prompt) {
+      try {
+        await prompt.prompt();
+        const choice = await prompt.userChoice;
+        if (choice.outcome === 'accepted') {
+          console.log('[PWA] Instalación aceptada por el usuario.');
+          window.__pwaDeferredPrompt = null;
+          setDeferredPrompt(null);
+          setIsDismissed(true);
+        } else {
+          console.log('[PWA] Instalación cancelada por el usuario.');
+        }
+        return;
+      } catch (err) {
+        console.warn('[PWA] Error al invocar prompt:', err);
+      }
+    }
+
+    // Si no hay prompt nativo disponible (ej. iOS, o si el navegador lo bloquea), mostrar guía según el sistema operativo real
+    setShowModal(true);
   }, [deferredPrompt]);
 
-  const handleInstallClick = async () => {
-    if (isIOS) {
-      setShowIOSModal(true);
-      return;
-    }
-
-    if (!deferredPrompt) {
-      setShowIOSModal(true);
-      return;
-    }
-
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') {
-      console.log('[PWA] El usuario aceptó la instalación.');
-      setDeferredPrompt(null);
-      setIsDismissed(true);
-    } else {
-      console.log('[PWA] El usuario canceló la instalación.');
-    }
-  };
+  // Escuchar evento personalizado emitido desde cualquier parte de la app (drawer, footer, etc.)
+  useEffect(() => {
+    const handleCustomInstall = () => {
+      triggerInstallation();
+    };
+    window.addEventListener('tio-willy-open-install', handleCustomInstall);
+    return () => {
+      window.removeEventListener('tio-willy-open-install', handleCustomInstall);
+    };
+  }, [triggerInstallation]);
 
   const handleDismiss = () => {
     setIsDismissed(true);
     localStorage.setItem('tio_willy_pwa_dismissed', Date.now().toString());
   };
 
-  // Si ya es app instalada o está descartado el banner flotante
+  // Si ya es app instalada, no mostrar nada
   if (isStandalone) return null;
 
   return (
     <>
-      {/* Banner flotante inferior elegante */}
+      {/* Banner Flotante Inferior */}
       {!isDismissed && (
         <aside
           role="region"
@@ -136,16 +152,18 @@ export default function PwaInstallBanner() {
                 <span className="text-[10px] bg-red-600/20 text-red-400 font-bold px-1.5 py-0.2 rounded">Instalable</span>
               </div>
               <h4 className="text-sm font-bold text-white mt-0.5 leading-snug">
-                Instala Tío Willy en tu teléfono
+                {deviceType === 'desktop' 
+                  ? 'Instala la aplicación en tu computadora' 
+                  : 'Instala Tío Willy en tu teléfono'}
               </h4>
               <p className="text-xs text-zinc-400 mt-1 leading-relaxed">
-                Acceso ultra rápido, navegación fluida y catálogo disponible incluso sin conexión.
+                Acceso ultra rápido, catálogo offline y apertura en ventana propia.
               </p>
 
               <div className="flex items-center gap-2 mt-3">
                 <button
                   type="button"
-                  onClick={handleInstallClick}
+                  onClick={triggerInstallation}
                   className="px-4 py-2 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-red-600/30 cursor-pointer flex items-center gap-1.5 active:scale-95"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -176,18 +194,18 @@ export default function PwaInstallBanner() {
         </aside>
       )}
 
-      {/* Modal / Sheet explicativo para iOS o navegadores que requieren instalación manual */}
-      {showIOSModal && (
+      {/* Modal Guía Dinámico según el Sistema Operativo (Android, PC o iOS) */}
+      {showModal && (
         <div 
           className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-4 animate-in fade-in duration-200"
-          onClick={() => setShowIOSModal(false)}
+          onClick={() => setShowModal(false)}
         >
           <div 
             className="w-full max-w-sm bg-zinc-900 border border-zinc-800 rounded-3xl p-6 text-white shadow-2xl relative animate-in slide-in-from-bottom-6 sm:zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
             <button
-              onClick={() => setShowIOSModal(false)}
+              onClick={() => setShowModal(false)}
               className="absolute top-4 right-4 text-zinc-400 hover:text-white w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center cursor-pointer"
               aria-label="Cerrar"
             >
@@ -199,54 +217,139 @@ export default function PwaInstallBanner() {
                 <img src="/icons/icon-192x192.png" alt="Tío Willy" className="w-full h-full object-cover" />
               </div>
               <div>
-                <h3 className="text-base font-black text-white">Instalar en tu Pantalla</h3>
+                <h3 className="text-base font-black text-white">
+                  {deviceType === 'desktop' ? 'Instalar en tu PC / Mac' : 'Instalar en tu Pantalla'}
+                </h3>
                 <span className="text-xs text-red-400 font-bold">Home & Toys Tío Willy</span>
               </div>
             </div>
 
-            <div className="space-y-3.5 my-4 text-xs text-zinc-300">
-              <div className="flex items-start gap-3 bg-zinc-950/60 p-3 rounded-2xl border border-zinc-800/80">
-                <div className="w-6 h-6 rounded-lg bg-red-600/20 text-red-400 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
-                  1
+            {/* Guía Específica para Android */}
+            {deviceType === 'android' && (
+              <div className="space-y-3.5 my-4 text-xs text-zinc-300">
+                <div className="flex items-start gap-3 bg-zinc-950/60 p-3 rounded-2xl border border-zinc-800/80">
+                  <div className="w-6 h-6 rounded-lg bg-red-600/20 text-red-400 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                    1
+                  </div>
+                  <div>
+                    <p className="font-semibold text-white">Abre el menú de Chrome en Android:</p>
+                    <p className="text-zinc-400 mt-0.5">
+                      Pulsa sobre los tres puntos <strong>(⋮)</strong> en la esquina superior derecha.
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-semibold text-white">
-                    {isIOS ? 'Pulsa el botón de Compartir en Safari:' : 'Abre el menú de tu navegador:'}
-                  </p>
-                  <p className="text-zinc-400 mt-0.5">
-                    {isIOS ? 'Ubicado en la barra inferior (icono de un cuadro con una flecha hacia arriba ⎋).' : 'Pulsa en los tres puntos (•••) en la esquina superior.'}
-                  </p>
-                </div>
-              </div>
 
-              <div className="flex items-start gap-3 bg-zinc-950/60 p-3 rounded-2xl border border-zinc-800/80">
-                <div className="w-6 h-6 rounded-lg bg-red-600/20 text-red-400 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
-                  2
+                <div className="flex items-start gap-3 bg-zinc-950/60 p-3 rounded-2xl border border-zinc-800/80">
+                  <div className="w-6 h-6 rounded-lg bg-red-600/20 text-red-400 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                    2
+                  </div>
+                  <div>
+                    <p className="font-semibold text-white">Selecciona "Instalar aplicación":</p>
+                    <p className="text-zinc-400 mt-0.5">
+                      (O también puede decir <strong>"Agregar a la pantalla principal"</strong>).
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-semibold text-white">Selecciona "Agregar a pantalla de inicio":</p>
-                  <p className="text-zinc-400 mt-0.5">
-                    Busca la opción con el símbolo <strong>➕</strong> en el menú desplegable.
-                  </p>
-                </div>
-              </div>
 
-              <div className="flex items-start gap-3 bg-zinc-950/60 p-3 rounded-2xl border border-zinc-800/80">
-                <div className="w-6 h-6 rounded-lg bg-emerald-600/20 text-emerald-400 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
-                  ✓
-                </div>
-                <div>
-                  <p className="font-semibold text-white">¡Listo para usar!</p>
-                  <p className="text-zinc-400 mt-0.5">
-                    Se creará el icono de Tío Willy como una app nativa con apertura a pantalla completa.
-                  </p>
+                <div className="flex items-start gap-3 bg-zinc-950/60 p-3 rounded-2xl border border-zinc-800/80">
+                  <div className="w-6 h-6 rounded-lg bg-emerald-600/20 text-emerald-400 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                    ✓
+                  </div>
+                  <div>
+                    <p className="font-semibold text-white">¡Icono creado automáticamente!</p>
+                    <p className="text-zinc-400 mt-0.5">
+                      Se instalará con el logo de Tío Willy en tu cajón de aplicaciones.
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
+
+            {/* Guía Específica para PC / Desktop (Chrome / Edge) */}
+            {deviceType === 'desktop' && (
+              <div className="space-y-3.5 my-4 text-xs text-zinc-300">
+                <div className="flex items-start gap-3 bg-zinc-950/60 p-3 rounded-2xl border border-zinc-800/80">
+                  <div className="w-6 h-6 rounded-lg bg-red-600/20 text-red-400 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                    1
+                  </div>
+                  <div>
+                    <p className="font-semibold text-white">Barra de direcciones:</p>
+                    <p className="text-zinc-400 mt-0.5">
+                      Haz clic en el icono de instalación 💻 con flecha hacia abajo en la barra superior de Chrome o Edge (al lado de la estrella de favoritos).
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 bg-zinc-950/60 p-3 rounded-2xl border border-zinc-800/80">
+                  <div className="w-6 h-6 rounded-lg bg-red-600/20 text-red-400 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                    2
+                  </div>
+                  <div>
+                    <p className="font-semibold text-white">O desde el menú principal:</p>
+                    <p className="text-zinc-400 mt-0.5">
+                      Haz clic en los tres puntos <strong>(⋮)</strong> arriba a la derecha ➔ <strong>"Guardar y compartir"</strong> ➔ <strong>"Instalar Tío Willy"</strong>.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 bg-zinc-950/60 p-3 rounded-2xl border border-zinc-800/80">
+                  <div className="w-6 h-6 rounded-lg bg-emerald-600/20 text-emerald-400 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                    ✓
+                  </div>
+                  <div>
+                    <p className="font-semibold text-white">Acceso en tu Escritorio:</p>
+                    <p className="text-zinc-400 mt-0.5">
+                      Se abrirá en su propia ventana sin marcos y creará un acceso directo en tu escritorio.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Guía Específica para iOS (Safari iPhone / iPad) */}
+            {deviceType === 'ios' && (
+              <div className="space-y-3.5 my-4 text-xs text-zinc-300">
+                <div className="flex items-start gap-3 bg-zinc-950/60 p-3 rounded-2xl border border-zinc-800/80">
+                  <div className="w-6 h-6 rounded-lg bg-red-600/20 text-red-400 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                    1
+                  </div>
+                  <div>
+                    <p className="font-semibold text-white">Pulsa el botón Compartir en Safari:</p>
+                    <p className="text-zinc-400 mt-0.5">
+                      En la barra inferior de Safari, pulsa el icono de un cuadro con flecha hacia arriba <strong>⎋</strong>.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 bg-zinc-950/60 p-3 rounded-2xl border border-zinc-800/80">
+                  <div className="w-6 h-6 rounded-lg bg-red-600/20 text-red-400 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                    2
+                  </div>
+                  <div>
+                    <p className="font-semibold text-white">Selecciona "Agregar a pantalla de inicio":</p>
+                    <p className="text-zinc-400 mt-0.5">
+                      Desliza hacia abajo en el menú y selecciona la opción con el símbolo <strong>➕</strong>.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 bg-zinc-950/60 p-3 rounded-2xl border border-zinc-800/80">
+                  <div className="w-6 h-6 rounded-lg bg-emerald-600/20 text-emerald-400 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                    ✓
+                  </div>
+                  <div>
+                    <p className="font-semibold text-white">¡Listo en tu iPhone!</p>
+                    <p className="text-zinc-400 mt-0.5">
+                      Se agregará el icono de Tío Willy para abrir a pantalla completa.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <button
               type="button"
-              onClick={() => setShowIOSModal(false)}
+              onClick={() => setShowModal(false)}
               className="w-full py-3 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-red-600/30 cursor-pointer"
             >
               Entendido
