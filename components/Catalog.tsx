@@ -2327,7 +2327,24 @@ export default function Catalog({
               )}
             </button>
 
-            {/* 5. Contacto & Redes Sociales */}
+            {/* 5. Instalar App Móvil (PWA) */}
+            <button
+              type="button"
+              onClick={() => {
+                setIsDrawerOpen(false);
+                if (typeof window !== 'undefined') {
+                  window.dispatchEvent(new Event('tio-willy-open-install'));
+                }
+              }}
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white text-xs font-black transition-all uppercase tracking-wider cursor-pointer shadow-md shadow-red-600/25 active:scale-98"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              <span>📲 Instalar App en el Teléfono</span>
+            </button>
+
+            {/* 6. Contacto & Redes Sociales */}
             <div className="pt-2 border-t border-zinc-100 flex flex-col gap-2">
               <a
                 href="https://api.whatsapp.com/send?phone=584244576086"
@@ -3565,12 +3582,26 @@ export default function Catalog({
 
         <p className="mt-2 text-zinc-400">© 2026 Home and Toys Tío Willy. Todos los derechos reservados.</p>
         <p className="text-xs text-zinc-500 italic">Desarrollado con pasión para una experiencia de compra premium.</p>
-        <a 
-          href="/admin" 
-          className="text-xs text-red-500 hover:text-red-400 transition-colors duration-300 uppercase tracking-widest font-bold mt-2 hover:underline"
-        >
-          Acceso Administrador
-        </a>
+        <div className="flex items-center gap-4 mt-2">
+          <button
+            type="button"
+            onClick={() => {
+              if (typeof window !== 'undefined') {
+                window.dispatchEvent(new Event('tio-willy-open-install'));
+              }
+            }}
+            className="text-xs text-zinc-400 hover:text-white transition-colors duration-300 uppercase tracking-widest font-bold flex items-center gap-1.5 cursor-pointer"
+          >
+            <span>📲 Instalar App (PWA)</span>
+          </button>
+          <span className="text-zinc-700">•</span>
+          <a 
+            href="/admin" 
+            className="text-xs text-red-500 hover:text-red-400 transition-colors duration-300 uppercase tracking-widest font-bold hover:underline"
+          >
+            Acceso Administrador
+          </a>
+        </div>
       </footer>
 
       {/* Modal para producto seleccionado en sección Super Ofertas */}

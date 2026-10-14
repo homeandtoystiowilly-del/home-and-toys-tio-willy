@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sin Conexión | Home & Toys Tío Willy</title>
+  <meta name="theme-color" content="#09090b">
+  <link rel="icon" href="/favicon-32x32.png">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+    body {
+      background-color: #09090b;
+      color: #fafafa;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+      text-align: center;
+    }
+    .card {
+      background: #18181b;
+      border: 1px solid #27272a;
+      border-radius: 24px;
+      padding: 32px 24px;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #dc2626, #ef4444, #f97316);
+    }
+    .logo-container {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      background: #27272a;
+      border: 2px solid #dc2626;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px auto;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(220, 38, 38, 0.3);
+    }
+    .logo-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    h1 {
+      font-size: 22px;
+      font-weight: 900;
+      margin-bottom: 8px;
+      color: #ffffff;
+      letter-spacing: -0.02em;
+    }
+    .highlight {
+      color: #ef4444;
+      font-weight: 800;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 12px;
+      display: block;
+    }
+    p {
+      font-size: 14px;
+      color: #a1a1aa;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+    .btn-retry {
+      background: #dc2626;
+      color: #ffffff;
+      border: none;
+      border-radius: 14px;
+      padding: 14px 28px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 16px rgba(220, 38, 38, 0.4);
+    }
+    .btn-retry:hover {
+      background: #b91c1c;
+    }
+    .btn-retry:active {
+      transform: scale(0.98);
+    }
+    .info-box {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid #27272a;
+      text-align: left;
+    }
+    .info-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #71717a;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    .info-item {
+      font-size: 13px;
+      color: #e4e4e7;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .badge-offline {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      margin-bottom: 16px;
+    }
+    .pulse-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #ef4444;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { opacity: 0.4; }
+      50% { opacity: 1; }
+      100% { opacity: 0.4; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo-container">
+      <img src="/icons/icon-192x192.png" alt="Home & Toys Tío Willy">
+    </div>
+
+    <div class="badge-offline">
+      <span class="pulse-dot"></span> Modo Sin Conexión
+    </div>
+
+    <span class="highlight">Home & Toys Tío Willy</span>
+    <h1>Parece que no tienes internet</h1>
+    <p>La aplicación está lista para funcionar, pero necesitas conexión para sincronizar los productos o precios más recientes.</p>
+
+    <button class="btn-retry" onclick="window.location.reload()">
+      🔄 Reintentar Conexión
+    </button>
+
+    <div class="info-box">
+      <div class="info-title">Atención Telefónica Directa</div>
+      <div class="info-item">📞 0424-4576086 / 0424-1439324</div>
+      <div class="info-item">📍 Centro de Caracas, Edificio Arvelo, PB</div>
+    </div>
+  </div>
+</body>
+</html>
