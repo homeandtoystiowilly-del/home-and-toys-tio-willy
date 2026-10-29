@@ -1066,3 +1066,29 @@ export async function toggleProductVarietyStatusAction(
     return { success: false, error: getFriendlyError(error, 'Error al actualizar la disponibilidad de la variedad.') };
   }
 }
+
+
+// Acción pública para obtener catálogo en vivo actualizado (usado por el generador de PDF)
+export async function getLiveCatalogDataAction() {
+  try {
+    const client = await clientPromise;
+    const db = client.db('tio_willy_db');
+
+    const [categorias, productos] = await Promise.all([
+      db.collection('categorias').find({}).toArray(),
+      db.collection('productos').find({ status: { $ne: 'paused' } }).toArray(),
+    ]);
+
+    return {
+      success: true,
+      categorias: JSON.parse(JSON.stringify(categorias)),
+      productos: JSON.parse(JSON.stringify(productos)),
+    };
+  } catch (error: any) {
+    console.error('Error al obtener catálogo en vivo para PDF:', error);
+    return {
+      success: false,
+      error: error?.message || 'Error al conectar con la base de datos',
+    };
+  }
+}

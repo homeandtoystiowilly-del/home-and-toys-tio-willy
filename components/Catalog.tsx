@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { trackEventAction } from '../app/admin/adminActions';
+import { trackEventAction, getLiveCatalogDataAction } from '../app/admin/adminActions';
 import {
   fetchBcvRates,
   formatBcvRate,
@@ -1215,6 +1215,7 @@ export default function Catalog({
   const [isSubcatDropdownOpen, setIsSubcatDropdownOpen] = useState<boolean>(false);
   const subcatDropdownRef = useRef<HTMLDivElement>(null);
   const [pdfLoading, setPdfLoading] = useState<boolean>(false);
+  const [pdfProgressText, setPdfProgressText] = useState<string>('');
   const [selectedOfferProduct, setSelectedOfferProduct] = useState<Product | null>(null);
   const [selectedUrlProduct, setSelectedUrlProduct] = useState<Product | null>(null);
   const [selectedUrlVarietyIdx, setSelectedUrlVarietyIdx] = useState<number>(0);
@@ -1432,32 +1433,151 @@ export default function Catalog({
     return counts;
   }, [activeProducts, selectedCategory, searchQuery, subcategories]);
 
-  // Helper to load an image URL and convert it to Base64
-  const getBase64ImageFromUrl = async (url: string): Promise<string> => {
-    try {
-      const controller = new AbortController();
-      const id = setTimeout(() => controller.abort(), 6000); // 6s timeout
-      const res = await fetch(url, { signal: controller.signal });
-      clearTimeout(id);
-      
-      const blob = await res.blob();
+  // Helper robusto para procesar y optimizar imágenes para jsPDF (Soporta DataURL, WebP, PNG, JPEG y URLs remotas)
+  const getBase64ImageForPdf = async (url: string): Promise<{ data: string; format: string } | null> => {
+    if (!url || typeof url !== 'string') return null;
+
+    // Caso 1: La imagen ya es un Data URL (base64 directo guardado en MongoDB)
+    if (url.startsWith('data:image/')) {
+      const mimeMatch = url.match(/^data:image\/([a-zA-Z0-9\+\-]+);/);
+      const mime = mimeMatch ? mimeMatch[1].toLowerCase() : 'jpeg';
+
+      // Si es JPEG directo, retornarlo sin procesamiento innecesario
+      if (mime === 'jpeg' || mime === 'jpg') {
+        return { data: url, format: 'JPEG' };
+      }
+      // Si es PNG directo, jsPDF lo soporta con formato PNG
+      if (mime === 'png') {
+        return { data: url, format: 'PNG' };
+      }
+
+      // Si es WEBP u otro formato, jsPDF no lo procesa directamente:
+      // Lo renderizamos en un canvas virtual y lo convertimos a JPEG sobre fondo blanco
       return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result as string);
-        reader.onerror = () => resolve('');
-        reader.readAsDataURL(blob);
+        const img = new Image();
+        img.onload = () => {
+          try {
+            const canvas = document.createElement('canvas');
+            const maxDim = 800; // Limitar resolución para evitar PDFs gigantescos
+            let w = img.naturalWidth || img.width || 400;
+            let h = img.naturalHeight || img.height || 400;
+            if (w > maxDim || h > maxDim) {
+              if (w > h) {
+                h = Math.round((h * maxDim) / w);
+                w = maxDim;
+              } else {
+                w = Math.round((w * maxDim) / h);
+                h = maxDim;
+              }
+            }
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            if (ctx) {
+              ctx.fillStyle = '#FFFFFF';
+              ctx.fillRect(0, 0, w, h);
+              ctx.drawImage(img, 0, 0, w, h);
+              const jpegData = canvas.toDataURL('image/jpeg', 0.85);
+              resolve({ data: jpegData, format: 'JPEG' });
+              return;
+            }
+          } catch (e) {
+            console.warn('Error convirtiendo imagen data: a canvas:', e);
+          }
+          resolve(null);
+        };
+        img.onerror = () => resolve(null);
+        img.src = url;
       });
-    } catch (e) {
-      console.warn("Error fetching image for PDF: ", url, e);
-      return '';
     }
+
+    // Caso 2: URLs remotas (Cloudinary, /images/..., etc.)
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+
+      const timer = setTimeout(() => {
+        resolve(null);
+      }, 5000);
+
+      img.onload = () => {
+        clearTimeout(timer);
+        try {
+          const canvas = document.createElement('canvas');
+          const maxDim = 800;
+          let w = img.naturalWidth || img.width || 400;
+          let h = img.naturalHeight || img.height || 400;
+          if (w > maxDim || h > maxDim) {
+            if (w > h) {
+              h = Math.round((h * maxDim) / w);
+              w = maxDim;
+            } else {
+              w = Math.round((w * maxDim) / h);
+              h = maxDim;
+            }
+          }
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, w, h);
+            ctx.drawImage(img, 0, 0, w, h);
+            const jpegData = canvas.toDataURL('image/jpeg', 0.85);
+            resolve({ data: jpegData, format: 'JPEG' });
+            return;
+          }
+        } catch (e) {
+          console.warn('Error en canvas con imagen remota:', e);
+        }
+        resolve(null);
+      };
+
+      img.onerror = async () => {
+        clearTimeout(timer);
+        // Fallback a fetch directo si el elemento Image falla
+        try {
+          const res = await fetch(url);
+          const blob = await res.blob();
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const data = reader.result as string;
+            const fmt = blob.type.includes('png') ? 'PNG' : 'JPEG';
+            resolve({ data, format: fmt });
+          };
+          reader.onerror = () => resolve(null);
+          reader.readAsDataURL(blob);
+        } catch {
+          resolve(null);
+        }
+      };
+
+      img.src = url;
+    });
   };
 
   const handleGenerateCatalogPDF = async () => {
     if (pdfLoading) return;
     setPdfLoading(true);
+    setPdfProgressText('Sincronizando catálogo en vivo...');
 
     try {
+      // 1. Obtener siempre los datos en vivo más recientes desde la base de datos (MongoDB)
+      let activeProductList: Product[] = activeProducts;
+      let categoriesForPdf: Category[] = initialCategorias;
+
+      try {
+        const liveRes = await getLiveCatalogDataAction();
+        if (liveRes && liveRes.success && Array.isArray(liveRes.productos) && liveRes.productos.length > 0) {
+          activeProductList = liveRes.productos.filter((p: Product) => p.status !== 'paused');
+          if (Array.isArray(liveRes.categorias) && liveRes.categorias.length > 0) {
+            categoriesForPdf = liveRes.categorias;
+          }
+        }
+      } catch (errLive) {
+        console.warn('No se pudo sincronizar en vivo antes del PDF, usando estado local:', errLive);
+      }
+
       // Carga dinámica bajo demanda para optimizar el bundle inicial
       const { jsPDF } = await import('jspdf');
 
@@ -1471,7 +1591,6 @@ export default function Catalog({
       const pageHeight = doc.internal.pageSize.getHeight(); // 297
 
       // --- PAGINA DE PORTADA (Blanca / Minimalista) ---
-      // Fondo blanco
       doc.setFillColor(255, 255, 255);
       doc.rect(0, 0, pageWidth, pageHeight, 'F');
 
@@ -1515,26 +1634,21 @@ export default function Catalog({
       const boxW = pageWidth - 50;
       const boxH = 65;
 
-      // Caja gris claro de fondo
       doc.setFillColor(248, 248, 250);
       doc.roundedRect(boxX, boxY, boxW, boxH, 4, 4, 'F');
       
-      // Borde punteado
       doc.setDrawColor(180, 180, 190);
       doc.setLineWidth(0.4);
-      // Simular borde dashed
       doc.line(boxX + 2, boxY, boxX + boxW - 2, boxY);
       doc.line(boxX + boxW, boxY + 2, boxX + boxW, boxY + boxH - 2);
       doc.line(boxX + 2, boxY + boxH, boxX + boxW - 2, boxY + boxH);
       doc.line(boxX, boxY + 2, boxX, boxY + boxH - 2);
 
-      // Título en la caja
       doc.setTextColor(50, 50, 60);
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(11);
       doc.text("ATENDIDO POR (CONTACTO COMERCIAL):", boxX + 10, boxY + 12);
 
-      // Campos en blanco para rellenar
       doc.setTextColor(110, 110, 120);
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(9.5);
@@ -1542,19 +1656,18 @@ export default function Catalog({
       doc.text("Teléfono: ________________________________________________", boxX + 10, boxY + 38);
       doc.text("Correo/Red Social: _________________________________________", boxX + 10, boxY + 50);
 
-      // Pie de portada
       doc.setTextColor(160, 160, 165);
       doc.setFontSize(8);
       doc.text("Herramienta de ventas autorizada para distribuidores independientes.", pageWidth / 2, 265, { align: 'center' });
 
       // --- AGRUPAR PRODUCTOS POR CATEGORÍA ---
       const grouped: { [categoryId: string]: Product[] } = {};
-      initialCategorias.forEach((cat) => {
+      categoriesForPdf.forEach((cat) => {
         grouped[cat._id] = [];
       });
       const unmatchedProducts: Product[] = [];
 
-      activeProducts.forEach((prod) => {
+      activeProductList.forEach((prod) => {
         if (grouped[prod.category]) {
           grouped[prod.category].push(prod);
         } else {
@@ -1562,26 +1675,26 @@ export default function Catalog({
         }
       });
 
+      const totalItemsCount = activeProductList.length;
+      let processedCounter = 0;
+
       let currentY = 20;
       const margin = 15;
       const contentWidth = pageWidth - (margin * 2); // 180
       let firstItemRendered = false;
 
       // Iterar sobre las categorías
-      for (let c = 0; c < initialCategorias.length; c++) {
-        const cat = initialCategorias[c];
+      for (let c = 0; c < categoriesForPdf.length; c++) {
+        const cat = categoriesForPdf[c];
         const catProducts = grouped[cat._id];
         if (catProducts.length === 0) continue;
 
-        // Comprobar si cabe el banner de categoría + 1 producto (98mm de espacio)
         if (!firstItemRendered || currentY + 98 > pageHeight - 20) {
           doc.addPage();
           
-          // Fondo blanco para hojas de catálogo
           doc.setFillColor(255, 255, 255);
           doc.rect(0, 0, pageWidth, pageHeight, 'F');
           
-          // Cabecera fina y limpia
           doc.setDrawColor(215, 215, 220);
           doc.setLineWidth(0.4);
           doc.line(margin, 15, pageWidth - margin, 15);
@@ -1598,7 +1711,7 @@ export default function Catalog({
           firstItemRendered = true;
         }
 
-        // Dibujar banner de categoría sutil
+        // Dibujar banner de categoría
         doc.setFillColor(242, 242, 247);
         doc.roundedRect(margin, currentY, contentWidth, 9, 2, 2, 'F');
         doc.setDrawColor(220, 220, 225);
@@ -1614,16 +1727,15 @@ export default function Catalog({
         // Listar productos de esta categoría
         for (let pIdx = 0; pIdx < catProducts.length; pIdx++) {
           const prod = catProducts[pIdx];
+          processedCounter++;
+          setPdfProgressText(`Compilando fotos (${processedCounter}/${totalItemsCount})...`);
 
-          // Comprobar si cabe la tarjeta actual (78mm + 6mm = 84mm)
           if (currentY + 84 > pageHeight - 20) {
             doc.addPage();
             
-            // Fondo blanco
             doc.setFillColor(255, 255, 255);
             doc.rect(0, 0, pageWidth, pageHeight, 'F');
             
-            // Cabecera
             doc.setDrawColor(215, 215, 220);
             doc.setLineWidth(0.4);
             doc.line(margin, 15, pageWidth - margin, 15);
@@ -1639,20 +1751,23 @@ export default function Catalog({
             currentY = 20;
           }
 
-          // Altura de tarjeta: 78mm
           const cardH = 78;
 
-          // Dibujar contenedor del producto
           doc.setFillColor(255, 255, 255);
           doc.roundedRect(margin, currentY, contentWidth, cardH, 3, 3, 'F');
           doc.setDrawColor(225, 225, 230);
           doc.setLineWidth(0.4);
           doc.roundedRect(margin, currentY, contentWidth, cardH, 3, 3, 'D');
 
-          // Procesar Imagen de Producto (Asíncrono)
-          let imgBase64 = '';
-          if (prod.images && prod.images[0]) {
-            imgBase64 = await getBase64ImageFromUrl(prod.images[0]);
+          // Procesar Imagen de Producto: buscar la primera imagen válida en prod.images
+          let imgObj: { data: string; format: string } | null = null;
+          if (Array.isArray(prod.images) && prod.images.length > 0) {
+            for (const imgUrl of prod.images) {
+              if (imgUrl && typeof imgUrl === 'string' && imgUrl.trim()) {
+                imgObj = await getBase64ImageForPdf(imgUrl.trim());
+                if (imgObj && imgObj.data) break;
+              }
+            }
           }
 
           // Dibujar recuadro de imagen grande
@@ -1666,10 +1781,11 @@ export default function Catalog({
           doc.setDrawColor(235, 235, 240);
           doc.roundedRect(imgX, imgY, imgW, imgH, 2, 2, 'D');
 
-          if (imgBase64) {
+          if (imgObj && imgObj.data) {
             try {
-              doc.addImage(imgBase64, 'JPEG', imgX, imgY, imgW, imgH);
+              doc.addImage(imgObj.data, imgObj.format, imgX, imgY, imgW, imgH, undefined, 'FAST');
             } catch (e) {
+              console.warn("Error en doc.addImage para producto:", prod.name, e);
               doc.setTextColor(140, 140, 145);
               doc.setFont('helvetica', 'normal');
               doc.setFontSize(8);
@@ -1702,7 +1818,7 @@ export default function Catalog({
           doc.setFontSize(12);
           doc.text(prod.name, infoX, infoY + 7.5);
 
-          // Subcategoría o variantes
+          // Subcategoría o medidas
           const subcat = prod.subcategory || '';
           if (subcat) {
             doc.setTextColor(120, 120, 125);
@@ -1753,7 +1869,6 @@ export default function Catalog({
           firstItemRendered = true;
         }
 
-        // Dibujar banner "OTROS PRODUCTOS"
         doc.setFillColor(242, 242, 247);
         doc.roundedRect(margin, currentY, contentWidth, 9, 2, 2, 'F');
         doc.setDrawColor(220, 220, 225);
@@ -1768,6 +1883,8 @@ export default function Catalog({
 
         for (let pIdx = 0; pIdx < unmatchedProducts.length; pIdx++) {
           const prod = unmatchedProducts[pIdx];
+          processedCounter++;
+          setPdfProgressText(`Compilando fotos (${processedCounter}/${totalItemsCount})...`);
 
           if (currentY + 84 > pageHeight - 20) {
             doc.addPage();
@@ -1798,9 +1915,14 @@ export default function Catalog({
           doc.setLineWidth(0.4);
           doc.roundedRect(margin, currentY, contentWidth, cardH, 3, 3, 'D');
 
-          let imgBase64 = '';
-          if (prod.images && prod.images[0]) {
-            imgBase64 = await getBase64ImageFromUrl(prod.images[0]);
+          let imgObj: { data: string; format: string } | null = null;
+          if (Array.isArray(prod.images) && prod.images.length > 0) {
+            for (const imgUrl of prod.images) {
+              if (imgUrl && typeof imgUrl === 'string' && imgUrl.trim()) {
+                imgObj = await getBase64ImageForPdf(imgUrl.trim());
+                if (imgObj && imgObj.data) break;
+              }
+            }
           }
 
           const imgX = margin + 5;
@@ -1813,9 +1935,9 @@ export default function Catalog({
           doc.setDrawColor(235, 235, 240);
           doc.roundedRect(imgX, imgY, imgW, imgH, 2, 2, 'D');
 
-          if (imgBase64) {
+          if (imgObj && imgObj.data) {
             try {
-              doc.addImage(imgBase64, 'JPEG', imgX, imgY, imgW, imgH);
+              doc.addImage(imgObj.data, imgObj.format, imgX, imgY, imgW, imgH, undefined, 'FAST');
             } catch (e) {
               doc.setTextColor(140, 140, 145);
               doc.setFont('helvetica', 'normal');
@@ -1870,12 +1992,14 @@ export default function Catalog({
         }
       }
 
+      setPdfProgressText('Guardando archivo PDF...');
       doc.save("Catalogo_General_Productos.pdf");
     } catch (error) {
       console.error("Error al generar catálogo PDF: ", error);
       alert("Ocurrió un error al compilar el catálogo PDF. Por favor intente de nuevo.");
     } finally {
       setPdfLoading(false);
+      setPdfProgressText('');
     }
   };
 
@@ -2315,7 +2439,7 @@ export default function Catalog({
               {pdfLoading ? (
                 <>
                   <span className="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
-                  <span>Generando Catálogo PDF...</span>
+                  <span>{pdfProgressText || 'Generando Catálogo PDF...'}</span>
                 </>
               ) : (
                 <>
@@ -2503,7 +2627,7 @@ export default function Catalog({
                       {pdfLoading ? (
                         <>
                           <span className="w-2.5 h-2.5 rounded-full bg-white animate-ping"></span>
-                          <span>Generando PDF...</span>
+                          <span>{pdfProgressText || 'Generando PDF...'}</span>
                         </>
                       ) : (
                         <>
