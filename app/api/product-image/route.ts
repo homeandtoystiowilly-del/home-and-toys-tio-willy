@@ -24,10 +24,10 @@ export async function GET(request: NextRequest) {
 
     let prod: any = null;
     if (ObjectId.isValid(id)) {
-      prod = await collection.findOne({ _id: new ObjectId(id) } as any);
+      prod = await collection.findOne({ _id: new ObjectId(id) } as any, { projection: { images: 1 } });
     }
     if (!prod) {
-      prod = await collection.findOne({ _id: id } as any);
+      prod = await collection.findOne({ _id: id } as any, { projection: { images: 1 } });
     }
 
     if (prod && Array.isArray(prod.images) && prod.images.length > 0) {
@@ -65,7 +65,8 @@ export async function GET(request: NextRequest) {
         status: 200,
         headers: {
           'Content-Type': mimeType,
-          'Cache-Control': 'public, max-age=86400, immutable',
+          'Cache-Control': 'public, max-age=86400, s-maxage=604800, stale-while-revalidate=86400, immutable',
+          'Access-Control-Allow-Origin': '*',
         },
       });
     }

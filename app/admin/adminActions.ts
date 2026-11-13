@@ -756,19 +756,35 @@ export async function updateProductAction(productId: string, formData: FormData)
       }
     }
 
+    const client = await clientPromise;
+    const db = client.db('tio_willy_db');
+
+    const queryId = ObjectId.isValid(productId) && productId.length === 24 ? new ObjectId(productId) : productId;
+
+    // Si existingImages contiene URLs optimizadas de /api/product-image, recuperar los Base64 o URLs originales de la BD
+    let resolvedExistingImages = [...existingImages];
+    if (existingImages.some((img) => typeof img === 'string' && img.includes('/api/product-image'))) {
+      const currentDoc = await db.collection('productos').findOne({ _id: queryId as any });
+      if (currentDoc && Array.isArray(currentDoc.images) && currentDoc.images.length > 0) {
+        resolvedExistingImages = existingImages.map((img) => {
+          if (typeof img === 'string' && img.includes('/api/product-image')) {
+            const vMatch = img.match(/[?&]v=(\d+)/);
+            const vIdx = vMatch ? parseInt(vMatch[1], 10) : 0;
+            return currentDoc.images[vIdx] || currentDoc.images[0] || '/images/chair_red.jpg';
+          }
+          return img;
+        });
+      }
+    }
+
     // Combinar imágenes conservadas del producto con las nuevas subidas
-    const mergedImages = [...existingImages, ...uploadedUrls];
+    const mergedImages = [...resolvedExistingImages, ...uploadedUrls];
 
     // Asegurar que haya al menos tantas imágenes como variedades, sin recortar el exceso
     const finalImages: string[] = [...mergedImages];
     while (finalImages.length < varieties.length) {
       finalImages.push(mergedImages[0] || '/images/chair_red.jpg');
     }
-
-    const client = await clientPromise;
-    const db = client.db('tio_willy_db');
-
-    const queryId = ObjectId.isValid(productId) && productId.length === 24 ? new ObjectId(productId) : productId;
 
     const currency = (formData.get('currency') as string) || 'USD';
     const subcategory = (formData.get('subcategory') as string || '').trim();

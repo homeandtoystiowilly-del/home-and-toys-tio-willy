@@ -225,12 +225,14 @@ export function ProductCard({
   product, 
   categoryName, 
   currency = 'USD',
-  bcvRate
+  bcvRate,
+  priority = false
 }: { 
   product: Product; 
   categoryName?: string; 
   currency?: string;
   bcvRate?: number;
+  priority?: boolean;
 }) {
   const pausedVars = useMemo(() => product.pausedVarieties || [], [product.pausedVarieties]);
   const initialAvailableIdx = useMemo(() => {
@@ -357,7 +359,8 @@ export function ProductCard({
         <img 
           src={currentImage} 
           alt={`${product.name} - ${currentVariety}`}
-          loading="lazy"
+          loading={priority ? 'eager' : 'lazy'}
+          fetchPriority={priority ? 'high' : 'auto'}
           decoding="async"
           className="w-full h-full object-contain object-center transition-all duration-500 scale-100 group-hover:scale-105"
         />
@@ -3396,7 +3399,7 @@ export default function Catalog({
             {/* Grid de Productos */}
             {paginatedProducts.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-                {paginatedProducts.map((prod: Product) => {
+                {paginatedProducts.map((prod: Product, idx: number) => {
                   const categoryObj = initialCategorias.find((c) => c._id === prod.category);
                   const categoryName = categoryObj ? categoryObj.name : prod.category;
                   return (
@@ -3406,6 +3409,7 @@ export default function Catalog({
                       categoryName={categoryName} 
                       currency={currency}
                       bcvRate={currency === 'EUR' ? bcvRates.eur : bcvRates.usd}
+                      priority={idx < 4}
                     />
                   );
                 })}
