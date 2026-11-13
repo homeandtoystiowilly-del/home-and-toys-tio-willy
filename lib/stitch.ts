@@ -3,11 +3,11 @@ import { MongoClient, MongoClientOptions } from 'mongodb';
 // Reemplaza con tu URI de conexión o credenciales de Stitch/MongoDB Atlas
 const URI = process.env.STITCH_DB_URI;
 
-// Opciones de conexión ultra-rápidas para evitar cuelgues (Timeout estricto de 2s)
+// Opciones de conexión optimizadas y seguras para Serverless en Vercel
 const OPTIONS: MongoClientOptions = {
-  serverSelectionTimeoutMS: 2000, // Máximo 2 segundos para seleccionar servidor
-  connectTimeoutMS: 2000,        // Máximo 2 segundos para conectar
-  socketTimeoutMS: 3000,         // Máximo 3 segundos en operaciones de socket
+  serverSelectionTimeoutMS: 8000, // Tiempo adecuado para handshake en serverless cold start
+  connectTimeoutMS: 8000,        
+  socketTimeoutMS: 10000,        
   maxPoolSize: 10,
   minPoolSize: 0,
   maxIdleTimeMS: 15000
