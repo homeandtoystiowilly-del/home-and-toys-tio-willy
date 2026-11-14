@@ -1215,27 +1215,12 @@ export default function Catalog({
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [showInactivityAlert, setShowInactivityAlert] = useState<boolean>(false);
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>('todos');
-  const [isSubcatDropdownOpen, setIsSubcatDropdownOpen] = useState<boolean>(false);
-  const subcatDropdownRef = useRef<HTMLDivElement>(null);
   const [pdfLoading, setPdfLoading] = useState<boolean>(false);
   const [pdfProgressText, setPdfProgressText] = useState<string>('');
   const [selectedOfferProduct, setSelectedOfferProduct] = useState<Product | null>(null);
   const [selectedUrlProduct, setSelectedUrlProduct] = useState<Product | null>(null);
   const [selectedUrlVarietyIdx, setSelectedUrlVarietyIdx] = useState<number>(0);
   const [catalogOrigin, setCatalogOrigin] = useState<string>('');
-
-  // Cerrar el dropdown de subcategorías al hacer clic fuera
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (subcatDropdownRef.current && !subcatDropdownRef.current.contains(event.target as Node)) {
-        setIsSubcatDropdownOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -1379,38 +1364,23 @@ export default function Catalog({
   // Resetear subcategoría cuando cambia la categoría principal
   useEffect(() => {
     setSelectedSubcategory('todos');
-    setIsSubcatDropdownOpen(false);
     setCurrentPage(1);
   }, [selectedCategory]);
 
   // Resetear subcategoría cuando cambia la búsqueda
   useEffect(() => {
     setSelectedSubcategory('todos');
-    setIsSubcatDropdownOpen(false);
     setCurrentPage(1);
   }, [searchQuery]);
 
-  // Obtener las subcategorías dinámicas para la categoría seleccionada o todas si está en 'todos'
+  // Obtener las subcategorías exclusivas para las bicicletas (Tamaños y Rines)
   const subcategories = useMemo(() => {
-    if (selectedCategory === 'todos') {
-      const allSubcats = new Set<string>();
-      activeProducts.forEach((p) => {
-        if (p.subcategory && p.subcategory.trim().length > 0) {
-          allSubcats.add(p.subcategory.trim());
-        }
-      });
-      return Array.from(allSubcats).sort((a, b) => {
-        const aNum = a.match(/\d+/);
-        const bNum = b.match(/\d+/);
-        if (aNum && bNum) {
-          const diff = parseInt(aNum[0], 10) - parseInt(bNum[0], 10);
-          if (diff !== 0) return diff;
-        }
-        return a.localeCompare(b);
-      });
+    // Si la categoría seleccionada no es 'todos' ni 'bicicletas', no mostrar la barra de Tamaños y Rines
+    if (selectedCategory !== 'todos' && selectedCategory !== 'bicicletas') {
+      return [];
     }
-    const productsInCategory = activeProducts.filter((p) => p.category === selectedCategory);
-    return getSubcategoriesForCategory(productsInCategory, initialCategorias, selectedCategory);
+    const bicycleProducts = activeProducts.filter((p) => p.category === 'bicicletas');
+    return getSubcategoriesForCategory(bicycleProducts, initialCategorias, 'bicicletas');
   }, [selectedCategory, activeProducts, initialCategorias]);
 
   // Conteo de productos por subcategoría respetando la categoría actual y búsqueda
@@ -3164,13 +3134,9 @@ export default function Catalog({
               </div>
             </div>
 
-            {/* Filtro de Tamaños y Rines (Menú Desplegable en Móvil + Píldoras en Desktop) */}
+            {/* Filtro de Tamaños y Rines (Filtro por subcategorías en catálogo) */}
             {subcategories.length > 0 && (
-              <div 
-                ref={subcatDropdownRef}
-                className="relative w-full bg-white border border-zinc-200/90 rounded-2xl sm:rounded-3xl p-3 sm:p-4 shadow-sm flex flex-col gap-2.5 z-20"
-              >
-                {/* Encabezado: Título + acción rápida */}
+              <div className="w-full bg-white border border-zinc-200/90 rounded-3xl p-3.5 sm:p-4 shadow-sm flex flex-col gap-2.5">
                 <div className="flex justify-between items-center px-1">
                   <span className="text-[11px] font-extrabold uppercase tracking-wider text-zinc-500 flex items-center gap-1.5">
                     <span className="text-amber-500">🔥</span>
@@ -3180,170 +3146,17 @@ export default function Catalog({
                     <button
                       onClick={() => {
                         setSelectedSubcategory('todos');
-                        setIsSubcatDropdownOpen(false);
                         setCurrentPage(1);
                       }}
                       className="text-[11px] font-bold text-red-600 hover:text-red-700 flex items-center gap-1 transition-colors cursor-pointer"
                     >
-                      <span>Ver todas</span>
-                      <span className="text-[10px] bg-red-50 text-red-600 font-extrabold px-1.5 py-0.5 rounded-full border border-red-100">
-                        {subcategoryCounts['todos'] || 0}
-                      </span>
+                      Ver todas
                     </button>
                   )}
                 </div>
-
-                {/* VISTA MÓVIL (< sm): Menú Desplegable Táctil y Estético */}
-                <div className="sm:hidden relative">
-                  <button
-                    type="button"
-                    onClick={() => setIsSubcatDropdownOpen((prev) => !prev)}
-                    aria-haspopup="listbox"
-                    aria-expanded={isSubcatDropdownOpen}
-                    className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border text-sm transition-all duration-200 cursor-pointer ${
-                      isSubcatDropdownOpen
-                        ? 'bg-zinc-900 border-zinc-900 text-white shadow-md ring-2 ring-red-500/20'
-                        : selectedSubcategory !== 'todos'
-                        ? 'bg-red-50/80 border-red-200 text-zinc-900 font-semibold'
-                        : 'bg-zinc-50 border-zinc-200 text-zinc-800 hover:bg-zinc-100'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2 truncate">
-                      <span className="text-base flex-shrink-0">
-                        {selectedSubcategory === 'todos' ? '✨' : '🔥'}
-                      </span>
-                      <div className="flex flex-col text-left">
-                        <span className={`text-[10px] font-bold uppercase tracking-wider ${
-                          isSubcatDropdownOpen ? 'text-zinc-400' : 'text-zinc-500'
-                        }`}>
-                          Seleccionar medida:
-                        </span>
-                        <span className={`text-sm font-bold truncate ${
-                          isSubcatDropdownOpen 
-                            ? 'text-white' 
-                            : selectedSubcategory !== 'todos' 
-                            ? 'text-red-600' 
-                            : 'text-zinc-900'
-                        }`}>
-                          {selectedSubcategory === 'todos' ? 'Todos los tamaños y rines' : selectedSubcategory}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 flex-shrink-0 ml-2">
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${
-                        isSubcatDropdownOpen 
-                          ? 'bg-zinc-800 text-zinc-200' 
-                          : selectedSubcategory !== 'todos'
-                          ? 'bg-red-600 text-white'
-                          : 'bg-zinc-200/80 text-zinc-700'
-                      }`}>
-                        {selectedSubcategory === 'todos' 
-                          ? `${subcategoryCounts['todos'] || 0} disp.` 
-                          : `${subcategoryCounts[selectedSubcategory] || 0} disp.`}
-                      </span>
-                      <svg
-                        className={`w-4 h-4 transition-transform duration-200 ${
-                          isSubcatDropdownOpen 
-                            ? 'rotate-180 text-red-400' 
-                            : 'text-zinc-400'
-                        }`}
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </div>
-                  </button>
-
-                  {/* Menú Desplegable Flotante */}
-                  {isSubcatDropdownOpen && (
-                    <div 
-                      className="absolute left-0 right-0 mt-2 z-50 bg-white border border-zinc-200 rounded-2xl shadow-2xl p-1.5 flex flex-col gap-1 max-h-72 overflow-y-auto animate-in fade-in zoom-in-95 duration-150"
-                    >
-                      {/* Opción 'Todos los tamaños y rines' */}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSelectedSubcategory('todos');
-                          setIsSubcatDropdownOpen(false);
-                          setCurrentPage(1);
-                        }}
-                        className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-colors cursor-pointer text-left ${
-                          selectedSubcategory === 'todos'
-                            ? 'bg-red-600 text-white shadow-sm'
-                            : 'text-zinc-700 hover:bg-zinc-100 active:bg-zinc-200'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          <span>✨</span>
-                          <span>Todos los tamaños y rines</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className={`text-[11px] px-2 py-0.5 rounded-full font-bold ${
-                            selectedSubcategory === 'todos'
-                              ? 'bg-white/20 text-white'
-                              : 'bg-zinc-100 text-zinc-600'
-                          }`}>
-                            {subcategoryCounts['todos'] || 0}
-                          </span>
-                          {selectedSubcategory === 'todos' && (
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
-                            </svg>
-                          )}
-                        </div>
-                      </button>
-
-                      <div className="h-px bg-zinc-100 my-0.5" />
-
-                      {/* Opciones individuales de subcategoría (Rin 12, Rin 16, Rin 20, etc.) */}
-                      {subcategories.map((subcat) => {
-                        const isActive = selectedSubcategory === subcat;
-                        const count = subcategoryCounts[subcat] || 0;
-                        return (
-                          <button
-                            key={subcat}
-                            type="button"
-                            onClick={() => {
-                              setSelectedSubcategory(subcat);
-                              setIsSubcatDropdownOpen(false);
-                              setCurrentPage(1);
-                            }}
-                            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-colors cursor-pointer text-left ${
-                              isActive
-                                ? 'bg-red-600 text-white shadow-sm'
-                                : 'text-zinc-700 hover:bg-zinc-100 active:bg-zinc-200'
-                            }`}
-                          >
-                            <div className="flex items-center gap-2">
-                              <span className={isActive ? 'text-white' : 'text-amber-500'}>🔥</span>
-                              <span>{subcat}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <span className={`text-[11px] px-2 py-0.5 rounded-full font-bold ${
-                                isActive
-                                  ? 'bg-white/20 text-white'
-                                  : 'bg-zinc-100 text-zinc-600'
-                              }`}>
-                                {count}
-                              </span>
-                              {isActive && (
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
-                                </svg>
-                              )}
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-
-                {/* VISTA TABLET / DESKTOP (>= sm): Píldoras horizontales interactivas con conteos */}
-                <div className="hidden sm:flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none no-scrollbar">
+                
+                {/* Contenedor con Scroll Lateral Suave y píldoras interactivas */}
+                <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none no-scrollbar">
                   {/* Botón Ver Todo */}
                   <button
                     onClick={() => {
@@ -3358,17 +3171,11 @@ export default function Catalog({
                   >
                     <span>✨</span>
                     <span>Ver todas</span>
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-extrabold ${
-                      selectedSubcategory === 'todos' ? 'bg-white/20 text-white' : 'bg-zinc-200 text-zinc-600'
-                    }`}>
-                      {subcategoryCounts['todos'] || 0}
-                    </span>
                   </button>
 
                   {/* Botones de subcategorías */}
                   {subcategories.map((subcat) => {
                     const isActive = selectedSubcategory === subcat;
-                    const count = subcategoryCounts[subcat] || 0;
                     return (
                       <button
                         key={subcat}
@@ -3384,11 +3191,6 @@ export default function Catalog({
                       >
                         <span className="text-amber-500">🔥</span>
                         <span>{subcat}</span>
-                        <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-extrabold ${
-                          isActive ? 'bg-white/20 text-white' : 'bg-zinc-200 text-zinc-600'
-                        }`}>
-                          {count}
-                        </span>
                       </button>
                     );
                   })}
@@ -3710,26 +3512,12 @@ export default function Catalog({
 
         <p className="mt-2 text-zinc-400">© 2026 Home and Toys Tío Willy. Todos los derechos reservados.</p>
         <p className="text-xs text-zinc-500 italic">Desarrollado con pasión para una experiencia de compra premium.</p>
-        <div className="flex items-center gap-4 mt-2">
-          <button
-            type="button"
-            onClick={() => {
-              if (typeof window !== 'undefined') {
-                window.dispatchEvent(new Event('tio-willy-open-install'));
-              }
-            }}
-            className="text-xs text-zinc-400 hover:text-white transition-colors duration-300 uppercase tracking-widest font-bold flex items-center gap-1.5 cursor-pointer"
-          >
-            <span>📲 Instalar App (PWA)</span>
-          </button>
-          <span className="text-zinc-700">•</span>
-          <a 
-            href="/admin" 
-            className="text-xs text-red-500 hover:text-red-400 transition-colors duration-300 uppercase tracking-widest font-bold hover:underline"
-          >
-            Acceso Administrador
-          </a>
-        </div>
+        <a 
+          href="/admin" 
+          className="text-xs text-red-500 hover:text-red-400 transition-colors duration-300 uppercase tracking-widest font-bold mt-2 hover:underline"
+        >
+          Acceso Administrador
+        </a>
       </footer>
 
       {/* Modal para producto seleccionado en sección Super Ofertas */}
