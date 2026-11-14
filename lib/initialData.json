@@ -1,0 +1,1407 @@
+{
+  "cleanSeedCategorias": [
+    {
+      "_id": "juguetes",
+      "name": "Juguetes y Diversión",
+      "subcategories": []
+    },
+    {
+      "_id": "hogar",
+      "name": "Hogar y Decoración",
+      "subcategories": []
+    },
+    {
+      "_id": "bicicletas",
+      "name": "Bicicletas",
+      "subcategories": [
+        "Rin 16",
+        "Rin 20",
+        "Rin 24",
+        "Rin 26",
+        "Rin 29"
+      ]
+    },
+    {
+      "_id": "scooter_el_ctrico",
+      "name": "Scooter eléctrico",
+      "subcategories": []
+    },
+    {
+      "_id": "bebes",
+      "name": "Bebes",
+      "subcategories": []
+    },
+    {
+      "_id": "patinetas_electricas",
+      "name": "Patinetas electricas",
+      "subcategories": []
+    },
+    {
+      "_id": "toldos",
+      "name": "Toldos",
+      "subcategories": []
+    },
+    {
+      "_id": "patines",
+      "name": "Patines",
+      "subcategories": []
+    },
+    {
+      "_id": "monopatines",
+      "name": "Monopatines",
+      "subcategories": []
+    }
+  ],
+  "cleanSeedProductos": [
+    {
+      "_id": "6a7cc366f82fab9d3d199f55",
+      "name": "Bicimoto rin 16",
+      "description": "Bicimoto con emulador de sonido rin 16  para niño de 5 hasta los 7 años\r\nVienen con cascos y sus rodilleras ",
+      "category": "bicicletas",
+      "priceDetal": 110,
+      "priceMayor": 95,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6a7cc366f82fab9d3d199f55&v=0",
+        "/api/product-image?id=6a7cc366f82fab9d3d199f55&v=1",
+        "/api/product-image?id=6a7cc366f82fab9d3d199f55&v=2",
+        "/api/product-image?id=6a7cc366f82fab9d3d199f55&v=3"
+      ],
+      "varieties": [
+        "Azul",
+        "Negro",
+        "Fucsia",
+        "Rojo"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a7cdc492951f5f7722d742b",
+      "name": "Bicicleta Rin 16/ Tesla 2025",
+      "description": "Rin 16\r\nColor azul y rosada \r\nCuadro de hierro reforzado \r\nFreno de taco\r\nRuedas de apoyo de silicon con luces Led \r\nGuardafango \r\nCesta decorativa \r\nTermo \r\n",
+      "category": "bicicletas",
+      "priceDetal": 80,
+      "priceMayor": 65,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6a7cdc492951f5f7722d742b&v=0",
+        "/api/product-image?id=6a7cdc492951f5f7722d742b&v=1"
+      ],
+      "varieties": [
+        "Azul",
+        "rosada"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a7d0f5620ad5faff70196b3",
+      "name": "Bicicleta rin 20 cross ",
+      "description": "Rin 20 tipo croos\r\nCuadro reforzado\r\nRines de aluminio\r\nFreno de taco",
+      "category": "bicicletas",
+      "priceDetal": 100,
+      "priceMayor": 85,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6a7d0f5620ad5faff70196b3&v=0",
+        "/api/product-image?id=6a7d0f5620ad5faff70196b3&v=1",
+        "/api/product-image?id=6a7d0f5620ad5faff70196b3&v=2",
+        "/api/product-image?id=6a7d0f5620ad5faff70196b3&v=3"
+      ],
+      "varieties": [
+        "Rosada",
+        "morada",
+        "azul",
+        "negro"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a7d1246265522eda29ab390",
+      "name": "Bicimoto rin 20 ",
+      "description": "Bicimoto rin 20\r\nCon emulador de sonido\r\nFreno de taco\r\n",
+      "category": "bicicletas",
+      "priceDetal": 100,
+      "priceMayor": 80,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6a7d1246265522eda29ab390&v=0",
+        "/api/product-image?id=6a7d1246265522eda29ab390&v=1",
+        "/api/product-image?id=6a7d1246265522eda29ab390&v=2"
+      ],
+      "varieties": [
+        "Rosado",
+        "rojo",
+        "verde"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a7d41c995d868700d199935",
+      "name": "Scooter k8 ",
+      "description": "Scooter Eléctrico modelo k8\r\nPara niño hasta los 12 años\r\nAguanta hasta 60kg\r\nTienen un rendimiento de 16 km\r\nCuenta con luces Led ",
+      "category": "scooter_el_ctrico",
+      "priceDetal": 180,
+      "priceMayor": 160,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6a7d41c995d868700d199935&v=0",
+        "/api/product-image?id=6a7d41c995d868700d199935&v=1"
+      ],
+      "varieties": [
+        "Verde",
+        "rojo"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a7db76c0a295d6d1bbca666",
+      "name": "Bicicleta rin 20 tipo montañera ",
+      "description": "Rin 20 tipo montañera marca tesla baike\r\nCuadro reforzado\r\nSuspensión delantera\r\nFreno de disco\r\nRines de aluminio ",
+      "category": "bicicletas",
+      "priceDetal": 110,
+      "priceMayor": 90,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6a7db76c0a295d6d1bbca666&v=0",
+        "/api/product-image?id=6a7db76c0a295d6d1bbca666&v=1"
+      ],
+      "varieties": [
+        "Rosado",
+        "rojo"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a7deca114b7a51f49ee1cdf",
+      "name": "bicicleta rin 24 montañera CM 550",
+      "description": "Bicicleta rin 24 montañera 7 velocidades \r\nfreno de discos\r\nsuspension delantera \r\ncuadro de acero reforzado \r\nrines de aluminio",
+      "category": "bicicletas",
+      "priceDetal": 165,
+      "priceMayor": 145,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6a7deca114b7a51f49ee1cdf&v=0",
+        "/api/product-image?id=6a7deca114b7a51f49ee1cdf&v=1",
+        "/api/product-image?id=6a7deca114b7a51f49ee1cdf&v=2",
+        "/api/product-image?id=6a7deca114b7a51f49ee1cdf&v=3"
+      ],
+      "varieties": [
+        "azul",
+        "morado",
+        "verde",
+        "rojo"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a7e186dc0b1a6cd0881093d",
+      "name": "Scooter eléctrico k6",
+      "description": " Modelo k6\r\nIdeal hasta los 10 años \r\nCapacidad de carga hasta 60 kg \r\nAlcanza hasta 16 k/m\r\nTiene Bluetooth \r\nCuenta con luces Led ",
+      "category": "scooter_el_ctrico",
+      "priceDetal": 150,
+      "priceMayor": 130,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6a7e186dc0b1a6cd0881093d&v=0"
+      ],
+      "varieties": [
+        "Verde"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a7e1bc6154a887e805cbc15",
+      "name": "Bicicleta Rin 20 CM387",
+      "description": "Rin 20 ideal hasta los 10 años\r\n7 velocidades de cambio\r\nFreno de disco en ambas ruedas\r\nRines de aluminio\r\nSuspensión delantera \r\nEstructura de acero ",
+      "category": "bicicletas",
+      "priceDetal": 130,
+      "priceMayor": 110,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6a7e1bc6154a887e805cbc15&v=0",
+        "/api/product-image?id=6a7e1bc6154a887e805cbc15&v=1",
+        "/api/product-image?id=6a7e1bc6154a887e805cbc15&v=2",
+        "/api/product-image?id=6a7e1bc6154a887e805cbc15&v=3"
+      ],
+      "varieties": [
+        "Naranja",
+        "Rojo",
+        "Gris",
+        "Fucsia"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a7e21d875b9f20284719b64",
+      "name": "Bicicleta Rin 20 CM245",
+      "description": "Rin 20 ideal hasta los 10 años máximo\r\n7 velocidades de cambio\r\nFreno de disco en ambas ruedas\r\nRines de aluminio\r\nSuspensión delantera\r\nEstructura de acero ",
+      "category": "bicicletas",
+      "priceDetal": 130,
+      "priceMayor": 110,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6a7e21d875b9f20284719b64&v=0",
+        "/api/product-image?id=6a7e21d875b9f20284719b64&v=1",
+        "/api/product-image?id=6a7e21d875b9f20284719b64&v=2",
+        "/api/product-image?id=6a7e21d875b9f20284719b64&v=3"
+      ],
+      "varieties": [
+        "Negro",
+        "Azul",
+        "Rosado",
+        "Rojo"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a7e26651481f09b15361412",
+      "name": "Bicicleta Rin 24 CM-111",
+      "description": "Rin 24 ideal hasta los 14 años\r\n21 velocidades de cambio\r\nRines de aluminio\r\nSuspensión delantera\r\nFreno de disco en ambas ruedas\r\nEstructura de acero ",
+      "category": "bicicletas",
+      "priceDetal": 150,
+      "priceMayor": 140,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6a7e26651481f09b15361412&v=0",
+        "/api/product-image?id=6a7e26651481f09b15361412&v=1",
+        "/api/product-image?id=6a7e26651481f09b15361412&v=2",
+        "/api/product-image?id=6a7e26651481f09b15361412&v=3"
+      ],
+      "varieties": [
+        "Verde",
+        "Rojo",
+        "Naranja",
+        "Amarillo"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a7e4bb8130813778c13d354",
+      "name": "Silla para niños multiusos ",
+      "description": "Silla de plástico multiusos\r\nColores Rojo y Azul ",
+      "category": "bebes",
+      "priceDetal": 40,
+      "priceMayor": 30,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6a7e4bb8130813778c13d354&v=0",
+        "/api/product-image?id=6a7e4bb8130813778c13d354&v=1"
+      ],
+      "varieties": [
+        "Rojo",
+        "Azul"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a7e4d95130813778c13d355",
+      "name": "Silla para bebes acolchada ",
+      "description": "Asiento y respaldo acolchado\r\nBandeja frontal  de plástico con barra de juguete interactiva con piezas moviles\r\nCuenta con ruedas en la parte inferior para facilitar el desplazamiento ",
+      "category": "bebes",
+      "priceDetal": 60,
+      "priceMayor": 46,
+      "minMayor": 3,
+      "images": [
+        "/api/product-image?id=6a7e4d95130813778c13d355&v=0",
+        "/api/product-image?id=6a7e4d95130813778c13d355&v=1"
+      ],
+      "varieties": [
+        "Rosado",
+        "Azul"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a7f3bd4986a0941e1cf2780",
+      "name": "Andadera infantil",
+      "description": "Plegable\r\nJuego didáctico\r\nAsiento acolchado ",
+      "category": "bebes",
+      "priceDetal": 25,
+      "priceMayor": 20,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6a7f3bd4986a0941e1cf2780&v=0",
+        "/api/product-image?id=6a7f3bd4986a0941e1cf2780&v=1",
+        "/api/product-image?id=6a7f3bd4986a0941e1cf2780&v=2"
+      ],
+      "varieties": [
+        "Verde",
+        "Fucsia",
+        "Azul"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a7f3dfe986a0941e1cf2781",
+      "name": "Coche paraguas de aluminio",
+      "description": "Estructura de aluminio\r\nPlegable\r\nEs reclinable \r\nTiene arnés de seguridad \r\n",
+      "category": "bebes",
+      "priceDetal": 100,
+      "priceMayor": 80,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6a7f3dfe986a0941e1cf2781&v=0",
+        "/api/product-image?id=6a7f3dfe986a0941e1cf2781&v=1"
+      ],
+      "varieties": [
+        "Azul",
+        "Gris"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a7f63f4a5345a463fa239da",
+      "name": "Cuatrimoto con control remoto",
+      "description": "Ideal desde 1 año hasta los 4\r\nCuenta con control remoto\r\nSoporta hasta 25 kilos\r\n",
+      "category": "bebes",
+      "priceDetal": 120,
+      "priceMayor": 100,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6a7f63f4a5345a463fa239da&v=0",
+        "/api/product-image?id=6a7f63f4a5345a463fa239da&v=1",
+        "/api/product-image?id=6a7f63f4a5345a463fa239da&v=2"
+      ],
+      "varieties": [
+        "Amarillo",
+        "Fucsia",
+        "Rojo"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a7f896eb766b59c2c194ec7",
+      "name": "Coche tipo maleta",
+      "description": "Compacto y ligero ideal para viajes\r\nIdeal desde los 6 a meses de edad hasta los 3 años\r\nSuporte de carga hasta 15 kg aproximadamente ",
+      "category": "bebes",
+      "priceDetal": 80,
+      "priceMayor": 60,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6a7f896eb766b59c2c194ec7&v=0",
+        "/api/product-image?id=6a7f896eb766b59c2c194ec7&v=1",
+        "/api/product-image?id=6a7f896eb766b59c2c194ec7&v=2",
+        "/api/product-image?id=6a7f896eb766b59c2c194ec7&v=3",
+        "/api/product-image?id=6a7f896eb766b59c2c194ec7&v=4"
+      ],
+      "varieties": [
+        "Gris",
+        "Morado",
+        "Verde"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a7f8dad76869c3a299badad",
+      "name": "Coche tipo paraguas",
+      "description": "Coche de paseo tipo paraguas\r\nLigero y compacto\r\nDesde los 6 meses hasta 3 años de edad\r\nCapacidad hasta 15 kilos aproximadamente ",
+      "category": "bebes",
+      "priceDetal": 80,
+      "priceMayor": 60,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6a7f8dad76869c3a299badad&v=0",
+        "/api/product-image?id=6a7f8dad76869c3a299badad&v=1",
+        "/api/product-image?id=6a7f8dad76869c3a299badad&v=2",
+        "/api/product-image?id=6a7f8dad76869c3a299badad&v=3"
+      ],
+      "varieties": [
+        "Azul",
+        "gris",
+        "morado",
+        "vinotinto"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a7f926c1e11c4b0c67d09f2",
+      "name": "Coche de oso plegable",
+      "description": "Coche plegable y ligero\r\nCapacidad hasta los 3 años de edad\r\nAproximadamente hasta los 15 kilos\r\n",
+      "category": "bebes",
+      "priceDetal": 60,
+      "priceMayor": 46,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6a7f926c1e11c4b0c67d09f2&v=0",
+        "/api/product-image?id=6a7f926c1e11c4b0c67d09f2&v=1",
+        "/api/product-image?id=6a7f926c1e11c4b0c67d09f2&v=2",
+        "/api/product-image?id=6a7f926c1e11c4b0c67d09f2&v=3"
+      ],
+      "varieties": [
+        "Azul",
+        "Fucsia"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a7fa8e15b8406cef696a10e",
+      "name": "Triciclo infantil",
+      "description": "Estructura robusta de metal y componentes de  plástico resistente\r\nRando de uso desde 1 año hasta los 3, máximo 4 años\r\nSoporta 25 kilos aproximadamente ",
+      "category": "bicicletas",
+      "priceDetal": 45,
+      "priceMayor": 35,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6a7fa8e15b8406cef696a10e&v=0",
+        "/api/product-image?id=6a7fa8e15b8406cef696a10e&v=1",
+        "/api/product-image?id=6a7fa8e15b8406cef696a10e&v=2"
+      ],
+      "varieties": [
+        "Azul",
+        "Rosado",
+        "Morado"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a7fae8855b20b2f0651ddd2",
+      "name": "Cocina con efectos",
+      "description": "Cocina con accesorios y efectos de humo, luces en la hornilla, timbre, efecto de agua para el fregadero ",
+      "category": "juguetes",
+      "priceDetal": 55,
+      "priceMayor": 45,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6a7fae8855b20b2f0651ddd2&v=0",
+        "/api/product-image?id=6a7fae8855b20b2f0651ddd2&v=1"
+      ],
+      "varieties": [
+        "Estandar"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a8099cc77012737ef1c37b9",
+      "name": "Bicicleta Rin 26 CM-266 /Montañera ",
+      "description": "Bicicleta montañera\r\nSuspensión delantera\r\n21 velocidades\r\nRines de aluminio\r\nFreno de disco en ambas ruedas\r\nCuadro de acero\r\nGuardafango\r\nTermo ",
+      "category": "bicicletas",
+      "priceDetal": 160,
+      "priceMayor": 155,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6a8099cc77012737ef1c37b9&v=0",
+        "/api/product-image?id=6a8099cc77012737ef1c37b9&v=1",
+        "/api/product-image?id=6a8099cc77012737ef1c37b9&v=2",
+        "/api/product-image?id=6a8099cc77012737ef1c37b9&v=3"
+      ],
+      "varieties": [
+        "Verde",
+        "Rojo",
+        "Amarillo",
+        "Naranja"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a809d7a2aa5b48414f4ea1c",
+      "name": "Bicicleta Rin 26 CM-222",
+      "description": "Bicicleta Rin 26\r\nCuadro de acero\r\nSuspensión delantera\r\nRines de aluminio\r\nFreno de disco en ambas ruedas\r\nGuardafango\r\nTermo ",
+      "category": "bicicletas",
+      "priceDetal": 150,
+      "priceMayor": 140,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6a809d7a2aa5b48414f4ea1c&v=0",
+        "/api/product-image?id=6a809d7a2aa5b48414f4ea1c&v=1",
+        "/api/product-image?id=6a809d7a2aa5b48414f4ea1c&v=2",
+        "/api/product-image?id=6a809d7a2aa5b48414f4ea1c&v=3"
+      ],
+      "varieties": [
+        "Naranja",
+        "Verde",
+        "Rojo",
+        "Azul"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a80a5cb407d1d9eaf4de2fe",
+      "name": "Carro eléctrico",
+      "description": "Carro tipo jeep de luces  con batería y control remoto ",
+      "category": "juguetes",
+      "priceDetal": 220,
+      "priceMayor": 180,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6a80a5cb407d1d9eaf4de2fe&v=0",
+        "/api/product-image?id=6a80a5cb407d1d9eaf4de2fe&v=1"
+      ],
+      "varieties": [
+        "Azul",
+        "Rojo"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a80a7c5eaed39b5b53f5c97",
+      "name": "Bicicleta Rin 29 CM - 882",
+      "description": "Estructura de acero\r\nSuspensión delantera\r\nRines de aluminio\r\nFreno de disco\r\nTermo\r\n21 velocidades ",
+      "category": "bicicletas",
+      "priceDetal": 190,
+      "priceMayor": 175,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6a80a7c5eaed39b5b53f5c97&v=0",
+        "/api/product-image?id=6a80a7c5eaed39b5b53f5c97&v=1",
+        "/api/product-image?id=6a80a7c5eaed39b5b53f5c97&v=2",
+        "/api/product-image?id=6a80a7c5eaed39b5b53f5c97&v=3",
+        "/api/product-image?id=6a80a7c5eaed39b5b53f5c97&v=4"
+      ],
+      "varieties": [
+        "Rosado",
+        "Azul",
+        "Gris",
+        "Amarillo",
+        "Naranja"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a80ca02ca8568dd37c4c98d",
+      "name": "Lonas aluminizadas para toldos 3x3",
+      "description": "Lonas imperdible\r\nTamaño 3x3\r\nAluminizada ",
+      "category": "toldos",
+      "priceDetal": 45,
+      "priceMayor": 35,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6a80ca02ca8568dd37c4c98d&v=0",
+        "/api/product-image?id=6a80ca02ca8568dd37c4c98d&v=1",
+        "/api/product-image?id=6a80ca02ca8568dd37c4c98d&v=2",
+        "/api/product-image?id=6a80ca02ca8568dd37c4c98d&v=3"
+      ],
+      "varieties": [
+        "Rojo",
+        "Azul"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a80d98549ec1d376c4863fa",
+      "name": "Toldo 3x3 de lona aluminizada",
+      "description": "Toldo 3x3\r\nPlegable \r\nEstructura reforzada\r\nPeso 19kg\r\nLona impermeable y aluminizada ",
+      "category": "toldos",
+      "priceDetal": 85,
+      "priceMayor": 75,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6a80d98549ec1d376c4863fa&v=0",
+        "/api/product-image?id=6a80d98549ec1d376c4863fa&v=1",
+        "/api/product-image?id=6a80d98549ec1d376c4863fa&v=2",
+        "/api/product-image?id=6a80d98549ec1d376c4863fa&v=3"
+      ],
+      "varieties": [
+        "Rojo",
+        "Azul",
+        "Negro"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a80e15a42698f2a0af5fe3b",
+      "name": "Vestidor portatil",
+      "description": "Vestidor portátil\r\nMedidas 120x120x190",
+      "category": "toldos",
+      "priceDetal": 35,
+      "priceMayor": 30,
+      "minMayor": 10,
+      "images": [
+        "/api/product-image?id=6a80e15a42698f2a0af5fe3b&v=0",
+        "/api/product-image?id=6a80e15a42698f2a0af5fe3b&v=1",
+        "/api/product-image?id=6a80e15a42698f2a0af5fe3b&v=2"
+      ],
+      "varieties": [
+        "Verde",
+        "Azul",
+        "militar"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a80eb4420f70682e82271c0",
+      "name": "Toldo 3x3 con paredes ",
+      "description": "Toldo 3x3\r\nEstructura de hierro reforzada\r\nLona aluminizada\r\nParedes laterales de lona ",
+      "category": "toldos",
+      "priceDetal": 120,
+      "priceMayor": 110,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6a80eb4420f70682e82271c0&v=0",
+        "/api/product-image?id=6a80eb4420f70682e82271c0&v=1",
+        "/api/product-image?id=6a80eb4420f70682e82271c0&v=2"
+      ],
+      "varieties": [
+        "Negro",
+        "Azul",
+        "Rojo"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a80ed3620f70682e82271c1",
+      "name": "Paredes para toldo 3x3 ",
+      "description": "Lonas laterales para toldo 3x3 \r\n",
+      "category": "toldos",
+      "priceDetal": 45,
+      "priceMayor": 35,
+      "minMayor": 3,
+      "images": [
+        "/api/product-image?id=6a80ed3620f70682e82271c1&v=0",
+        "/api/product-image?id=6a80ed3620f70682e82271c1&v=1",
+        "/api/product-image?id=6a80ed3620f70682e82271c1&v=2"
+      ],
+      "varieties": [
+        "Azul",
+        "Negro",
+        "Rojo"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a833ef58c19572a1d34ca72",
+      "name": "Carrito de mercado",
+      "description": "Carrito de ruedas para mercado ",
+      "category": "hogar",
+      "priceDetal": 15,
+      "priceMayor": 0,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6a833ef58c19572a1d34ca72&v=0",
+        "/api/product-image?id=6a833ef58c19572a1d34ca72&v=1",
+        "/api/product-image?id=6a833ef58c19572a1d34ca72&v=2",
+        "/api/product-image?id=6a833ef58c19572a1d34ca72&v=3"
+      ],
+      "varieties": [
+        "Azul",
+        "Rojo",
+        "Negro"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a83558aa76689295cf150a6",
+      "name": "Patines ajustable ",
+      "description": "Patines lineales juatables a 4 ruedas\r\nAbarcan la talla 35 hasta la 38\r\nLuces Led en las ruedas\r\nCuentan con bolso\r\nCasco\r\nRodilleras\r\nCoderas\r\nMuñequeras",
+      "category": "patines",
+      "priceDetal": 40,
+      "priceMayor": 32,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6a83558aa76689295cf150a6&v=0",
+        "/api/product-image?id=6a83558aa76689295cf150a6&v=1"
+      ],
+      "varieties": [
+        "Fucsia"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a835667eeedb50fb72b20cd",
+      "name": "Patines 4 ruedas ajustable",
+      "description": "Patines ajustable\r\nTalla 31/34 y 35/38\r\nIncluyen bolso \r\nCasco \r\nRodillera \r\nCodera\r\nMuñequera \r\n\r\n",
+      "category": "patines",
+      "priceDetal": 40,
+      "priceMayor": 32,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6a835667eeedb50fb72b20cd&v=0"
+      ],
+      "varieties": [
+        "Negro"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a835b92a79c7f937f89d995",
+      "name": "Patines para principiantes",
+      "description": "Talla 31/34\r\nIncluyen bolso\r\nCasco\r\nRodillera\r\nCodera\r\nMuñequera ",
+      "category": "patines",
+      "priceDetal": 65,
+      "priceMayor": 0,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6a835b92a79c7f937f89d995&v=0"
+      ],
+      "varieties": [
+        "Azul"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a837982e4065469261cc53b",
+      "name": "Bicicleta rin 26 caucho grueso CM-280",
+      "description": "Bicicleta Rin 26  caucho grueso, freno de disco,  suspensión delantera, 21 velocidades, Rines de aluminio, cuadro de acero reforzado ",
+      "category": "bicicletas",
+      "priceDetal": 180,
+      "priceMayor": 165,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6a837982e4065469261cc53b&v=0",
+        "/api/product-image?id=6a837982e4065469261cc53b&v=1",
+        "/api/product-image?id=6a837982e4065469261cc53b&v=2"
+      ],
+      "varieties": [
+        "Verde",
+        "naranja",
+        "azul"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a849251c5b1b55fa84b9216",
+      "name": "Carrito de camping plegable",
+      "description": "Carro plegable\r\nCapacidad para 80 kilogramos/80$\r\nCapacidad para 120 kilogramos /100$",
+      "category": "hogar",
+      "priceDetal": 80,
+      "priceMayor": 60,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6a849251c5b1b55fa84b9216&v=0",
+        "/api/product-image?id=6a849251c5b1b55fa84b9216&v=1",
+        "/api/product-image?id=6a849251c5b1b55fa84b9216&v=2",
+        "/api/product-image?id=6a849251c5b1b55fa84b9216&v=3",
+        "/api/product-image?id=6a849251c5b1b55fa84b9216&v=4"
+      ],
+      "varieties": [
+        "Negro"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a84a6ca45ebb6165d9b1fd2",
+      "name": "Patineta efecto túnel 8 pulgadas",
+      "description": "Efecto tunel\r\nBluetooth\r\n2 horas de batería\r\nDistancia 12 kilómetros\r\nPeso 100kg",
+      "category": "patinetas_electricas",
+      "priceDetal": 130,
+      "priceMayor": 115,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6a84a6ca45ebb6165d9b1fd2&v=0",
+        "/api/product-image?id=6a84a6ca45ebb6165d9b1fd2&v=1",
+        "/api/product-image?id=6a84a6ca45ebb6165d9b1fd2&v=2",
+        "/api/product-image?id=6a84a6ca45ebb6165d9b1fd2&v=3"
+      ],
+      "varieties": [
+        "Azul",
+        "Naranja",
+        "Blanco",
+        "Amarillo"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a84aa1e94f999f65871666c",
+      "name": "Patineta efecto túnel  6.5 pulgadas ",
+      "description": "Capacidad de carga máxima  100kg\r\nCapacidad mínima 20kg\r\nBluetooth\r\n2horas de uso\r\n8 y 12 km/h",
+      "category": "patinetas_electricas",
+      "priceDetal": 115,
+      "priceMayor": 105,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6a84aa1e94f999f65871666c&v=0",
+        "/api/product-image?id=6a84aa1e94f999f65871666c&v=1",
+        "/api/product-image?id=6a84aa1e94f999f65871666c&v=2",
+        "/api/product-image?id=6a84aa1e94f999f65871666c&v=3",
+        "/api/product-image?id=6a84aa1e94f999f65871666c&v=4",
+        "/api/product-image?id=6a84aa1e94f999f65871666c&v=5"
+      ],
+      "varieties": [
+        "Azul",
+        "Blanco",
+        "Negro",
+        "Rosada",
+        "Azul",
+        "Negro"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a91a689cdee86736fe6ac47",
+      "name": "Laterales transparente Para toldos 3x3 ",
+      "description": "Paredes transparente para toldos ",
+      "category": "toldos",
+      "priceDetal": 50,
+      "priceMayor": 40,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6a91a689cdee86736fe6ac47&v=0",
+        "/api/product-image?id=6a91a689cdee86736fe6ac47&v=1",
+        "/api/product-image?id=6a91a689cdee86736fe6ac47&v=2"
+      ],
+      "varieties": [
+        "Azul",
+        "Rojo"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a91b2112e591227618bdedd",
+      "name": "Laterales transparente para toldos 2x2 ",
+      "description": "Tamaño 2x2",
+      "category": "toldos",
+      "priceDetal": 45,
+      "priceMayor": 35,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6a91b2112e591227618bdedd&v=0",
+        "/api/product-image?id=6a91b2112e591227618bdedd&v=1"
+      ],
+      "varieties": [
+        "Rojo",
+        "Azul"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a91be1c5afe25a453b8935d",
+      "name": "Toldo 2x2 con paredes",
+      "description": "Tamaño 2x2 toldos con paredes",
+      "category": "toldos",
+      "priceDetal": 115,
+      "priceMayor": 100,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6a91be1c5afe25a453b8935d&v=0",
+        "/api/product-image?id=6a91be1c5afe25a453b8935d&v=1",
+        "/api/product-image?id=6a91be1c5afe25a453b8935d&v=2"
+      ],
+      "varieties": [
+        "Rojo",
+        "Negro",
+        "Azul"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a91bea7a1e8e9d0c1883b74",
+      "name": "Paredes para toldos 2x2 ",
+      "description": "Paredes Paa toldos 2x2 ",
+      "category": "toldos",
+      "priceDetal": 40,
+      "priceMayor": 30,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6a91bea7a1e8e9d0c1883b74&v=0",
+        "/api/product-image?id=6a91bea7a1e8e9d0c1883b74&v=1"
+      ],
+      "varieties": [
+        "Rojo",
+        "Azul"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a99da08d679d07306184061",
+      "name": "Bicicleta Rin 16",
+      "description": "Rines de aluminio\r\nCesta decorativa\r\nParrillera\r\nRueditas de apoyo en silicon ",
+      "category": "bicicletas",
+      "priceDetal": 95,
+      "priceMayor": 0,
+      "minMayor": 1,
+      "images": [
+        "/api/product-image?id=6a99da08d679d07306184061&v=0"
+      ],
+      "varieties": [
+        "Fucsia"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6a99dcc0d679d07306184062",
+      "name": "Bicicleta Rin 16",
+      "description": "Cesta decorativa\r\nGuardafango\r\nRuedas de apoyo\r\nRines de aluminio ",
+      "category": "bicicletas",
+      "priceDetal": 60,
+      "priceMayor": 55,
+      "minMayor": 3,
+      "images": [
+        "/api/product-image?id=6a99dcc0d679d07306184062&v=0"
+      ],
+      "varieties": [
+        "Morado"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6aab34ccba59f87557b6a50d",
+      "name": "Bicicleta Rin 16 niño y niña ",
+      "description": "Bicicleta con cesta para niños ",
+      "category": "bicicletas",
+      "priceDetal": 70,
+      "priceMayor": 55,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6aab34ccba59f87557b6a50d&v=0",
+        "/api/product-image?id=6aab34ccba59f87557b6a50d&v=1",
+        "/api/product-image?id=6aab34ccba59f87557b6a50d&v=2"
+      ],
+      "varieties": [
+        "Azul",
+        "Rosado",
+        "Morado"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6aad9f7e7e8cc59b248fd5cb",
+      "name": "Bicicleta kuromi ",
+      "description": "Bicicleta Rin 16 con cesta y Parrillera ",
+      "category": "bicicletas",
+      "priceDetal": 85,
+      "priceMayor": 75,
+      "minMayor": 3,
+      "images": [
+        "/api/product-image?id=6aad9f7e7e8cc59b248fd5cb&v=0"
+      ],
+      "varieties": [
+        "Estándar"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6aaea7af1b4bc50b2e8a83f5",
+      "name": "Bicicleta CM Rin 20- 383",
+      "description": "Freno de disco\r\nSuspensión\r\n7 velocidades ",
+      "category": "bicicletas",
+      "priceDetal": 120,
+      "priceMayor": 105,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6aaea7af1b4bc50b2e8a83f5&v=0",
+        "/api/product-image?id=6aaea7af1b4bc50b2e8a83f5&v=1",
+        "/api/product-image?id=6aaea7af1b4bc50b2e8a83f5&v=2",
+        "/api/product-image?id=6aaea7af1b4bc50b2e8a83f5&v=3"
+      ],
+      "varieties": [
+        "Verde",
+        "Amarillo",
+        "Rosado",
+        "Azul"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6ab7a1cb7467089938951b42",
+      "name": "Lona o techo para toldos 2x2 ",
+      "description": "Lonas o techo para toldos 2x2 reforzada y aluminizada con protección ultra violeta de alta calidad. ",
+      "category": "toldos",
+      "priceDetal": 40,
+      "priceMayor": 30,
+      "minMayor": 3,
+      "images": [
+        "/api/product-image?id=6ab7a1cb7467089938951b42&v=0",
+        "/api/product-image?id=6ab7a1cb7467089938951b42&v=1",
+        "/api/product-image?id=6ab7a1cb7467089938951b42&v=2"
+      ],
+      "varieties": [
+        "Azul",
+        "roja",
+        "negra"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6ac3db902c4635e5ba930d53",
+      "name": "Patines lineales ajustables a cuatro ruedas ",
+      "description": "Patines lineales\r\nTraen kit de protección y bolso \r\nAlumbran una sola rueda ",
+      "category": "patines",
+      "priceDetal": 40,
+      "priceMayor": 30,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6ac3db902c4635e5ba930d53&v=0",
+        "/api/product-image?id=6ac3db902c4635e5ba930d53&v=1",
+        "/api/product-image?id=6ac3db902c4635e5ba930d53&v=2",
+        "/api/product-image?id=6ac3db902c4635e5ba930d53&v=3"
+      ],
+      "varieties": [
+        "Verde",
+        "Rosado",
+        "Morado",
+        "Azul"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6ade68df3759d54e1368608d",
+      "name": "Scooter spiderman JB-926",
+      "description": "Colores disponible\r\nRojo\r\nAzul\r\nNegro ",
+      "category": "monopatines",
+      "priceDetal": 35,
+      "priceMayor": 25,
+      "minMayor": 3,
+      "images": [
+        "/api/product-image?id=6ade68df3759d54e1368608d&v=0",
+        "/api/product-image?id=6ade68df3759d54e1368608d&v=1",
+        "/api/product-image?id=6ade68df3759d54e1368608d&v=2"
+      ],
+      "varieties": [
+        "Estándar"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6ade699f91f0dc6898e63bc8",
+      "name": "Monopatín Stitch YM-907",
+      "description": "Colores\r\nAzul\r\nRojo\r\nMorado",
+      "category": "monopatines",
+      "priceDetal": 35,
+      "priceMayor": 25,
+      "minMayor": 3,
+      "images": [
+        "/api/product-image?id=6ade699f91f0dc6898e63bc8&v=0",
+        "/api/product-image?id=6ade699f91f0dc6898e63bc8&v=1",
+        "/api/product-image?id=6ade699f91f0dc6898e63bc8&v=2",
+        "/api/product-image?id=6ade699f91f0dc6898e63bc8&v=3"
+      ],
+      "varieties": [
+        "Estándar"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6ade6a0191f0dc6898e63bc9",
+      "name": "Monopatín Hello Kitty YM-909",
+      "description": "Colores\r\nRosado\r\nAzul\r\nRojo",
+      "category": "monopatines",
+      "priceDetal": 35,
+      "priceMayor": 25,
+      "minMayor": 3,
+      "images": [
+        "/api/product-image?id=6ade6a0191f0dc6898e63bc9&v=0",
+        "/api/product-image?id=6ade6a0191f0dc6898e63bc9&v=1",
+        "/api/product-image?id=6ade6a0191f0dc6898e63bc9&v=2",
+        "/api/product-image?id=6ade6a0191f0dc6898e63bc9&v=3"
+      ],
+      "varieties": [
+        "Estándar"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6ade6a7c91f0dc6898e63bca",
+      "name": "Monopatín Unicornio SW-218",
+      "description": "Colores\r\nTurquesa\r\nBlanco\r\nRosado",
+      "category": "monopatines",
+      "priceDetal": 50,
+      "priceMayor": 40,
+      "minMayor": 3,
+      "images": [
+        "/api/product-image?id=6ade6a7c91f0dc6898e63bca&v=0",
+        "/api/product-image?id=6ade6a7c91f0dc6898e63bca&v=1",
+        "/api/product-image?id=6ade6a7c91f0dc6898e63bca&v=2",
+        "/api/product-image?id=6ade6a7c91f0dc6898e63bca&v=3",
+        "/api/product-image?id=6ade6a7c91f0dc6898e63bca&v=4",
+        "/api/product-image?id=6ade6a7c91f0dc6898e63bca&v=5"
+      ],
+      "varieties": [
+        "Estándar"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6ade6b2591f0dc6898e63bcb",
+      "name": "Scooter Avioneta BDX-1288",
+      "description": "Colores\r\nRosado\r\nVerde\r\nAzul\r\nMarron",
+      "category": "monopatines",
+      "priceDetal": 55,
+      "priceMayor": 45,
+      "minMayor": 3,
+      "images": [
+        "/api/product-image?id=6ade6b2591f0dc6898e63bcb&v=0",
+        "/api/product-image?id=6ade6b2591f0dc6898e63bcb&v=1",
+        "/api/product-image?id=6ade6b2591f0dc6898e63bcb&v=2",
+        "/api/product-image?id=6ade6b2591f0dc6898e63bcb&v=3"
+      ],
+      "varieties": [
+        "Estándar"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6ade6ba591f0dc6898e63bcc",
+      "name": "Monopatín Burbujas JLBB-616P",
+      "description": "Colores\r\nVerde\r\nAzul cielo\r\nRosado ",
+      "category": "monopatines",
+      "priceDetal": 60,
+      "priceMayor": 50,
+      "minMayor": 3,
+      "images": [
+        "/api/product-image?id=6ade6ba591f0dc6898e63bcc&v=0",
+        "/api/product-image?id=6ade6ba591f0dc6898e63bcc&v=1",
+        "/api/product-image?id=6ade6ba591f0dc6898e63bcc&v=2",
+        "/api/product-image?id=6ade6ba591f0dc6898e63bcc&v=3",
+        "/api/product-image?id=6ade6ba591f0dc6898e63bcc&v=4"
+      ],
+      "varieties": [
+        "Estándar"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6ade6c2c91f0dc6898e63bcd",
+      "name": "Monopatín Grande Humo QH-590",
+      "description": "Colores\r\nVerde\r\nNegro\r\nRosado\r\nAmarillo ",
+      "category": "monopatines",
+      "priceDetal": 60,
+      "priceMayor": 50,
+      "minMayor": 3,
+      "images": [
+        "/api/product-image?id=6ade6c2c91f0dc6898e63bcd&v=0",
+        "/api/product-image?id=6ade6c2c91f0dc6898e63bcd&v=1",
+        "/api/product-image?id=6ade6c2c91f0dc6898e63bcd&v=2",
+        "/api/product-image?id=6ade6c2c91f0dc6898e63bcd&v=3",
+        "/api/product-image?id=6ade6c2c91f0dc6898e63bcd&v=4"
+      ],
+      "varieties": [
+        "Rosado",
+        "amarillo"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6ae099e498a57d618917979d",
+      "name": "Ventilador Recargable ",
+      "description": "Color blanco\r\nControl remoto\r\nLampara de luz Led\r\nRecargable",
+      "category": "hogar",
+      "priceDetal": 75,
+      "priceMayor": 65,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6ae099e498a57d618917979d&v=0",
+        "/api/product-image?id=6ae099e498a57d618917979d&v=1",
+        "/api/product-image?id=6ae099e498a57d618917979d&v=2"
+      ],
+      "varieties": [
+        "Blanco"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6ae0da14257974bfe58426b6",
+      "name": "Scooter eléctrico para mayores de 12 años",
+      "description": "Colores blanco y negro\r\nCapacidad de carga hasta 150kg\r\nVelocidad entre 20 y 30 kh\r\nLinterna\r\nAmortiguadores ",
+      "category": "scooter_el_ctrico",
+      "priceDetal": 330,
+      "priceMayor": 300,
+      "minMayor": 3,
+      "images": [
+        "/api/product-image?id=6ae0da14257974bfe58426b6&v=0",
+        "/api/product-image?id=6ae0da14257974bfe58426b6&v=1",
+        "/api/product-image?id=6ae0da14257974bfe58426b6&v=2",
+        "/api/product-image?id=6ae0da14257974bfe58426b6&v=3",
+        "/api/product-image?id=6ae0da14257974bfe58426b6&v=4"
+      ],
+      "varieties": [
+        "Estándar"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6ae0daafadc9ccc8b17e7c18",
+      "name": "Scooter k6 CM",
+      "description": "Tiene Bluetooth\r\nCarga máxima 65 kg\r\nVelocidad hasta 14k/h\r\nLuces\r\nColores\r\nNegro\r\nAzul\r\nGris\r\n",
+      "category": "scooter_el_ctrico",
+      "priceDetal": 160,
+      "priceMayor": 143,
+      "minMayor": 3,
+      "images": [
+        "/api/product-image?id=6ae0daafadc9ccc8b17e7c18&v=0",
+        "/api/product-image?id=6ae0daafadc9ccc8b17e7c18&v=1",
+        "/api/product-image?id=6ae0daafadc9ccc8b17e7c18&v=2",
+        "/api/product-image?id=6ae0daafadc9ccc8b17e7c18&v=3",
+        "/api/product-image?id=6ae0daafadc9ccc8b17e7c18&v=4",
+        "/api/product-image?id=6ae0daafadc9ccc8b17e7c18&v=5"
+      ],
+      "varieties": [
+        "Estándar"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6ae225362f9bb893c172b41f",
+      "name": "Scooter eléctrico Pequeño con Bluetooth S35-1oth S35th uetooth ",
+      "description": "Para niños hasta los 4 años\r\nVelocidad máxima 12k/h\r\nMedo máximo 50kg\r\nPeso del equipo 4kg\r\nMédicas 62 cm\r\nPlegable\r\nColores\r\nGris\r\nNegro\r\nAzul\r\nRosado ",
+      "category": "scooter_el_ctrico",
+      "priceDetal": 140,
+      "priceMayor": 130,
+      "minMayor": 3,
+      "images": [
+        "/api/product-image?id=6ae225362f9bb893c172b41f&v=0",
+        "/api/product-image?id=6ae225362f9bb893c172b41f&v=1",
+        "/api/product-image?id=6ae225362f9bb893c172b41f&v=2",
+        "/api/product-image?id=6ae225362f9bb893c172b41f&v=3",
+        "/api/product-image?id=6ae225362f9bb893c172b41f&v=4"
+      ],
+      "varieties": [
+        "Gris",
+        "Negro",
+        "Azul",
+        "Rosado"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6ae5eae1366c8ed50367bf0f",
+      "name": "Scooter sencillo para niños pequeños ",
+      "description": "Tienen luces en las ruedas \r\nRuedas de silicon \r\nSon plegables \r\n",
+      "category": "monopatines",
+      "priceDetal": 15,
+      "priceMayor": 12,
+      "minMayor": 12,
+      "images": [
+        "/api/product-image?id=6ae5eae1366c8ed50367bf0f&v=0",
+        "/api/product-image?id=6ae5eae1366c8ed50367bf0f&v=1",
+        "/api/product-image?id=6ae5eae1366c8ed50367bf0f&v=2"
+      ],
+      "varieties": [
+        "Estándar"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6ae620224489e609d635cc5e",
+      "name": "Patines de niño ",
+      "description": "Incluyen kit de tornillos para ajustar a 4 ruedas\r\nEl patin  se ajusta a 4 ruedas\r\nTrae bolso, casco, rodilleras, coderas, muñequera ",
+      "category": "patines",
+      "priceDetal": 40,
+      "priceMayor": 30,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6ae620224489e609d635cc5e&v=0",
+        "/api/product-image?id=6ae620224489e609d635cc5e&v=1",
+        "/api/product-image?id=6ae620224489e609d635cc5e&v=2",
+        "/api/product-image?id=6ae620224489e609d635cc5e&v=3"
+      ],
+      "varieties": [
+        "Estándar"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6af48bc096d36fa10e50987c",
+      "name": "Scooter grande ",
+      "description": "Incluye faro Led frontal\r\nTimbre metálico\r\nPalanca de freno\r\nFreno de disco trasero \r\nPuños metálicos\r\nNeumáticos de 8.5 pulgadas\r\nVelocidad máxima 25 a 30 km/h \r\nAutonomia 25 a 30 Km \r\n",
+      "category": "scooter_el_ctrico",
+      "priceDetal": 300,
+      "priceMayor": 270,
+      "minMayor": 3,
+      "images": [
+        "/api/product-image?id=6af48bc096d36fa10e50987c&v=0",
+        "/api/product-image?id=6af48bc096d36fa10e50987c&v=1",
+        "/api/product-image?id=6af48bc096d36fa10e50987c&v=2",
+        "/api/product-image?id=6af48bc096d36fa10e50987c&v=3",
+        "/api/product-image?id=6af48bc096d36fa10e50987c&v=4"
+      ],
+      "varieties": [
+        "Blanco",
+        "Rosado",
+        "Negro"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6af4ac5768d0a09f0e05ae31",
+      "name": "Triciclo 360 Pequeño ",
+      "description": "Medida desde el asiento hasta el pedal 70cm\r\nTiene 3 velocidades\r\nBluetooth\r\nSoporte de peso cercano  a los 70 kg\r\nEncendido con llave\r\nBotón de freno delantero ",
+      "category": "juguetes",
+      "priceDetal": 150,
+      "priceMayor": 135,
+      "minMayor": 3,
+      "images": [
+        "/api/product-image?id=6af4ac5768d0a09f0e05ae31&v=0",
+        "/api/product-image?id=6af4ac5768d0a09f0e05ae31&v=1",
+        "/api/product-image?id=6af4ac5768d0a09f0e05ae31&v=2"
+      ],
+      "varieties": [
+        "Estándar"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6af4b40061962570aee7221f",
+      "name": "Triciclo 360 Grande ",
+      "description": "Medidas desde el asiento hasta el pedal 78cm\r\nCapacidad entre 50kg y 100 kg\r\nLuz Led frontal\r\nBluetooth\r\nTiempo de uso entre 3 y 5 horas\r\nVelocidad entre 15 y 20 km/h",
+      "category": "juguetes",
+      "priceDetal": 180,
+      "priceMayor": 165,
+      "minMayor": 3,
+      "images": [
+        "/api/product-image?id=6af4b40061962570aee7221f&v=0",
+        "/api/product-image?id=6af4b40061962570aee7221f&v=1",
+        "/api/product-image?id=6af4b40061962570aee7221f&v=2",
+        "/api/product-image?id=6af4b40061962570aee7221f&v=3",
+        "/api/product-image?id=6af4b40061962570aee7221f&v=4",
+        "/api/product-image?id=6af4b40061962570aee7221f&v=5"
+      ],
+      "varieties": [
+        "Estándar"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6af5dc001a5908ab92fd51ec",
+      "name": "Rin 26 Tesla VP",
+      "description": "21 velocidades\r\nRines de aluminio\r\nSuspensión delantera\r\nFreno de disco ",
+      "category": "bicicletas",
+      "priceDetal": 160,
+      "priceMayor": 145,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6af5dc001a5908ab92fd51ec&v=0",
+        "/api/product-image?id=6af5dc001a5908ab92fd51ec&v=1",
+        "/api/product-image?id=6af5dc001a5908ab92fd51ec&v=2",
+        "/api/product-image?id=6af5dc001a5908ab92fd51ec&v=3"
+      ],
+      "varieties": [
+        "Negro",
+        "Blanco",
+        "Gris",
+        "Fucsia"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6af5e1291a5908ab92fd51ed",
+      "name": "Rin 26 Tesla clásica ",
+      "description": "21 velocidades\r\nRines de aluminio\r\nFreno de disco\r\nSuspensión delantera ",
+      "category": "bicicletas",
+      "priceDetal": 140,
+      "priceMayor": 120,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6af5e1291a5908ab92fd51ed&v=0",
+        "/api/product-image?id=6af5e1291a5908ab92fd51ed&v=1",
+        "/api/product-image?id=6af5e1291a5908ab92fd51ed&v=2",
+        "/api/product-image?id=6af5e1291a5908ab92fd51ed&v=3"
+      ],
+      "varieties": [
+        "Azul",
+        "Vino",
+        "Gris",
+        "Fucsia"
+      ],
+      "currency": "USD"
+    },
+    {
+      "_id": "6af76c850255de81bedb7317",
+      "name": "Bicicleta Tesla Sport 20 R16 ",
+      "description": "Rin 16\r\nDiseño con cesta y linterna\r\nModelo estilo montañero ",
+      "category": "bicicletas",
+      "priceDetal": 90,
+      "priceMayor": 75,
+      "minMayor": 6,
+      "images": [
+        "/api/product-image?id=6af76c850255de81bedb7317&v=0",
+        "/api/product-image?id=6af76c850255de81bedb7317&v=1",
+        "/api/product-image?id=6af76c850255de81bedb7317&v=2",
+        "/api/product-image?id=6af76c850255de81bedb7317&v=3"
+      ],
+      "varieties": [
+        "Fucsia",
+        "Azul"
+      ],
+      "currency": "USD"
+    }
+  ]
+}
