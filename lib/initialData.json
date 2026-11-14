@@ -3,7 +3,9 @@
     {
       "_id": "juguetes",
       "name": "Juguetes y Diversión",
-      "subcategories": []
+      "subcategories": [
+        "Triciclo electrico"
+      ]
     },
     {
       "_id": "hogar",
@@ -24,7 +26,9 @@
     {
       "_id": "scooter_el_ctrico",
       "name": "Scooter eléctrico",
-      "subcategories": []
+      "subcategories": [
+        "Scooter eléctrico"
+      ]
     },
     {
       "_id": "bebes",
@@ -44,7 +48,10 @@
     {
       "_id": "patines",
       "name": "Patines",
-      "subcategories": []
+      "subcategories": [
+        "Patines lineales",
+        "Patines convertibles"
+      ]
     },
     {
       "_id": "monopatines",
@@ -73,7 +80,11 @@
         "Fucsia",
         "Rojo"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "subcategory": "Rin 16",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6a7cdc492951f5f7722d742b",
@@ -91,7 +102,11 @@
         "Azul",
         "rosada"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "subcategory": "Rin 16",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6a7d0f5620ad5faff70196b3",
@@ -113,7 +128,11 @@
         "azul",
         "negro"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "subcategory": "Rin 20",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6a7d1246265522eda29ab390",
@@ -133,7 +152,14 @@
         "rojo",
         "verde"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "subcategory": "Rin 20",
+      "isOffer": true,
+      "offerPrice": 80,
+      "status": "active",
+      "pausedVarieties": [
+        "rojo"
+      ]
     },
     {
       "_id": "6a7d41c995d868700d199935",
@@ -151,7 +177,12 @@
         "Verde",
         "rojo"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": [
+        "Verde"
+      ]
     },
     {
       "_id": "6a7db76c0a295d6d1bbca666",
@@ -169,7 +200,10 @@
         "Rosado",
         "rojo"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6a7deca114b7a51f49ee1cdf",
@@ -191,7 +225,16 @@
         "verde",
         "rojo"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "subcategory": "Rin 24",
+      "isOffer": false,
+      "status": "paused",
+      "pausedVarieties": [
+        "morado",
+        "rojo",
+        "azul",
+        "verde"
+      ]
     },
     {
       "_id": "6a7e186dc0b1a6cd0881093d",
@@ -207,7 +250,10 @@
       "varieties": [
         "Verde"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "paused",
+      "pausedVarieties": []
     },
     {
       "_id": "6a7e1bc6154a887e805cbc15",
@@ -229,7 +275,11 @@
         "Gris",
         "Fucsia"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "subcategory": "Rin 20",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6a7e21d875b9f20284719b64",
@@ -251,7 +301,11 @@
         "Rosado",
         "Rojo"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "subcategory": "Rin 20",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6a7e26651481f09b15361412",
@@ -273,7 +327,16 @@
         "Naranja",
         "Amarillo"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "subcategory": "Rin 24",
+      "isOffer": false,
+      "status": "paused",
+      "pausedVarieties": [
+        "Naranja",
+        "Rojo",
+        "Verde",
+        "Amarillo"
+      ]
     },
     {
       "_id": "6a7e4bb8130813778c13d354",
@@ -291,7 +354,10 @@
         "Rojo",
         "Azul"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6a7e4d95130813778c13d355",
@@ -309,7 +375,10 @@
         "Rosado",
         "Azul"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6a7f3bd4986a0941e1cf2780",
@@ -329,7 +398,10 @@
         "Fucsia",
         "Azul"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6a7f3dfe986a0941e1cf2781",
@@ -347,7 +419,10 @@
         "Azul",
         "Gris"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6a7f63f4a5345a463fa239da",
@@ -367,7 +442,14 @@
         "Fucsia",
         "Rojo"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "paused",
+      "pausedVarieties": [
+        "Fucsia",
+        "Amarillo",
+        "Rojo"
+      ]
     },
     {
       "_id": "6a7f896eb766b59c2c194ec7",
@@ -389,7 +471,10 @@
         "Morado",
         "Verde"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6a7f8dad76869c3a299badad",
@@ -411,7 +496,10 @@
         "morado",
         "vinotinto"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6a7f926c1e11c4b0c67d09f2",
@@ -431,7 +519,10 @@
         "Azul",
         "Fucsia"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6a7fa8e15b8406cef696a10e",
@@ -451,7 +542,13 @@
         "Rosado",
         "Morado"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": [
+        "Rosado",
+        "Morado"
+      ]
     },
     {
       "_id": "6a7fae8855b20b2f0651ddd2",
@@ -468,7 +565,10 @@
       "varieties": [
         "Estandar"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "paused",
+      "pausedVarieties": []
     },
     {
       "_id": "6a8099cc77012737ef1c37b9",
@@ -490,7 +590,15 @@
         "Amarillo",
         "Naranja"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "subcategory": "Rin 26",
+      "isOffer": false,
+      "status": "paused",
+      "pausedVarieties": [
+        "Verde",
+        "Rojo",
+        "Naranja"
+      ]
     },
     {
       "_id": "6a809d7a2aa5b48414f4ea1c",
@@ -512,7 +620,15 @@
         "Rojo",
         "Azul"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "subcategory": "Rin 26",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": [
+        "Rojo",
+        "Azul",
+        "Verde"
+      ]
     },
     {
       "_id": "6a80a5cb407d1d9eaf4de2fe",
@@ -530,7 +646,10 @@
         "Azul",
         "Rojo"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6a80a7c5eaed39b5b53f5c97",
@@ -554,7 +673,11 @@
         "Amarillo",
         "Naranja"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "subcategory": "Rin 29",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6a80ca02ca8568dd37c4c98d",
@@ -574,7 +697,10 @@
         "Rojo",
         "Azul"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6a80d98549ec1d376c4863fa",
@@ -595,7 +721,10 @@
         "Azul",
         "Negro"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6a80e15a42698f2a0af5fe3b",
@@ -615,7 +744,10 @@
         "Azul",
         "militar"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6a80eb4420f70682e82271c0",
@@ -635,7 +767,12 @@
         "Azul",
         "Rojo"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": [
+        "Negro"
+      ]
     },
     {
       "_id": "6a80ed3620f70682e82271c1",
@@ -655,7 +792,10 @@
         "Negro",
         "Rojo"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6a833ef58c19572a1d34ca72",
@@ -676,7 +816,10 @@
         "Rojo",
         "Negro"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6a83558aa76689295cf150a6",
@@ -693,7 +836,10 @@
       "varieties": [
         "Fucsia"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "paused",
+      "pausedVarieties": []
     },
     {
       "_id": "6a835667eeedb50fb72b20cd",
@@ -709,7 +855,10 @@
       "varieties": [
         "Negro"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6a835b92a79c7f937f89d995",
@@ -725,7 +874,10 @@
       "varieties": [
         "Azul"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6a837982e4065469261cc53b",
@@ -745,7 +897,13 @@
         "naranja",
         "azul"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "subcategory": "Rin 26",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": [
+        "azul"
+      ]
     },
     {
       "_id": "6a849251c5b1b55fa84b9216",
@@ -765,7 +923,10 @@
       "varieties": [
         "Negro"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6a84a6ca45ebb6165d9b1fd2",
@@ -787,7 +948,10 @@
         "Blanco",
         "Amarillo"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6a84aa1e94f999f65871666c",
@@ -813,7 +977,10 @@
         "Azul",
         "Negro"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6a91a689cdee86736fe6ac47",
@@ -832,7 +999,10 @@
         "Azul",
         "Rojo"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6a91b2112e591227618bdedd",
@@ -850,7 +1020,10 @@
         "Rojo",
         "Azul"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6a91be1c5afe25a453b8935d",
@@ -870,7 +1043,10 @@
         "Negro",
         "Azul"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6a91bea7a1e8e9d0c1883b74",
@@ -888,7 +1064,10 @@
         "Rojo",
         "Azul"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6a99da08d679d07306184061",
@@ -904,7 +1083,11 @@
       "varieties": [
         "Fucsia"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "subcategory": "Rin 16",
+      "isOffer": false,
+      "status": "paused",
+      "pausedVarieties": []
     },
     {
       "_id": "6a99dcc0d679d07306184062",
@@ -920,7 +1103,11 @@
       "varieties": [
         "Morado"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "subcategory": "Rin 16",
+      "isOffer": false,
+      "status": "paused",
+      "pausedVarieties": []
     },
     {
       "_id": "6aab34ccba59f87557b6a50d",
@@ -940,7 +1127,13 @@
         "Rosado",
         "Morado"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "subcategory": "Rin 16",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": [
+        "Azul"
+      ]
     },
     {
       "_id": "6aad9f7e7e8cc59b248fd5cb",
@@ -956,7 +1149,11 @@
       "varieties": [
         "Estándar"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "subcategory": "Rin 16",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6aaea7af1b4bc50b2e8a83f5",
@@ -978,7 +1175,14 @@
         "Rosado",
         "Azul"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "subcategory": "Rin 20",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": [
+        "Rosado",
+        "Amarillo"
+      ]
     },
     {
       "_id": "6ab7a1cb7467089938951b42",
@@ -998,7 +1202,10 @@
         "roja",
         "negra"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6ac3db902c4635e5ba930d53",
@@ -1020,7 +1227,10 @@
         "Morado",
         "Azul"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6ade68df3759d54e1368608d",
@@ -1038,7 +1248,10 @@
       "varieties": [
         "Estándar"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6ade699f91f0dc6898e63bc8",
@@ -1057,7 +1270,10 @@
       "varieties": [
         "Estándar"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6ade6a0191f0dc6898e63bc9",
@@ -1076,7 +1292,10 @@
       "varieties": [
         "Estándar"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6ade6a7c91f0dc6898e63bca",
@@ -1097,7 +1316,10 @@
       "varieties": [
         "Estándar"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6ade6b2591f0dc6898e63bcb",
@@ -1116,7 +1338,10 @@
       "varieties": [
         "Estándar"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6ade6ba591f0dc6898e63bcc",
@@ -1136,7 +1361,10 @@
       "varieties": [
         "Estándar"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "paused",
+      "pausedVarieties": []
     },
     {
       "_id": "6ade6c2c91f0dc6898e63bcd",
@@ -1157,7 +1385,10 @@
         "Rosado",
         "amarillo"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6ae099e498a57d618917979d",
@@ -1175,7 +1406,10 @@
       "varieties": [
         "Blanco"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6ae0da14257974bfe58426b6",
@@ -1195,7 +1429,10 @@
       "varieties": [
         "Estándar"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6ae0daafadc9ccc8b17e7c18",
@@ -1216,7 +1453,10 @@
       "varieties": [
         "Estándar"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6ae225362f9bb893c172b41f",
@@ -1239,7 +1479,10 @@
         "Azul",
         "Rosado"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6ae5eae1366c8ed50367bf0f",
@@ -1257,7 +1500,10 @@
       "varieties": [
         "Estándar"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "paused",
+      "pausedVarieties": []
     },
     {
       "_id": "6ae620224489e609d635cc5e",
@@ -1276,7 +1522,11 @@
       "varieties": [
         "Estándar"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "subcategory": "Patines convertibles",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6af48bc096d36fa10e50987c",
@@ -1298,7 +1548,11 @@
         "Rosado",
         "Negro"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "subcategory": "Scooter eléctrico",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6af4ac5768d0a09f0e05ae31",
@@ -1316,7 +1570,11 @@
       "varieties": [
         "Estándar"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "subcategory": "Triciclo electrico",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6af4b40061962570aee7221f",
@@ -1337,7 +1595,10 @@
       "varieties": [
         "Estándar"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6af5dc001a5908ab92fd51ec",
@@ -1359,7 +1620,10 @@
         "Gris",
         "Fucsia"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6af5e1291a5908ab92fd51ed",
@@ -1381,7 +1645,11 @@
         "Gris",
         "Fucsia"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "subcategory": "Rin 26",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     },
     {
       "_id": "6af76c850255de81bedb7317",
@@ -1401,7 +1669,11 @@
         "Fucsia",
         "Azul"
       ],
-      "currency": "USD"
+      "currency": "USD",
+      "subcategory": "Rin 16",
+      "isOffer": false,
+      "status": "active",
+      "pausedVarieties": []
     }
   ]
 }
